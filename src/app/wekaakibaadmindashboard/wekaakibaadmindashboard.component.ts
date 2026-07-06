@@ -20,6 +20,7 @@ export class WekaakibaadmindashboardComponent implements OnInit {
   soldChart: any;
   search:any;
   loaded:boolean=false;
+  showprogress=false;
   constructor(public appserv: AppservicesService,private userserv: UsersService) { }
 
   ngOnInit() {
@@ -119,7 +120,7 @@ export class WekaakibaadmindashboardComponent implements OnInit {
         this.loaded=false;
         if (response.message==="success" && response.status===200) {
           this.financedata=response.data;
-          this.financedata.periodicdashboard.forEach(element => {
+          this.financedata.periodicdashboard.forEach((element:any) => {
             this.labelChart.push(element.date);
             this.ChartData.push(element.periodicbefenefits[0].totalbenefits);
           });

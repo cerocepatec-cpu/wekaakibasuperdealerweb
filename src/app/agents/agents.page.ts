@@ -34,7 +34,6 @@ export class AgentsPage implements OnInit {
   constructor(
     public appserv: AppservicesService,
     private Userserv: UsersService,
-    private notificationService: NotificationService,
     private authserv: AuthentificationService
   ) {}
 

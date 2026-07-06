@@ -1,53 +1,69 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-item lines="full">
-      <ion-buttons slot="start">
-        <ion-button fill="clear" (click)="appserv.smartBack()">
-          <ion-icon name="chevron-back-outline" size="large"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <ion-text class="font-bold-600 font-size-30" slot="start"
-        >{{pagetitle}} ({{listUsers.length}})</ion-text
-      >
-      <ion-text
-        slot="start"
-        color="primary"
-        (click)="showcheckbox=!showcheckbox; listselectedUsers=[];"
+<ion-header class="agents-header ion-no-border">
+  <ion-toolbar class="agents-toolbar">
+    <!-- BACK -->
+    <ion-buttons slot="start">
+      <ion-button fill="clear" class="back-btn" (click)="appserv.smartBack()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <!-- TITLE -->
+    <ion-title class="agents-title">
+      <span>{{ pagetitle }}</span>
+      <small>{{ listUsers.length }} utilisateur(s)</small>
+    </ion-title>
+
+    <!-- ACTIONS -->
+    <ion-buttons slot="end" class="header-actions">
+      <ion-button
+        fill="clear"
+        class="done-btn"
         *ngIf="showcheckbox"
-        >Terminer</ion-text
+        (click)="showcheckbox = !showcheckbox; listselectedUsers = [];"
       >
-      <ion-icon
+        Terminer
+      </ion-button>
+
+      <ion-button
+        fill="clear"
+        class="header-action-btn add-btn"
         *ngIf="appserv.permissionFilter('agents','add')"
-        name="add-circle-outline"
-        color="primary"
-        size="large"
-        slot="end"
         (click)="newuser()"
-      ></ion-icon>
-      <ion-icon
-        name="download-outline"
-        color="success"
+      >
+        <ion-icon name="add-circle-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button
+        fill="clear"
+        class="header-action-btn download-btn"
         (click)="importexcelfile()"
-        size="large"
-        slot="end"
-      ></ion-icon>
-    </ion-item>
-    <mat-menu #menuexport="matMenu">
-      <button mat-menu-item>
-        <ion-text class="font-size-12">Exporter en Excel</ion-text>
-      </button>
-      <button mat-menu-item>
-        <ion-text class="font-size-12">Exporter en PDF</ion-text>
-      </button>
-    </mat-menu>
+      >
+        <ion-icon name="download-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
+
+  <mat-menu #menuexport="matMenu">
+    <button mat-menu-item>
+      <ion-text class="font-size-12">Exporter en Excel</ion-text>
+    </button>
+    <button mat-menu-item>
+      <ion-text class="font-size-12">Exporter en PDF</ion-text>
+    </button>
+  </mat-menu>
+
   <ion-progress-bar
     type="indeterminate"
     mode="ios"
     *ngIf="showprogress"
-  ></ion-progress-bar>
+    class="scan-progress-bar"
+  >
+  </ion-progress-bar>
 </ion-header>
-<ion-content class="contentbody" fullscreen>
+
+<ion-content class="contentbody agents-viewport" fullscreen>
+  <div class="viewport-glow"></div>
+
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content
       pullingIcon="chevron-down-circle-outline"
@@ -58,148 +74,197 @@
     </ion-refresher-content>
   </ion-refresher>
 
-  <ion-item lines="none" class="contentbody margin-left-moins-15">
-    <ion-searchbar
-      class="font-size-11"
-      [(ngModel)]="keyword"
-      mode="ios"
-      placeholder="Recherche"
-      #defaultinput
-      (ionInput)="handlesearchchange($event)"
-    ></ion-searchbar>
-    <ion-icon
-      name="filter-outline"
-      slot="end"
-      [matMenuTriggerFor]="filter_menu"
-      color="primary"
-    ></ion-icon>
-    <mat-menu #filter_menu="matMenu">
-      <button mat-menu-item (click)="deletefilter()">
-        <ion-text class="font-size-11" color="danger"
-          >Annuler le filtre</ion-text
-        >
-      </button>
-      <button mat-menu-item (click)="filterbytype('enabled')">
-        <ion-text class="font-size-11">Activés</ion-text>
-      </button>
-      <button mat-menu-item (click)="filterbytype('disabled')">
-        <ion-text class="font-size-11">Non activés</ion-text>
-      </button>
-    </mat-menu>
-  </ion-item>
+  <!-- SEARCH PANEL -->
+  <section class="agents-search-panel">
+    <div class="panel-heading">
+      <div class="command-label">
+        <ion-icon name="people-outline"></ion-icon>
+        <span>Gestion des utilisateurs</span>
+      </div>
 
-  <ion-chip
-    class="font-size-12"
-    (click)="getlistcollectors()"
-    [color]="pagetitle==='Collecteurs'?'primary':''"
-    >Collecteurs</ion-chip
-  >
-  <ion-chip
-    class="font-size-12"
-    (click)=" getlistSuperdealer()"
-    [color]="pagetitle==='Superdealer'?'primary':''"
-    >Super dealer </ion-chip
-  >
-  <ion-chip
-    class="font-size-12"
-    (click)=" getlist()"
-    [color]="pagetitle==='Membres'?'primary':''"
-    >Membres</ion-chip
-  >
-  <ion-chip
-    class="font-size-12"
-    routerLink="/uzisha/groups"
-    [color]="pagetitle==='Groupes'?'primary':''"
-    >Groupes</ion-chip
-  >
-  <hr class="hr" />
-  <ion-card
-    class="bd-radius-10 ion-padding"
-    color="warning"
-    *ngIf="listUsers.length===0"
-  >
-    <ion-text class="font-size-13">Aucun agent disponible</ion-text>
-  </ion-card>
+      <ion-badge class="count-badge"> {{ listUsers.length }} </ion-badge>
+    </div>
 
-  <ion-item
-    class="default-list-item contentbody"
-    lines="inset"
-    *ngFor="let user of listUsers"
-    detail="true"
-  >
-    <ion-checkbox
-      slot="start"
-      *ngIf="showcheckbox"
-      mode="ios"
-      size="small"
-    ></ion-checkbox>
-    <ion-avatar slot="start">
-      <ion-img
-        [src]="user.avatar?appserv.imgUrl+user.avatar:''"
-        *ngIf="user.avatar"
-      ></ion-img>
-      <ion-text class="font-bold-600 font-size-20" *ngIf="!user.avatar"
-        >{{(user.name?user.name:user.user_name) | uppercase | slice:0:1
-        }}</ion-text
+    <div class="search-row">
+      <ion-searchbar
+        class="agent-searchbar"
+        [(ngModel)]="keyword"
+        mode="ios"
+        placeholder="Recherche"
+        #defaultinput
+        (ionInput)="handlesearchchange($event)"
       >
-    </ion-avatar>
-    <ion-label (click)="detailuser(user)">
-      <p class="item-label-title">
-        <ion-text>{{(user.name?user.name:user.user_name)|titlecase }}</ion-text>
-      </p>
-      <p class="secondpara">
-        <ion-text>{{user.user_name?user.user_name:user.note}}</ion-text>
-      </p>
-      <p *ngIf="user.collector" class="secondpara font-size-14">
-        % Collection : &nbsp;<ion-text
-          class="font-bold-600 font-size-14"
-          color="dark"
-          >{{user.collection_percentage}}%</ion-text
-        >
-      </p>
-    </ion-label>
-    <ion-chip class="font-size-12 smalldevicehidden"
-      >{{user.uuid?user.uuid:user.description}}</ion-chip
-    >
+      </ion-searchbar>
+
+      <ion-button
+        fill="clear"
+        mode="ios"
+        class="filter-btn"
+        [matMenuTriggerFor]="filter_menu"
+      >
+        <ion-icon name="filter-outline"></ion-icon>
+      </ion-button>
+
+      <mat-menu #filter_menu="matMenu">
+        <button mat-menu-item (click)="deletefilter()">
+          <ion-text class="font-size-11" color="danger">
+            Annuler le filtre
+          </ion-text>
+        </button>
+
+        <button mat-menu-item (click)="filterbytype('enabled')">
+          <ion-text class="font-size-11">Activés</ion-text>
+        </button>
+
+        <button mat-menu-item (click)="filterbytype('disabled')">
+          <ion-text class="font-size-11">Non activés</ion-text>
+        </button>
+      </mat-menu>
+    </div>
+
+    <p class="search-hint">
+      Recherchez par nom, identifiant, note ou nom d’utilisateur.
+    </p>
+  </section>
+
+  <!-- FILTER CHIPS -->
+  <section class="type-tabs">
     <ion-chip
-      color="warning"
-      slot="end"
-      *ngIf="user.user_type==='super_admin'"
-      class="smalldevicehidden"
-      >S.A</ion-chip
+      class="type-chip"
+      (click)="getlistcollectors()"
+      [class.active-chip]="pagetitle === 'Collecteurs'"
     >
-    <ion-spinner *ngIf="user.loading"></ion-spinner>
-    <ion-icon
-      name="radio-button-on-outline"
-      *ngIf="!user.loading"
-      [color]="user.status==='enabled'?'success':'danger'"
-      slot="end"
-      size="small"
-      [matMenuTriggerFor]="menuActivation"
-    ></ion-icon>
-    <mat-menu #menuActivation="matMenu">
-      <button
-        mat-menu-item
-        (click)="editAgentStatus(user,'enabled')"
-        *ngIf="appserv.permissionFilter('agents', 'disable') && user.status==='disabled'"
-      >
-        <ion-text class="font-size-11">Activer</ion-text>
-      </button>
-      <button
-        mat-menu-item
-        (click)="editAgentStatus(user,'disabled')"
-        *ngIf="appserv.permissionFilter('agents', 'disable') && user.status==='enabled'"
-      >
-        <ion-text class="font-size-11" color="danger">Désactiver</ion-text>
-      </button>
-      <button
-        mat-menu-item
-        (click)="setcollectionpercentage(user)"
-        *ngIf="appserv.permissionFilter('agents', 'edit')  && user.collector"
-      >
-        <ion-text class="font-size-11" color="primary">% Collection</ion-text>
-      </button>
-    </mat-menu>
-  </ion-item>
-</ion-content>
+      <ion-icon name="briefcase-outline"></ion-icon>
+      <ion-label>Collecteurs</ion-label>
+    </ion-chip>
 
+    <ion-chip
+      class="type-chip"
+      (click)="getlist()"
+      [class.active-chip]="pagetitle === 'Membres'"
+    >
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Membres</ion-label>
+    </ion-chip>
+  </section>
+
+  <!-- EMPTY STATE -->
+  <section class="users-feed">
+    <div class="empty-card" *ngIf="listUsers.length === 0">
+      <div class="empty-icon">
+        <ion-icon name="people-circle-outline"></ion-icon>
+      </div>
+
+      <h3>Aucun agent disponible</h3>
+      <p>Aucun utilisateur ne correspond aux critères actuels.</p>
+    </div>
+
+    <!-- LIST -->
+    <div class="users-list" *ngIf="listUsers.length > 0">
+      <ion-item
+        class="user-card"
+        lines="none"
+        *ngFor="let user of listUsers"
+        detail="true"
+      >
+        <ion-checkbox
+          slot="start"
+          class="select-checkbox"
+          *ngIf="showcheckbox"
+          mode="ios"
+          size="small"
+        >
+        </ion-checkbox>
+
+        <ion-avatar slot="start" class="member-avatar">
+          <ion-img
+            [src]="user.avatar ? appserv.imgUrl + user.avatar : ''"
+            *ngIf="user.avatar"
+          >
+          </ion-img>
+
+          <div class="avatar-fallback" *ngIf="!user.avatar">
+            {{ (user.name ? user.name : user.user_name) | uppercase | slice:0:1
+            }}
+          </div>
+        </ion-avatar>
+
+        <ion-label class="member-info" (click)="detailuser(user)">
+          <h3 class="member-name">
+            {{ (user.name ? user.name : user.user_name) | titlecase }}
+          </h3>
+
+          <p class="member-username">
+            {{ user.user_name ? user.user_name : user.note }}
+          </p>
+
+          <p class="member-uuid">
+            {{ user.uuid ? user.uuid : user.description }}
+          </p>
+
+          <p *ngIf="user.collector" class="collector-percentage">
+            % Collection :
+            <strong>{{ user.collection_percentage }}%</strong>
+          </p>
+
+          <div class="member-tags">
+            <ion-chip
+              color="warning"
+              *ngIf="user.user_type === 'super_admin'"
+              class="role-chip"
+            >
+              S.A
+            </ion-chip>
+          </div>
+        </ion-label>
+
+        <ion-spinner slot="end" class="status-spinner" *ngIf="user.loading">
+        </ion-spinner>
+
+        <ion-button
+          slot="end"
+          fill="clear"
+          class="status-btn"
+          *ngIf="!user.loading"
+          [matMenuTriggerFor]="menuActivation"
+        >
+          <ion-icon
+            name="radio-button-on-outline"
+            [color]="user.status === 'enabled' ? 'success' : 'danger'"
+          >
+          </ion-icon>
+        </ion-button>
+
+        <mat-menu #menuActivation="matMenu">
+          <button
+            mat-menu-item
+            (click)="editAgentStatus(user,'enabled')"
+            *ngIf="appserv.permissionFilter('agents', 'disable') && user.status === 'disabled'"
+          >
+            <ion-text class="font-size-11">Activer</ion-text>
+          </button>
+
+          <button
+            mat-menu-item
+            (click)="editAgentStatus(user,'disabled')"
+            *ngIf="appserv.permissionFilter('agents', 'disable') && user.status === 'enabled'"
+          >
+            <ion-text class="font-size-11" color="danger">
+              Désactiver
+            </ion-text>
+          </button>
+
+          <button
+            mat-menu-item
+            (click)="setcollectionpercentage(user)"
+            *ngIf="appserv.permissionFilter('agents', 'edit') && user.collector"
+          >
+            <ion-text class="font-size-11" color="primary">
+              % Collection
+            </ion-text>
+          </button>
+        </mat-menu>
+      </ion-item>
+    </div>
+  </section>
+</ion-content>

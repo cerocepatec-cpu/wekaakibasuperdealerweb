@@ -45,7 +45,7 @@ const uzishaRoutes: Route[] = [
         path: 'generalreport',
         component: RapportgeneralComponent,
         canActivate: [PermissionGuard],
-        data: { permission: { module: 'transactions', action: 'view' } },
+        //data: { permission: { module: 'transactions', action: 'view' } },
       },
       {
         path: 'welcome',
@@ -69,7 +69,7 @@ const uzishaRoutes: Route[] = [
         loadChildren: () =>
           import('../../agents/agents.module').then((m) => m.AgentsPageModule),
         canActivate: [PermissionGuard],
-        data: { permission: { module: 'agents', action: 'view' } },
+        //data: { permission: { module: 'agents', action: 'view' } },
       },
       {
         path: 'firstentries',
@@ -118,7 +118,7 @@ const uzishaRoutes: Route[] = [
             (m) => m.FinancesPageModule
           ),
         canActivate: [PermissionGuard],
-        data: { permission: { module: 'rapports', action: 'finances' } },
+        //data: { permission: { module: 'rapports', action: 'finances' } },
       },
       {
         path: 'providers',
@@ -158,7 +158,7 @@ const uzishaRoutes: Route[] = [
             (m) => m.ReportsPageModule
           ),
         canActivate: [PermissionGuard],
-        data: { permission: { module: 'rapports', action: 'view' } },
+        //data: { permission: { module: 'rapports', action: 'view' } },
       },
       {
         path: 'tabs',
@@ -262,7 +262,7 @@ const uzishaRoutes: Route[] = [
         path: 'expenditures',
         component: ExpendituresComponent,
         canActivate: [PermissionGuard],
-        data: { permission: { module: 'depenses', action: 'view' } },
+        //data: { permission: { module: 'depenses', action: 'view' } },
       },
       {
         path: 'tubs',
@@ -274,7 +274,7 @@ const uzishaRoutes: Route[] = [
         path: 'transactions',
         component: TransactionsComponent,
         canActivate: [PermissionGuard],
-        data: { permission: { module: 'transactions', action: 'view' } },
+        //data: { permission: { module: 'transactions', action: 'view' } },
       },
       {
         path: 'membersactivation',
@@ -310,7 +310,7 @@ const uzishaRoutes: Route[] = [
         path: 'wekaadmindashboard',
         component: WekaakibaadmindashboardComponent,
         canActivate: [PermissionGuard],
-        data: { permission: { module: 'rapports', action: 'finances' } },
+        //data: { permission: { module: 'rapports', action: 'finances' } },
       },
       {
         path: 'departements',

@@ -1,165 +1,854 @@
-/* --- COULEURS BASE (Variables suggérées) --- */
-:root {
-  --ion-color-base-dark: #000a12;     /* Noir très profond */
-  --ion-color-surface-dark: #0f1c2c;  /* Bleu-noir pour les surfaces */
-  --ion-color-holo-blue: #00e5ff;     /* Bleu Néon/Cyan pour l'accentuation */
-  --ion-color-holo-green: #39ff14;    /* Vert Néon pour les données critiques/succès */
-  --ion-color-medium-light: #5f748c;  /* Gris/Bleu pour les textes secondaires */
-  --ion-color-text-main: #e6f7ff;     /* Blanc cassé très clair pour le texte principal */
+/* =========================================================
+   PAGE RECHERCHE TRANSACTION MEMBRE
+   Style fintech professionnel
+   Light theme par défaut + Dark theme automatique
+   Compatible Ionic / Angular
+   ========================================================= */
+
+/* =========================================================
+   VARIABLES THEME
+   ========================================================= */
+
+:host {
+  /* LIGHT THEME PAR DÉFAUT */
+  --system-base: #f5f7fb;
+  --system-surface: #ffffff;
+  --system-surface-soft: #f8fafc;
+  --system-border: rgba(15, 23, 42, 0.1);
+
+  --system-blue: #0284c7;
+  --system-blue-soft: rgba(2, 132, 199, 0.1);
+
+  --system-green: #16a34a;
+  --system-green-soft: rgba(22, 163, 74, 0.1);
+
+  --system-amber: #f59e0b;
+  --system-amber-soft: rgba(245, 158, 11, 0.16);
+
+  --system-text: #0f172a;
+  --system-muted: #64748b;
+  --system-danger: #dc2626;
+
+  --system-header-bg: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #f8fafc 55%,
+    #eef6fb 100%
+  );
+
+  --system-page-bg:
+    radial-gradient(circle at 20% 0%, rgba(2, 132, 199, 0.08), transparent 32%),
+    radial-gradient(circle at 90% 12%, rgba(22, 163, 74, 0.05), transparent 30%),
+    linear-gradient(180deg, #f5f7fb 0%, #eef4f8 55%, #f8fafc 100%);
+
+  --system-panel-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(248, 250, 252, 0.96)
+  );
+
+  --system-card-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(248, 250, 252, 0.96)
+  );
+
+  --system-input-bg: rgba(255, 255, 255, 0.96);
+
+  display: block;
+  height: 100%;
 }
 
-/* Appliquer les variables au contenu Ionic */
-.system-viewport {
-  --ion-background-color: var(--ion-color-base-dark);
-  color: var(--ion-color-text-main);
-  
-  /* Effet subtil de 'scan line' (ligne de balayage) pour le grain rétro-futuriste */
-  background-image: linear-gradient(rgba(15, 28, 44, 0.4) 1px, transparent 1px);
-  background-size: 100% 4px; 
+/* DARK THEME AUTOMATIQUE */
+:host-context(.dark),
+:host-context(html.dark),
+:host-context(body.dark),
+:host-context(.ion-palette-dark),
+:host-context(body.ion-palette-dark) {
+  --system-base: #07111f;
+  --system-surface: #0f1c2c;
+  --system-surface-soft: #14263a;
+  --system-border: rgba(148, 163, 184, 0.22);
+
+  --system-blue: #00d9ff;
+  --system-blue-soft: rgba(0, 217, 255, 0.12);
+
+  --system-green: #35f47a;
+  --system-green-soft: rgba(53, 244, 122, 0.12);
+
+  --system-amber: #ffaa00;
+  --system-amber-soft: rgba(255, 170, 0, 0.16);
+
+  --system-text: #e6f7ff;
+  --system-muted: #8fa8bd;
+  --system-danger: #ff5573;
+
+  --system-header-bg: linear-gradient(
+    135deg,
+    #07111f 0%,
+    #0d1b2f 50%,
+    #07111f 100%
+  );
+
+  --system-page-bg:
+    radial-gradient(circle at 20% 0%, rgba(0, 217, 255, 0.14), transparent 32%),
+    radial-gradient(circle at 90% 12%, rgba(53, 244, 122, 0.08), transparent 30%),
+    linear-gradient(180deg, #07111f 0%, #091827 55%, #07111f 100%);
+
+  --system-panel-bg: linear-gradient(
+    135deg,
+    rgba(15, 28, 44, 0.94),
+    rgba(20, 38, 58, 0.9)
+  );
+
+  --system-card-bg: linear-gradient(
+    135deg,
+    rgba(15, 28, 44, 0.96),
+    rgba(20, 38, 58, 0.9)
+  );
+
+  --system-input-bg: rgba(7, 17, 31, 0.88);
 }
 
-/* --- EN-TÊTE ET TITRE --- */
+/* =========================================================
+   BASE
+   ========================================================= */
 
-.holo-tech-header {
-  background-color: var(--ion-color-base-dark);
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3); /* Ombre de 'lueur' */
+* {
+  box-sizing: border-box;
 }
 
-.critical-system-title {
-  font-family: 'Consolas', 'Roboto Mono', monospace;
-  letter-spacing: 4px;
-  color: var(--ion-color-holo-blue);
-  text-shadow: 0 0 5px var(--ion-color-holo-blue); /* Effet de tube cathodique/lueur */
+ion-content {
+  --background: var(--system-base);
 }
 
-.scan-progress-bar {
-  --background: var(--ion-color-surface-dark);
-  --progress-background: var(--ion-color-holo-green);
-  /* Animation de balayage ou clignotement pour le mode 'indeterminate' (à faire en keyframes) */
+ion-button {
+  text-transform: none;
 }
 
-
-/* --- ZONE DE COMMANDE (Searchbar & Bouton) --- */
-
-.command-prompt {
-  --background: var(--ion-color-surface-dark);
-  --color: var(--ion-color-text-main);
-  --placeholder-color: var(--ion-color-medium-light);
-  border: 1px solid var(--ion-color-holo-blue);
-  border-radius: 2px;
-  box-shadow: 0 0 5px rgba(0, 229, 255, 0.5); /* Lueur d'interface */
+ion-icon {
+  pointer-events: none;
 }
 
-.execute-lookup {
-  /* Bouton d'action tactique - Utilisation du 'warning' (ambre/orange) pour l'exécution */
-  --background: #ffaa00;
-  --color: var(--ion-color-base-dark);
-  font-weight: 700;
-  letter-spacing: 1px;
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.lookup-header {
+  background: var(--system-header-bg);
+  border-bottom: 1px solid var(--system-border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  z-index: 20;
 }
 
-/* --- CARTES DE DONNÉES (Items) --- */
+.lookup-toolbar {
+  --background: transparent;
+  --color: var(--system-text);
+  --min-height: 58px;
+  padding-inline: 4px;
+}
 
-.data-card {
-  --background: var(--ion-color-surface-dark);
-  color: var(--ion-color-text-main);
-  border: 1px solid var(--ion-color-medium-light);
-  border-radius: 4px;
-  transition: all 0.2s;
-  
-  &:hover {
-    --background: #1a2a3e; /* Léger changement pour le focus */
-    border-color: var(--ion-color-holo-blue);
-    box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
-    color: white!important; /* Lueur intense au survol */
-    .border-rounded-avatar{
-      color: white!important;
-    }
+.back-btn {
+  --color: var(--system-blue);
+  --background: transparent;
+  --background-hover: var(--system-blue-soft);
+  --background-activated: var(--system-blue-soft);
+  --border-radius: 12px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+
+  ion-icon {
+    font-size: 25px;
+    filter: drop-shadow(0 0 5px rgba(2, 132, 199, 0.28));
   }
 }
 
-.critical-action-card {
-    border: 1px solid var(--ion-color-holo-green);
-    box-shadow: 0 0 10px rgba(57, 255, 20, 0.4); 
+.lookup-title {
+  text-align: center;
+  padding-inline: 0;
+  color: var(--system-text);
+
+  span {
+    display: block;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: var(--system-text);
+  }
+
+  small {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    color: var(--system-blue);
+    text-transform: uppercase;
+  }
 }
 
-
-/* --- AVATAR ET INITIALES --- */
-
-.status-indicator-success {
-  background: rgba(57, 255, 20, 0.15); 
-  color: var(--ion-color-holo-green);
-  border: 1px solid var(--ion-color-holo-green);
+.scan-progress-bar {
+  height: 3px;
+  --background: rgba(148, 163, 184, 0.2);
+  --progress-background: linear-gradient(
+    90deg,
+    var(--system-green),
+    var(--system-blue)
+  );
 }
 
-.status-indicator-neutral {
-  background: rgba(0, 229, 255, 0.15);
-  color: var(--ion-color-holo-blue);
-  border: 1px solid var(--ion-color-holo-blue);
+/* =========================================================
+   PAGE BACKGROUND
+   ========================================================= */
+
+.system-viewport {
+  --background: var(--system-base);
+  color: var(--system-text);
+  position: relative;
 }
 
-.initial-text-mono {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 22px !important;
+.system-viewport::part(background) {
+  background: var(--system-page-bg);
+}
+
+.viewport-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+  background-image:
+    linear-gradient(rgba(2, 132, 199, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(2, 132, 199, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+  z-index: 0;
+}
+
+:host-context(.dark) .viewport-glow,
+:host-context(html.dark) .viewport-glow,
+:host-context(body.dark) .viewport-glow,
+:host-context(.ion-palette-dark) .viewport-glow,
+:host-context(body.ion-palette-dark) .viewport-glow {
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+}
+
+/* =========================================================
+   SEARCH / COMMAND PANEL
+   ========================================================= */
+
+.lookup-command-panel {
+  position: relative;
+  z-index: 1;
+  margin: 16px;
+  padding: 16px;
+  border-radius: 22px;
+  background: var(--system-panel-bg);
+  border: 1px solid var(--system-border);
+  box-shadow:
+    0 14px 35px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.command-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--system-blue);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+
+  ion-icon {
+    font-size: 18px;
+    filter: drop-shadow(0 0 5px rgba(2, 132, 199, 0.25));
+  }
+}
+
+.command-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.command-prompt {
+  flex: 1;
+  padding: 0;
+  min-height: 46px;
+
+  --background: var(--system-input-bg);
+  --color: var(--system-text);
+  --placeholder-color: var(--system-muted);
+  --icon-color: var(--system-blue);
+  --clear-button-color: var(--system-muted);
+  --border-radius: 14px;
+  --box-shadow: inset 0 0 0 1px var(--system-border);
+}
+
+.command-prompt.searchbar-has-focus {
+  --box-shadow:
+    inset 0 0 0 1px rgba(2, 132, 199, 0.45),
+    0 0 0 4px rgba(2, 132, 199, 0.08);
+}
+
+.execute-lookup {
+  height: 46px;
+  min-width: 86px;
+  margin: 0;
+
+  --background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  --background-activated: #d97706;
+  --background-hover: #fbbf24;
+  --color: #111827;
+  --border-radius: 14px;
+  --box-shadow: 0 8px 18px rgba(245, 158, 11, 0.24);
+
+  font-size: 13px;
   font-weight: 900;
+  letter-spacing: 0.6px;
+
+  ion-icon {
+    font-size: 16px;
+  }
+
+  &[disabled] {
+    opacity: 0.45;
+    --box-shadow: none;
+  }
 }
 
-/* --- ZONE DE RÉSULTATS ET TYPOGRAPHIE --- */
+.command-hint {
+  margin: 10px 2px 0;
+  color: var(--system-muted);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   RESULTS HEADER
+   ========================================================= */
 
 .data-feed {
-    padding: 0 !important;
-    background: none;
+  position: relative;
+  z-index: 1;
+  padding: 0 16px 24px;
+}
+
+.result-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .log-entry {
-  /* Texte de log système avec crochets et couleur néon */
-  font-family: 'Consolas', monospace;
-  color: var(--ion-color-holo-green);
-  font-size: 11px;
+  margin: 0 0 3px;
+  font-family: 'Consolas', 'Roboto Mono', monospace;
+  color: var(--system-green);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.result-toolbar h2 {
+  margin: 0;
+  color: var(--system-text);
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+}
+
+.result-badge {
+  --background: var(--system-green-soft);
+  --color: var(--system-green);
+  border: 1px solid rgba(22, 163, 74, 0.35);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 900;
   letter-spacing: 1px;
+}
+
+:host-context(.dark) .result-badge,
+:host-context(html.dark) .result-badge,
+:host-context(body.dark) .result-badge,
+:host-context(.ion-palette-dark) .result-badge,
+:host-context(body.ion-palette-dark) .result-badge {
+  border-color: rgba(53, 244, 122, 0.45);
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-state {
+  margin-top: 26px;
+  padding: 30px 18px;
+  border-radius: 22px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px dashed rgba(100, 116, 139, 0.28);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+}
+
+:host-context(.dark) .empty-state,
+:host-context(html.dark) .empty-state,
+:host-context(body.dark) .empty-state,
+:host-context(.ion-palette-dark) .empty-state,
+:host-context(body.ion-palette-dark) .empty-state {
+  background: rgba(15, 28, 44, 0.72);
+  border-color: rgba(143, 168, 189, 0.34);
+  box-shadow: none;
+}
+
+.empty-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--system-blue-soft);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+
+  ion-icon {
+    color: var(--system-blue);
+    font-size: 34px;
+  }
+}
+
+.empty-state h3 {
+  margin: 0;
+  color: var(--system-text);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.empty-state p {
+  margin: 6px auto 0;
+  max-width: 280px;
+  color: var(--system-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   USERS LIST
+   ========================================================= */
+
+.users-list {
+  display: grid;
+  gap: 10px;
+}
+
+.data-card {
+  --background: var(--system-surface);
+  --color: var(--system-text);
+  --border-radius: 18px;
+  --padding-start: 12px;
+  --inner-padding-end: 10px;
+  --min-height: 76px;
+
+  border: 1px solid var(--system-border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.data-card::part(native) {
+  background: var(--system-card-bg);
+  border-radius: 18px;
+}
+
+:host-context(.dark) .data-card,
+:host-context(html.dark) .data-card,
+:host-context(body.dark) .data-card,
+:host-context(.ion-palette-dark) .data-card,
+:host-context(body.ion-palette-dark) .data-card {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+.member-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.05);
+}
+
+.member-avatar ion-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(circle at 30% 20%, rgba(22, 163, 74, 0.22), transparent 34%),
+    rgba(2, 132, 199, 0.1);
+
+  color: var(--system-green);
+  font-family: 'Consolas', 'Roboto Mono', monospace;
+  font-size: 21px;
+  font-weight: 900;
+  border-radius: 16px;
+}
+
+:host-context(.dark) .avatar-fallback,
+:host-context(html.dark) .avatar-fallback,
+:host-context(body.dark) .avatar-fallback,
+:host-context(.ion-palette-dark) .avatar-fallback,
+:host-context(body.ion-palette-dark) .avatar-fallback {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(53, 244, 122, 0.24), transparent 34%),
+    rgba(0, 217, 255, 0.12);
+}
+
+/* =========================================================
+   MEMBER TEXT
+   ========================================================= */
+
+.member-info {
+  min-width: 0;
+  padding-top: 9px;
+  padding-bottom: 9px;
 }
 
 .user-id-label {
-  /* Nom d'utilisateur en couleur d'accentuation */
-  color: var(--ion-color-text-main);
-  font-weight: 600;
-  letter-spacing: 1px;
+  margin: 0 0 5px;
+  color: var(--system-text);
+  font-size: 14px;
+  font-weight: 850;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .data-uuid-label {
-  /* ID/UUID en police mono-espacée et couleur secondaire */
-  color: var(--ion-color-medium-light);
-  font-family: 'Roboto Mono', monospace;
-  font-size: 10px !important;
+  margin: 0;
+  color: var(--system-muted);
+  font-family: 'Consolas', 'Roboto Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.balance-block-grid {
+.action-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 6px;
+
+  ion-icon {
+    color: rgba(2, 132, 199, 0.72);
+    font-size: 23px;
+    transition:
+      transform 180ms ease,
+      color 180ms ease;
+  }
+}
+
+:host-context(.dark) .action-indicator ion-icon,
+:host-context(html.dark) .action-indicator ion-icon,
+:host-context(body.dark) .action-indicator ion-icon,
+:host-context(.ion-palette-dark) .action-indicator ion-icon,
+:host-context(body.ion-palette-dark) .action-indicator ion-icon {
+  color: rgba(0, 217, 255, 0.72);
+}
+
+/* =========================================================
+   INTERACTIONS
+   ========================================================= */
+
+@media (hover: hover) {
+  .data-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(2, 132, 199, 0.45);
+    box-shadow:
+      0 16px 36px rgba(15, 23, 42, 0.12),
+      0 0 18px rgba(2, 132, 199, 0.1);
+  }
+
+  .data-card:hover .action-indicator ion-icon {
+    color: var(--system-green);
+    transform: translateX(3px);
+  }
+
+  .execute-lookup:hover {
+    filter: brightness(1.04);
+  }
+
+  :host-context(.dark) .data-card:hover,
+  :host-context(html.dark) .data-card:hover,
+  :host-context(body.dark) .data-card:hover,
+  :host-context(.ion-palette-dark) .data-card:hover,
+  :host-context(body.ion-palette-dark) .data-card:hover {
+    border-color: rgba(0, 217, 255, 0.58);
+    box-shadow:
+      0 16px 36px rgba(0, 0, 0, 0.28),
+      0 0 18px rgba(0, 217, 255, 0.18);
+  }
+}
+
+.data-card:active {
+  transform: scale(0.985);
+  border-color: rgba(22, 163, 74, 0.55);
+}
+
+/* =========================================================
+   SKELETON LOADER ADAPTATION
+   ========================================================= */
+
+app-skeleton-loader {
+  display: block;
   margin-top: 10px;
-  padding-top: 5px;
-  /* Effet de grille/séparation des données */
-  border-top: 1px dashed var(--ion-color-medium-light); 
-  background-color: rgba(0, 0, 0, 0.1);
-  padding-left: 5px;
 }
 
-.balance-title-mono {
-  color: var(--ion-color-holo-blue);
-  font-size: 11px !important;
-  font-family: 'Roboto Mono', monospace;
+/* =========================================================
+   TABLETTE / DESKTOP
+   ========================================================= */
+
+@media (min-width: 768px) {
+  .lookup-command-panel,
+  .data-feed {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .users-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .data-card {
+    --min-height: 82px;
+  }
 }
 
-.balance-currency-code {
-  /* Code de devise en couleur de donnée critique */
-  color: var(--ion-color-holo-green);
-  font-weight: 700;
-  font-family: 'Consolas', monospace;
-  padding-right: 5px;
+@media (min-width: 1180px) {
+  .lookup-command-panel,
+  .data-feed {
+    max-width: 980px;
+  }
+
+  .users-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
-.balance-value-hightech {
-  /* Valeur numérique en couleur principale */
-  color: var(--ion-color-text-main);
-  font-weight: 700;
-  font-size: 13px;
-  font-family: 'Consolas', monospace;
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .lookup-toolbar {
+    --min-height: 54px;
+  }
+
+  .back-btn {
+    --padding-start: 6px;
+    --padding-end: 6px;
+
+    ion-icon {
+      font-size: 24px;
+    }
+  }
+
+  .lookup-title span {
+    font-size: 14px;
+    letter-spacing: 2.4px;
+  }
+
+  .lookup-title small {
+    font-size: 9.5px;
+  }
+
+  .lookup-command-panel {
+    margin: 12px;
+    padding: 13px;
+    border-radius: 18px;
+  }
+
+  .command-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .command-row {
+    gap: 8px;
+  }
+
+  .command-prompt {
+    min-height: 44px;
+  }
+
+  .execute-lookup {
+    min-width: 66px;
+    height: 44px;
+    --border-radius: 13px;
+
+    ion-icon {
+      display: none;
+    }
+  }
+
+  .command-hint {
+    font-size: 11px;
+  }
+
+  .data-feed {
+    padding: 0 12px 20px;
+  }
+
+  .result-toolbar h2 {
+    font-size: 18px;
+  }
+
+  .result-badge {
+    padding: 4px 9px;
+    font-size: 9.5px;
+  }
+
+  .data-card {
+    --min-height: 72px;
+    --padding-start: 10px;
+    --inner-padding-end: 8px;
+    border-radius: 16px;
+  }
+
+  .data-card::part(native) {
+    border-radius: 16px;
+  }
+
+  .member-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .avatar-fallback {
+    border-radius: 14px;
+    font-size: 19px;
+  }
+
+  .user-id-label {
+    font-size: 13.5px;
+  }
+
+  .data-uuid-label {
+    font-size: 10.5px;
+  }
+
+  .action-indicator ion-icon {
+    font-size: 21px;
+  }
+
+  .empty-state {
+    margin-top: 20px;
+    padding: 26px 16px;
+  }
+}
+
+/* =========================================================
+   TRÈS PETITS TÉLÉPHONES
+   ========================================================= */
+
+@media (max-width: 360px) {
+  .lookup-command-panel {
+    margin: 10px;
+    padding: 12px;
+  }
+
+  .command-label {
+    font-size: 10.5px;
+  }
+
+  .command-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .execute-lookup {
+    width: 100%;
+  }
+
+  .data-feed {
+    padding-inline: 10px;
+  }
+
+  .result-toolbar {
+    align-items: center;
+  }
+
+  .result-toolbar h2 {
+    font-size: 16px;
+  }
+
+  .result-badge {
+    padding: 4px 8px;
+  }
+
+  .member-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .avatar-fallback {
+    font-size: 18px;
+  }
+
+  .user-id-label {
+    font-size: 13px;
+  }
+
+  .data-uuid-label {
+    font-size: 10px;
+  }
+
+  .action-indicator ion-icon {
+    font-size: 20px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITÉ
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .data-card,
+  .action-indicator ion-icon,
+  .execute-lookup {
+    transition: none !important;
+  }
+
+  .data-card:hover,
+  .data-card:active {
+    transform: none !important;
+  }
 }

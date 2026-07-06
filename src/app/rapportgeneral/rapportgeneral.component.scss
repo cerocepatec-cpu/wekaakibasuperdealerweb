@@ -1,133 +1,356 @@
-.filter-popover{
-    --width: 600px;
-    --height: 100%;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-.leftside{
-    background: #e5f1f9;
-}
+/* =========================================================
+   TRANSACTIONS MEMBRES - RESPONSIVE OPÉRATIONNEL
+   Compatible desktop / tablette / petit téléphone
+   ========================================================= */
 
-.colorleftside{
-    --background: #e5f1f9;
-}
+/* ---------- BASE ---------- */
 
-.colorleftside{
-    --background: #e5f1f9;
-}
-
-.balancecanvas{
-    width: 750px!important;
-    height: 400px!important; 
-}
-.soldcanvas{
-    width: 205px!important;
-}
-
-ion-segment{
-    height: 32px;
-    width: 220px !important;
-    padding: 5px !important;
-    background-color: #cde8f1 !important;
-    border-radius: 20px !important;
-    ion-segment-button{
-      font-size: 11px;
-      top: 2.6px;
-      --border-radius: 40px !important;
-      color:rgb(73, 72, 72);
-    }
-  }
-
-  .bloc-container{
-  display: flex;
-  flex-direction: column;
-  height:80vh;
-  scrollbar-width: thin!important;
-  scrollbar-color: #6c757d transparent;
-}
-
-main{
-  flex: 1;
-  overflow: auto;
-}
-
- table {
-    border-collapse: collapse;
-    width: 100%;
-    min-width: 800px;
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    white-space: nowrap;
-  }
-
-  thead th {
-    background-color: #343a40;
-    color: white;
-    padding: 12px;
-    text-align: left;
-    position: sticky;
-    top: 0;
-    left: 0;
-    z-index: 3;
-  }
-
-  th.sticky-col,
-  td.sticky-col {
-    position: sticky;
-    left: 0;
-    background-color: #fff;
-    z-index: 2;
-    border-right: 1px solid #dee2e6;
-  }
-
-  th.sticky-col {
-    background-color: #343a40;
-    color: white;
-    z-index: 4;
-  }
-
-  tbody td {
-    padding: 10px;
-    border-bottom: 1px solid #dee2e6;
-  }
-
-  tbody tr:hover {
-    background-color: #bed0d3;
-  }
-
-  tbody tr.selected-tr {
-    background-color: #abeef7;
-  }
-
-  tbody tr:nth-child(odd) {
-    background-color: #f9f9f9;
-  }
-
-  td.sticky-col input[type="checkbox"],
-  th.sticky-col input[type="checkbox"] {
-    vertical-align: middle;
-  }
-
-ion-checkbox {
-    --size:15px !important;
-  }
-  mat-menu{
-    button{
-      padding: none!important;
-    }
-  }
-
-.center-content {
-  padding-top:10px!important;
+:host {
+  display: block;
   height: 100%;
 }
 
-.btn-selected{
-  background:rgb(226, 239, 241);
+* {
+  box-sizing: border-box;
+}
+
+.contentbody {
+  --background: #f5f7fb;
+}
+
+.white-bg {
+  background: #ffffff !important;
+}
+
+ion-header {
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+  z-index: 20;
+}
+
+ion-content {
+  --background: #f5f7fb;
+}
+
+main {
+  height: 100%;
+  overflow: auto;
+  padding: 10px;
+  scrollbar-width: thin !important;
+  scrollbar-color: #6c757d transparent;
+}
+
+main::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 20px;
+}
+
+.hr {
+  border: 0;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  margin: 6px 0;
+}
+
+/* ---------- POPOVER FILTRE ---------- */
+
+.filter-popover {
+  --width: min(600px, 96vw);
+  --height: min(100%, 96vh);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.leftside,
+.colorleftside {
+  background: #e5f1f9;
+  --background: #e5f1f9;
+}
+
+/* ---------- CANVAS ---------- */
+
+.balancecanvas {
+  width: min(750px, 100%) !important;
+  height: clamp(240px, 45vw, 400px) !important;
+}
+
+.soldcanvas {
+  width: min(205px, 100%) !important;
+}
+
+/* ---------- SEGMENT ---------- */
+
+ion-segment {
+  height: 32px;
+  width: min(220px, 100%) !important;
+  padding: 5px !important;
+  background-color: #cde8f1 !important;
+  border-radius: 20px !important;
+
+  ion-segment-button {
+    font-size: 11px;
+    top: 2.6px;
+    --border-radius: 40px !important;
+    color: rgb(73, 72, 72);
+    min-width: auto;
+  }
+}
+
+/* ---------- HEADER PRINCIPAL ---------- */
+
+.center-content {
+  padding-top: 10px !important;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+ion-header ion-grid,
+ion-header ion-row,
+ion-header ion-col {
+  min-width: 0;
+}
+
+ion-header ion-item {
+  --padding-start: 8px;
+  --inner-padding-end: 8px;
+  --min-height: 46px;
+  width: 100%;
+}
+
+ion-header ion-item ion-text.font-size-20 {
+  display: inline-block;
+  max-width: 100%;
+  font-size: clamp(15px, 2vw, 20px) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+ion-header ion-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+ion-header ion-button {
+  --border-radius: 10px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  min-height: 30px;
+  height: 32px;
+}
+
+.bg-button {
+  --background: #eef6f9;
+  --color: #1f2937;
+  --box-shadow: none;
+  --border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn-selected {
+  background: rgb(226, 239, 241);
   border: solid 2px rgba(75, 146, 238, 0.856);
-  border-radius: 2px!important;
+  border-radius: 6px !important;
+}
+
+/* ---------- SEARCH ---------- */
+
+.search-item {
+  --background: #ffffff;
+  --border-radius: 12px;
+  --min-height: 42px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  width: 100%;
+}
+
+.search-item-icon {
+  color: #64748b;
+}
+
+.search-item-input {
+  font-size: 13px !important;
+}
+
+.border-left-filter {
+  border-left: 1px solid #d0d7de;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  box-sizing: border-box;
+  width: auto;
+}
+
+.border-left-filter ion-icon {
+  font-size: 17px;
+  color: #6c757d;
+}
+
+/* ---------- SELECTION ---------- */
+
+.selected-items-bloc {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+  font-size: 12px;
+}
+
+.selected-items-bloc ion-badge {
+  cursor: pointer;
+  padding: 5px 8px;
+  border-radius: 999px;
+}
+
+/* ---------- TOTAUX PAR DEVISE ---------- */
+
+.toggle-subtotals-button {
+  min-height: 34px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.rotating-caret {
+  transition: transform 300ms ease;
+  display: inline-block;
+}
+
+.rotating-caret.open {
+  transform: rotate(180deg);
+}
+
+.totals-scroll-container {
+  overflow-x: auto;
+  margin: 0;
+  border-radius: 16px;
+  box-shadow: none;
+  background: transparent;
+
+  .cards-scroll-wrapper {
+    display: flex;
+    gap: 12px;
+    padding-bottom: 8px;
+    min-width: 100%;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+
+    .money-card {
+      flex: 0 0 auto;
+      width: clamp(210px, 28vw, 250px);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .money-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+
+        .money-title {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-weight: 700;
+          font-size: 14px;
+          color: var(--ion-color-primary);
+
+          ion-icon {
+            font-size: 20px;
+          }
+        }
+
+        .money-total {
+          font-size: 12px;
+          color: #334155;
+          text-align: right;
+        }
+      }
+
+      .money-stats {
+        .line {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          padding: 4px 0;
+          font-size: 13px;
+
+          span:last-child {
+            font-weight: 700;
+            text-align: right;
+          }
+
+          &.in {
+            color: #2e7d32;
+            font-weight: 600;
+          }
+
+          &.out {
+            color: #c62828;
+            font-weight: 600;
+          }
+
+          &.net {
+            border-top: 1px dashed #cbd5e1;
+            margin-top: 6px;
+            padding-top: 8px;
+            font-weight: 800;
+            color: #111827;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ---------- BOUTONS FILTRES ---------- */
+
+.display-flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.filter-buttons ion-button {
+  display: flex;
+  align-items: center;
+}
+
+.button-label {
+  display: inline;
+  margin-left: 4px;
+}
+
+/* ---------- MATERIAL MENU ---------- */
+
+mat-menu {
+  button {
+    padding: 0 !important;
+  }
 }
 
 ::ng-deep .mat-menu-content {
@@ -136,9 +359,11 @@ ion-checkbox {
 }
 
 ::ng-deep .mat-menu-item {
-  min-height: 32px !important; // hauteur réduite
+  min-height: 34px !important;
+  height: 34px !important;
   padding-top: 4px !important;
   padding-bottom: 4px !important;
+  font-size: 12px !important;
 }
 
 .menu-item-content {
@@ -151,165 +376,96 @@ ion-checkbox {
   font-size: 11px;
 }
 
-.border-left-filter {
-  border-left: 1px solid #ccc;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px; // un tout petit espace autour de l’icône
-  box-sizing: border-box;
-  width: auto;
-}
-.border-left-filter ion-icon {
-  font-size: 16px; // taille de l’icône
-  color: #6c757d; // couleur de l’icône
-}
+/* =========================================================
+   TABLE DES TRANSACTIONS
+   Desktop : vraie table
+   Mobile : lignes transformées en cartes lisibles
+   ========================================================= */
 
-.totals-scroll-container {
-  overflow-x: auto;
-
-  .cards-scroll-wrapper {
-    display: flex;
-    gap: 1rem;
-    padding-bottom: 0.5rem;
-    min-width: 100%;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-
-    .money-card {
-      flex: 0 0 auto;
-      width: 250px;
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 16px;
-      padding: 1rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-
-      .money-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .money-title {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-weight: 600;
-          font-size: 1rem;
-          color: var(--ion-color-primary);
-
-          ion-icon {
-            font-size: 20px;
-          }
-        }
-
-        .money-total {
-          font-size: 0.95rem;
-          color: #333;
-        }
-      }
-
-      .money-stats {
-        .line {
-          display: flex;
-          justify-content: space-between;
-          padding: 4px 0;
-          font-size: 0.9rem;
-
-          &.in {
-            color: #2e7d32;
-            font-weight: 500;
-          }
-
-          &.out {
-            color: #c62828;
-            font-weight: 500;
-          }
-
-          &.net {
-            border-top: 1px dashed #ccc;
-            margin-top: 6px;
-            padding-top: 6px;
-            font-weight: bold;
-            color: #333;
-          }
-        }
-      }
-    }
-  }
+.table-container {
+  width: 100%;
+  overflow: auto;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
 }
 
-.rotating-caret {
-  transition: transform 300ms ease;
-  display: inline-block;
-}
-.rotating-caret.open {
-  transform: rotate(180deg);
-}
-.display-flex-center {
-  display: flex;
-  justify-content: center; /* centre horizontalement */
-  align-items: center;     /* centre verticalement */
-  gap: 8px;                /* petit espace entre les éléments si plusieurs enfants */
-  flex-wrap: wrap;         /* permet le retour à la ligne si nécessaire */
-  width: 100%;             /* occupe toute la largeur disponible */
-  height: 100%;            /* utile si le parent a une hauteur définie */
-  text-align: center;      /* centre aussi le texte à l’intérieur */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 820px;
+  background-color: #ffffff;
+  white-space: nowrap;
 }
 
-
-// .display-flex-center {
-//   display: flex;
-//   align-items: center;
-// }
-
-.rotating-caret {
-  transition: transform 300ms ease;
-}
-.rotating-caret.open {
-  transform: rotate(180deg);
-}
-@media (max-width: 600px) {
-  .rotating-caret.mobile-closed {
-    transform: rotate(0deg) !important;
-  }
+thead th {
+  background-color: #343a40;
+  color: #ffffff;
+  padding: 12px;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  font-size: 13px;
 }
 
-.filter-buttons ion-button {
-  display: flex;
-  align-items: center;
+th.sticky-col,
+td.sticky-col {
+  position: sticky;
+  left: 0;
+  background-color: #ffffff;
+  z-index: 2;
+  border-right: 1px solid #dee2e6;
 }
-.button-label {
-  display: inline;
-  margin-left: 4px;
-}
-@media (max-width: 600px) {
-  .button-label {
-    display: none;
-  }
-  .filter-buttons ion-button {
-    min-width: 36px;
-    padding: 0 8px;
-  }
 
-  .hidden-on-mobile {
-    display: none !important;
-  }
+th.sticky-col {
+  background-color: #343a40;
+  color: #ffffff;
+  z-index: 4;
 }
+
+tbody td {
+  padding: 10px;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 13px;
+  color: #1f2937;
+}
+
+tbody tr:hover {
+  background-color: #eef7fa;
+}
+
+tbody tr.selected-tr {
+  background-color: #d8f8fd !important;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f9fafb;
+}
+
+td.sticky-col input[type='checkbox'],
+th.sticky-col input[type='checkbox'] {
+  vertical-align: middle;
+}
+
+ion-checkbox {
+  --size: 15px !important;
+}
+
+/* ---------- CARD VIEW ---------- */
 
 .fintech-card {
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   cursor: pointer;
+  margin: 8px 0;
+  overflow: hidden;
 
   &:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
   }
 }
 
@@ -317,20 +473,24 @@ ion-checkbox {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
+  padding: 6px;
   gap: 10px;
 }
 
 .uuid-date {
   flex-grow: 1;
-  margin-left: 10px;
+  min-width: 0;
+  margin-left: 6px;
   font-size: 14px;
   color: #555;
 }
 
 .uuid {
-  font-weight: bold;
+  font-weight: 800;
   color: var(--ion-color-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .date {
@@ -339,27 +499,32 @@ ion-checkbox {
 }
 
 .status-badge {
-  font-size: 12px;
+  font-size: 11px;
   height: 20px;
   text-transform: capitalize;
+  flex-shrink: 0;
 }
 
 .info-row {
   display: flex;
   align-items: flex-start;
   margin-top: 10px;
+  gap: 8px;
 }
 
 .info-icon {
   color: var(--ion-color-medium);
   font-size: 20px;
-  margin-right: 10px;
+  margin-right: 2px;
+  flex-shrink: 0;
 }
 
 .info-text {
   font-size: 14px;
   line-height: 1.4;
   color: #444;
+  min-width: 0;
+  word-break: break-word;
 }
 
 .uuid-small {
@@ -371,7 +536,7 @@ ion-checkbox {
   margin-top: 15px;
   text-align: right;
   font-size: 20px;
-  font-weight: bold;
+  font-weight: 900;
 }
 
 .success-text {
@@ -392,10 +557,12 @@ ion-checkbox {
   border: 2px solid var(--ion-color-success);
 }
 
+/* ---------- ITEM VIEW ---------- */
+
 .shadow-light {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
   border-radius: 12px;
-  background: #fff;
+  background: #ffffff;
 }
 
 .bg-avatar-icon {
@@ -407,36 +574,39 @@ ion-checkbox {
   height: 48px;
 }
 
-.font-size-11 { font-size: 11px; }
-.font-size-13 { font-size: 13px; }
-.font-size-14 { font-size: 14px; }
-.font-size-15 { font-size: 15px; }
+.selected-item-border {
+  border: 2px solid var(--ion-color-success);
+  border-radius: 12px;
+  transition: border 0.2s ease-in-out;
+}
 
-.text-muted {
-  color: #6b7280;
+.align-checkbox {
+  align-items: center !important;
+
+  ion-checkbox {
+    margin-inline-end: 8px;
+  }
 }
-.text-dark {
-  color: #1f2937;
-}
-.text-danger {
-  color: #dc2626;
-}
-.text-success {
-  color: #16a34a;
+
+.calendar-icon {
+  font-size: 14px;
+  vertical-align: middle;
+  margin-bottom: 2px;
 }
 
 .fintech-summary-box {
-  margin-top: -25px!important;
+  margin-top: -25px !important;
+
   .summary-card {
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
     background: #ffffff;
   }
 
   .summary-title {
     color: #1f2937;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
   }
 
   .summary-content {
@@ -462,34 +632,685 @@ ion-checkbox {
 
     ion-badge {
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       border-radius: 8px;
       padding: 4px 8px;
     }
   }
 }
-.calendar-icon {
-  font-size: 14px;
-  vertical-align: middle;
-  margin-bottom: 2px;
+
+/* ---------- HELPERS ---------- */
+
+.font-size-10 {
+  font-size: 10px !important;
 }
 
-.selected-item-border {
-  border: 2px solid var(--ion-color-success);
-  border-radius: 12px;
-  transition: border 0.2s ease-in-out;
+.font-size-11 {
+  font-size: 11px !important;
 }
 
-.align-checkbox {
-  align-items: center !important;
+.font-size-12 {
+  font-size: 12px !important;
+}
 
-  ion-checkbox {
-    margin-inline-end: 8px;
+.font-size-13 {
+  font-size: 13px !important;
+}
+
+.font-size-14 {
+  font-size: 14px !important;
+}
+
+.font-size-15 {
+  font-size: 15px !important;
+}
+
+.text-muted {
+  color: #6b7280;
+}
+
+.text-dark {
+  color: #1f2937;
+}
+
+.text-danger {
+  color: #dc2626;
+}
+
+.text-success {
+  color: #16a34a;
+}
+
+/* =========================================================
+   TABLETTE
+   ========================================================= */
+
+@media (max-width: 992px) {
+  ion-header ion-grid > ion-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  ion-header ion-grid > ion-row > ion-col:nth-child(1),
+  ion-header ion-grid > ion-row > ion-col:nth-child(2),
+  ion-header ion-grid > ion-row > ion-col:nth-child(3),
+  ion-header ion-grid > ion-row > ion-col:nth-child(4) {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  ion-header ion-grid > ion-row > ion-col:nth-child(1) {
+    order: 1;
+  }
+
+  ion-header ion-grid > ion-row > ion-col:nth-child(2) {
+    order: 2;
+    padding: 0 8px 6px !important;
+  }
+
+  ion-header ion-grid > ion-row > ion-col:nth-child(3) {
+    order: 3;
+    padding: 0 8px 6px !important;
+  }
+
+  ion-header ion-grid > ion-row > ion-col:nth-child(4) {
+    order: 4;
+  }
+
+  ion-header ion-col:nth-child(3) ion-buttons {
+    justify-content: flex-end;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  ion-header ion-col:nth-child(3) ion-button ion-text {
+    font-size: 12px;
+  }
+
+  .toggle-subtotals-button {
+    padding-left: 10px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .totals-scroll-container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  main {
+    padding: 8px;
+  }
+
+  .fintech-summary-box {
+    margin-top: 0 !important;
+  }
+
+  main ion-row > ion-col[size='8'],
+  main ion-row > ion-col[size='4'] {
+    flex: 0 0 100%;
+    max-width: 100%;
   }
 }
 
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
+@media (max-width: 768px) {
+  ion-header {
+    max-height: 62vh;
+    overflow-y: auto;
+  }
 
+  ion-header ion-item {
+    --min-height: 42px;
+    --padding-start: 6px;
+    --inner-padding-end: 6px;
+  }
 
+  ion-header ion-item ion-text.font-size-20 {
+    font-size: 15px !important;
+    max-width: calc(100vw - 145px);
+  }
 
+  ion-header ion-icon[name='settings'] {
+    margin-left: 4px !important;
+    margin-top: 0 !important;
+    width: 16px !important;
+    height: 16px !important;
+  }
 
+  ion-header ion-button {
+    height: 30px;
+    min-height: 30px;
+    --padding-start: 7px;
+    --padding-end: 7px;
+    font-size: 11px;
+  }
+
+  .search-item {
+    --min-height: 40px;
+  }
+
+  .selected-items-bloc {
+    justify-content: center;
+    padding: 4px 0;
+  }
+
+  .button-label {
+    display: none;
+  }
+
+  .filter-buttons ion-button {
+    min-width: 36px;
+    padding: 0 8px;
+  }
+
+  .hidden-on-mobile {
+    display: none !important;
+  }
+
+  .rotating-caret.mobile-closed {
+    transform: rotate(0deg) !important;
+  }
+
+  .totals-scroll-container {
+    padding: 8px !important;
+
+    .cards-scroll-wrapper {
+      gap: 10px;
+
+      .money-card {
+        width: 78vw;
+        max-width: 260px;
+        padding: 12px;
+      }
+    }
+  }
+
+  .toggle-subtotals-button {
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  ion-header ion-col:nth-child(4) ion-buttons {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 0 8px 6px;
+  }
+
+  ion-header ion-col:nth-child(4) ion-button {
+    flex: 0 0 auto;
+  }
+
+  ion-select {
+    max-width: 110px;
+    font-size: 11px;
+  }
+
+  /* Table transformée en cartes */
+  .table-container {
+    overflow: visible;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  table {
+    min-width: 0;
+    width: 100%;
+    background: transparent;
+    white-space: normal;
+  }
+
+  thead {
+    display: none;
+  }
+
+  table,
+  tbody,
+  tr,
+  td {
+    display: block;
+    width: 100%;
+  }
+
+  tbody tr {
+    margin-bottom: 10px;
+    border-radius: 14px;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+  }
+
+  tbody tr.selected-tr {
+    border-color: var(--ion-color-success);
+    background: #ecfdf5 !important;
+  }
+
+  tbody td {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-bottom: 1px solid #edf2f7;
+    font-size: 12.5px;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  tbody td:last-child {
+    border-bottom: none;
+  }
+
+  tbody td::before {
+    font-weight: 800;
+    color: #64748b;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  tbody td:nth-child(1)::before {
+    content: 'OP.ID';
+  }
+
+  tbody td:nth-child(2)::before {
+    content: 'Date';
+  }
+
+  tbody td:nth-child(3)::before {
+    content: 'Faite par';
+  }
+
+  tbody td:nth-child(4)::before {
+    content: 'Membre';
+  }
+
+  tbody td:nth-child(5)::before {
+    content: 'Type';
+  }
+
+  tbody td:nth-child(6)::before {
+    content: 'Montant';
+  }
+
+  tbody td:nth-child(7)::before {
+    content: 'Imputée';
+  }
+
+  tbody td:nth-child(8)::before {
+    content: 'Statut';
+  }
+
+  tbody td ion-checkbox {
+    margin-right: 6px !important;
+  }
+
+  /* Card view */
+  ion-card.fintech-card {
+    margin: 6px 0 10px;
+  }
+
+  .card-header-top {
+    align-items: flex-start;
+  }
+
+  .uuid-date {
+    margin-left: 2px;
+  }
+
+  .uuid {
+    font-size: 13px;
+  }
+
+  .date {
+    font-size: 11px;
+  }
+
+  .status-badge {
+    font-size: 10px;
+    height: auto;
+    min-height: 19px;
+  }
+
+  .info-text {
+    font-size: 13px;
+  }
+
+  .amount-row {
+    font-size: 18px;
+  }
+
+  /* Item view */
+  main ion-row.align-checkbox {
+    margin-bottom: 10px !important;
+  }
+
+  main ion-row.align-checkbox > ion-col:first-child {
+    flex: 0 0 42px;
+    max-width: 42px;
+    display: flex;
+    justify-content: center;
+  }
+
+  main ion-row.align-checkbox > ion-col:nth-child(2) {
+    flex: 1;
+    max-width: calc(100% - 42px);
+    margin-left: 0 !important;
+  }
+
+  main ion-row.align-checkbox > ion-col:nth-child(2) ion-item {
+    width: 100%;
+  }
+
+  main ion-row.align-checkbox ion-checkbox {
+    margin-left: 0 !important;
+  }
+
+  .dashboard-summary-item {
+    --padding-start: 8px;
+    --inner-padding-end: 8px;
+    --min-height: 78px;
+  }
+
+  .dashboard-summary-item ion-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dashboard-summary-item ion-label p {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+
+  .dashboard-summary-item [slot='end'] {
+    max-width: 105px;
+    margin-left: 6px;
+  }
+
+  .dashboard-summary-item [slot='end'] p {
+    font-size: 13px !important;
+    white-space: normal;
+  }
+
+  .fintech-summary-box {
+    padding: 8px !important;
+  }
+
+  .summary-title {
+    font-size: 14px !important;
+  }
+
+  .fintech-summary-box .summary-item ion-label {
+    font-size: 13px;
+  }
+}
+
+/* =========================================================
+   PETITS TÉLÉPHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+  main {
+    padding: 6px;
+  }
+
+  ion-header {
+    max-height: 68vh;
+  }
+
+  ion-header ion-grid > ion-row > ion-col:nth-child(1) ion-item {
+    display: flex;
+    align-items: center;
+  }
+
+  ion-header ion-item ion-text.font-size-20 {
+    font-size: 14px !important;
+    max-width: calc(100vw - 125px);
+  }
+
+  ion-header ion-button {
+    --padding-start: 6px;
+    --padding-end: 6px;
+  }
+
+  ion-header ion-button ion-text,
+  ion-header ion-button ion-note {
+    font-size: 10.5px !important;
+  }
+
+  ion-header ion-col:nth-child(3) ion-buttons {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-left: 8px;
+  }
+
+  ion-header ion-col:nth-child(3) ion-button {
+    flex: 0 0 auto;
+  }
+
+  ion-header ion-col:nth-child(3) ion-button:first-child {
+    min-width: 92px;
+  }
+
+  .search-item {
+    --padding-start: 4px;
+    --inner-padding-end: 4px;
+  }
+
+  .search-item-input {
+    font-size: 12px !important;
+  }
+
+  .toggle-subtotals-button {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .totals-scroll-container {
+    .cards-scroll-wrapper {
+      .money-card {
+        width: 82vw;
+      }
+    }
+  }
+
+  tbody td {
+    grid-template-columns: 92px minmax(0, 1fr);
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  tbody td::before {
+    font-size: 10px;
+  }
+
+  ion-badge {
+    font-size: 10px;
+  }
+
+  .bg-avatar-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .dashboard-summary-item {
+    --padding-start: 6px;
+    --inner-padding-end: 6px;
+  }
+
+  .dashboard-summary-item ion-avatar {
+    margin-right: 8px;
+  }
+
+  .dashboard-summary-item ion-label p.font-size-14 {
+    font-size: 12.5px !important;
+  }
+
+  .dashboard-summary-item ion-label p.font-size-13 {
+    font-size: 11.5px !important;
+  }
+
+  .dashboard-summary-item [slot='end'] {
+    max-width: 88px;
+  }
+
+  .dashboard-summary-item [slot='end'] p {
+    font-size: 12px !important;
+  }
+
+  .fintech-summary-box .summary-item {
+    --min-height: 42px;
+  }
+
+  .fintech-summary-box .summary-item ion-icon {
+    font-size: 18px;
+  }
+
+  .fintech-summary-box .summary-item ion-label {
+    font-size: 12px;
+  }
+
+  .fintech-summary-box .summary-item ion-badge {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}
+
+/* =========================================================
+   TRÈS PETITS ÉCRANS
+   ========================================================= */
+
+@media (max-width: 360px) {
+  ion-header ion-item ion-text.font-size-20 {
+    font-size: 13px !important;
+    max-width: calc(100vw - 112px);
+  }
+
+  ion-header ion-button {
+    min-width: 30px;
+  }
+
+  ion-header ion-button ion-text,
+  ion-header ion-button ion-note {
+    font-size: 10px !important;
+  }
+
+  tbody td {
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .dashboard-summary-item [slot='end'] {
+    max-width: 76px;
+  }
+
+  .dashboard-summary-item [slot='end'] p {
+    font-size: 11px !important;
+  }
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+@media (prefers-color-scheme: dark) {
+  .contentbody,
+  ion-content {
+    --background: #0f172a;
+  }
+
+  ion-header,
+  .white-bg {
+    background: #111827 !important;
+  }
+
+  ion-header {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
+  }
+
+  ion-header ion-item,
+  .search-item {
+    --background: #111827;
+    color: #f8fafc;
+  }
+
+  .bg-button {
+    --background: #1e293b;
+    --color: #f8fafc;
+  }
+
+  .table-container,
+  tbody tr,
+  .money-card,
+  .fintech-card,
+  .shadow-light,
+  .fintech-summary-box .summary-card {
+    background: #111827 !important;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #f8fafc;
+  }
+
+  table {
+    background: #111827;
+  }
+
+  tbody td {
+    color: #e5e7eb;
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  tbody tr:nth-child(odd) {
+    background-color: #172033 !important;
+  }
+
+  tbody tr:hover {
+    background-color: #1e293b !important;
+  }
+
+  tbody tr.selected-tr {
+    background-color: rgba(34, 197, 94, 0.16) !important;
+  }
+
+  .text-dark,
+  .summary-title,
+  .totals-scroll-container .money-card .money-stats .line.net {
+    color: #f8fafc !important;
+  }
+
+  .text-muted,
+  .date,
+  .uuid-small,
+  .info-text,
+  .money-total {
+    color: #cbd5e1 !important;
+  }
+
+  .bg-avatar-icon {
+    background-color: #1e293b;
+  }
+
+  .hr {
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+@media (max-width: 600px) {
+  .totals-scroll-container {
+    position: relative;
+  }
+
+  .totals-scroll-container::after {
+    content: '← glisser →';
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+}

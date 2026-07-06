@@ -1,161 +1,407 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>
-      DASHBOARD FINANCIER
+<ion-header class="finance-header ion-no-border">
+  <ion-toolbar class="finance-toolbar">
+    <ion-title class="finance-title">
+      <span>DASHBOARD FINANCIER</span>
+      <small>Analyse de performance</small>
     </ion-title>
-        <ion-row class="ion-padding-top">
-        <ion-col size="12" size-lg="2.5" class="ion-padding-start" (click)="dashboardperiodfilter()">
-          <ion-text class="font-size-20 font-bold-600">Votre situation financière</ion-text>
-          <br>
-          <ion-note class="font-size-10 ion-padding-start">Du {{from | date}} au {{to | date}}</ion-note>
-        </ion-col>
-        <ion-col size="12" size-lg="3.5" class="ion-padding-end">
-          <ion-item  lines="none" class="bd-square bd-radius-10" style="height: 35px!important">
-            <ion-icon name="search" size="small" slot="start" style="margin-top:2px!important;"></ion-icon>
-            <ion-input class="font-size-12" placeholder="Rechercher" mode="ios" #defaultsearchinput [(ngModel)]="search" style="margin-top: -13px!important;"></ion-input>
-            <ion-icon id="open-action-sheet" name="ellipsis-vertical-outline" class="largedevicehidden cursor-pointer" size="small" slot="end" style="margin-top:2px!important;"></ion-icon>
-          </ion-item>
-            <ion-action-sheet trigger="open-action-sheet" header="Que voulez-vous faire?" translucent="true" [buttons]="actionSheetButtons" mode="ios"></ion-action-sheet>
-        </ion-col>
-        <ion-col size="2" class="smalldevicehidden">
-          <ion-button  style="height: 30px!important" color="medium" mode="ios" fill="outline" size="small" [matMenuTriggerFor]="filter_menu">
+  </ion-toolbar>
+
+  <ion-progress-bar
+    type="indeterminate"
+    mode="ios"
+    *ngIf="showprogress"
+    class="scan-progress-bar">
+  </ion-progress-bar>
+</ion-header>
+
+<ion-content fullscreen class="finance-viewport">
+
+  <div class="viewport-glow"></div>
+
+  <app-skeleton-loader
+    *ngIf="loaded"
+    [repeat]="6"
+    type="grid">
+  </app-skeleton-loader>
+
+  <main class="dashboard" *ngIf="!loaded">
+
+    <!-- TOP PANEL -->
+    <section class="finance-command-panel">
+
+      <div class="panel-top">
+        <div class="period-block" (click)="dashboardperiodfilter()">
+          <div class="command-label">
+            <ion-icon name="analytics-outline"></ion-icon>
+            <span>Votre situation financière</span>
+          </div>
+
+          <p class="period-text">
+            Du {{ from | date }} au {{ to | date }}
+          </p>
+        </div>
+
+        <div class="desktop-actions smalldevicehidden">
+          <ion-button
+            class="outline-action-btn"
+            color="medium"
+            mode="ios"
+            fill="outline"
+            size="small"
+            [matMenuTriggerFor]="filter_menu">
             <ion-icon name="download-outline" slot="start"></ion-icon>
             Exporter
           </ion-button>
+
           <mat-menu #filter_menu="matMenu">
-            <button mat-menu-item (click)="exportallinexcel()"> <ion-text class="font-size-12">Excel</ion-text></button>
-            <button mat-menu-item (click)="exportallinpdf()"> <ion-text class="font-size-12">PDF</ion-text></button>
+            <button mat-menu-item (click)="exportallinexcel()">
+              <ion-text class="font-size-12">Excel</ion-text>
+            </button>
+
+            <button mat-menu-item (click)="exportallinpdf()">
+              <ion-text class="font-size-12">PDF</ion-text>
+            </button>
           </mat-menu>
-        </ion-col> 
-        <ion-col size="2" class="ion-padding-end smalldevicehidden">
-          <ion-button  style="height: 30px!important" color="secondary" mode="ios" fill="outline" size="small" (click)="printpage()">
-            <ion-icon name="print-outline" slot="start"></ion-icon> Imprimer
+
+          <ion-button
+            class="outline-action-btn print-btn"
+            color="secondary"
+            mode="ios"
+            fill="outline"
+            size="small"
+            (click)="printpage()">
+            <ion-icon name="print-outline" slot="start"></ion-icon>
+            Imprimer
           </ion-button>
-        </ion-col>
-      </ion-row>
-  </ion-toolbar>
-</ion-header>
-  <ion-content fullscreen>
-    <app-skeleton-loader *ngIf="loaded" [repeat]="6" type="grid"></app-skeleton-loader>
-    <main class="dashboard" *ngIf="!loaded">
-      <ion-row>
-        <ion-col size="12" size-lg="4" class="ion-padding-end ion-padding-bottom">
-          <div class="stat">
-            <h2>Revenu Total</h2>
-            <p *ngFor="let revenu of financedata.totalrevenu" class="font-size-15">{{revenu.abreviation}} {{revenu.totalrevenu | number}}</p>
-          </div>
-        </ion-col>
+        </div>
+      </div>
 
-        <ion-col size="12" size-lg="4" class="ion-padding-end ion-padding-bottom">
-          <div class="stat">
-            <h2>Dépenses</h2>
-            <p *ngFor="let revenu of financedata.expenditures" class="font-size-15">{{revenu.abreviation}} {{revenu.totalexpenditures | number}}</p>
-          </div>
-        </ion-col> 
-        
-        <ion-col size="12" size-lg="4">
-          <div class="stat">
-            <h2>Bénéfice</h2>
-            <p *ngFor="let revenu of financedata.benefits" class="font-size-15">{{revenu.abreviation}} {{revenu.totalbenefits | number}}</p>
-          </div>
-        </ion-col>
-      </ion-row>   
-      
-      <ion-row>
-        <ion-col size="12" size-lg="4" class="ion-padding-end ion-padding-bottom">
-          <div class="stat">
-            <h2>Membres</h2>
-            <p class="font-size-15">Nouveaux: {{financedata.nbmembers | number}}</p>
-            <p class="font-size-15">Total: {{financedata.totalmembers | number}}</p>
-          </div>
-        </ion-col> 
-        
-        <ion-col size="12" size-lg="4" class="ion-padding-end ion-padding-bottom">
-          <div class="stat">
-            <h2>Premières mises</h2>
-            <p *ngFor="let revenu of financedata.firstentries" class="font-size-15">{{revenu.abreviation}} {{revenu.totalfirstentries | number}}</p>
-          </div>
-        </ion-col>
+      <div class="search-row">
+        <div class="finance-search">
+          <ion-icon name="search-outline"></ion-icon>
 
-        <ion-col size="12" size-lg="4" class="ion-padding-end ion-padding-bottom">
-          <div class="stat">
-            <h2> Ventes carnets</h2>
-            <p *ngFor="let revenu of financedata.sells" class="font-size-15">{{revenu.abreviation}} {{revenu.totalsells | number}}</p>
-          </div>
-        </ion-col> 
+          <ion-input
+            class="font-size-12"
+            placeholder="Rechercher"
+            mode="ios"
+            #defaultsearchinput
+            [(ngModel)]="search">
+          </ion-input>
+        </div>
 
-      </ion-row>  
-      
-      <ion-row>
-        <ion-col size="12" size-lg="4" class="ion-padding-end ion-padding-bottom">
-          <div class="stat">
-            <h2>Dépôts membres</h2>
-            <p *ngFor="let revenu of financedata.depositmembers" class="font-size-15">{{revenu.abreviation}} {{revenu.totaltransactions | number}}</p>
-          </div>
-        </ion-col>
+        <ion-button
+          id="open-action-sheet"
+          fill="clear"
+          mode="ios"
+          class="mobile-action-btn largedevicehidden">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </ion-button>
 
-        <ion-col size="12" size-lg="4" class="ion-padding-end ion-padding-bottom">
-          <div class="stat">
-            <h2>Retraits membres</h2>
-            <p *ngFor="let revenu of financedata.withdrawmembers" class="font-size-15">{{revenu.abreviation}} {{revenu.totaltransactions | number}}</p>
-          </div>
-        </ion-col> 
-        
-        <ion-col size="12" size-lg="4">
-          <div class="stat">
-            <h2>Solde comptes</h2>
-            <p *ngFor="let revenu of financedata.soldtransactions" class="font-size-15">{{revenu.abreviation}} {{revenu.totalsoldtransactions | number}}</p>
-          </div>
-        </ion-col> 
-        
-        <ion-col size="12">
-          <div class="stat">
-            <h2>Solde comptes Net</h2>
-            <ion-note>Ces montants sont des soldes des mises des membres dans leurs comptes du début jusqu'à maintenant.</ion-note>
-            <p *ngFor="let item of financedata.soldaccountsnet" class="font-size-15">{{item.abreviation}} {{item.sold | number}}</p>
-          </div>
-        </ion-col>
-      </ion-row>
+        <ion-action-sheet
+          trigger="open-action-sheet"
+          header="Que voulez-vous faire ?"
+          translucent="true"
+          [buttons]="actionSheetButtons"
+          mode="ios">
+        </ion-action-sheet>
+      </div>
+
+    </section>
+
+    <!-- STATS -->
+    <ion-grid class="finance-grid">
 
       <ion-row>
-        <ion-col size="12" class="ion-padding-end">
-          <section class="chart">
-            <h2>Performance périodique</h2>
-            <div class="chart-placeholder">
-              <canvas id="canvas">{{chart}}</canvas>
+        <ion-col size="12" size-md="6" size-lg="4">
+          <div class="stat-card revenue-card">
+            <div class="stat-header">
+              <div>
+                <p class="stat-kicker">Revenus</p>
+                <h2>Revenu Total</h2>
+              </div>
+              <div class="stat-icon">
+                <ion-icon name="trending-up-outline"></ion-icon>
+              </div>
             </div>
-          </section>
+
+            <div class="stat-values">
+              <p *ngFor="let revenu of financedata.totalrevenu">
+                <span>{{ revenu.abreviation }}</span>
+                <strong>{{ revenu.totalrevenu | number }}</strong>
+              </p>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="12" size-md="6" size-lg="4">
+          <div class="stat-card expense-card">
+            <div class="stat-header">
+              <div>
+                <p class="stat-kicker">Charges</p>
+                <h2>Dépenses</h2>
+              </div>
+              <div class="stat-icon">
+                <ion-icon name="trending-down-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="stat-values">
+              <p *ngFor="let revenu of financedata.expenditures">
+                <span>{{ revenu.abreviation }}</span>
+                <strong>{{ revenu.totalexpenditures | number }}</strong>
+              </p>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="12" size-md="6" size-lg="4">
+          <div class="stat-card benefit-card">
+            <div class="stat-header">
+              <div>
+                <p class="stat-kicker">Résultat</p>
+                <h2>Bénéfice</h2>
+              </div>
+              <div class="stat-icon">
+                <ion-icon name="wallet-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="stat-values">
+              <p *ngFor="let revenu of financedata.benefits">
+                <span>{{ revenu.abreviation }}</span>
+                <strong>{{ revenu.totalbenefits | number }}</strong>
+              </p>
+            </div>
+          </div>
         </ion-col>
       </ion-row>
-     
 
-      <section class="transactions">
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4">
+          <div class="stat-card members-card">
+            <div class="stat-header">
+              <div>
+                <p class="stat-kicker">Croissance</p>
+                <h2>Membres</h2>
+              </div>
+              <div class="stat-icon">
+                <ion-icon name="people-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="stat-values">
+              <p>
+                <span>Nouveaux</span>
+                <strong>{{ financedata.nbmembers | number }}</strong>
+              </p>
+
+              <p>
+                <span>Total</span>
+                <strong>{{ financedata.totalmembers | number }}</strong>
+              </p>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="12" size-md="6" size-lg="4">
+          <div class="stat-card first-entry-card">
+            <div class="stat-header">
+              <div>
+                <p class="stat-kicker">Activation</p>
+                <h2>Premières mises</h2>
+              </div>
+              <div class="stat-icon">
+                <ion-icon name="sparkles-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="stat-values">
+              <p *ngFor="let revenu of financedata.firstentries">
+                <span>{{ revenu.abreviation }}</span>
+                <strong>{{ revenu.totalfirstentries | number }}</strong>
+              </p>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="12" size-md="6" size-lg="4">
+          <div class="stat-card sells-card">
+            <div class="stat-header">
+              <div>
+                <p class="stat-kicker">Carnets</p>
+                <h2>Ventes carnets</h2>
+              </div>
+              <div class="stat-icon">
+                <ion-icon name="book-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="stat-values">
+              <p *ngFor="let revenu of financedata.sells">
+                <span>{{ revenu.abreviation }}</span>
+                <strong>{{ revenu.totalsells | number }}</strong>
+              </p>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4">
+          <div class="stat-card deposit-card">
+            <div class="stat-header">
+              <div>
+                <p class="stat-kicker">Flux entrants</p>
+                <h2>Dépôts membres</h2>
+              </div>
+              <div class="stat-icon">
+                <ion-icon name="arrow-down-circle-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="stat-values">
+              <p *ngFor="let revenu of financedata.depositmembers">
+                <span>{{ revenu.abreviation }}</span>
+                <strong>{{ revenu.totaltransactions | number }}</strong>
+              </p>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="12" size-md="6" size-lg="4">
+          <div class="stat-card withdraw-card">
+            <div class="stat-header">
+              <div>
+                <p class="stat-kicker">Flux sortants</p>
+                <h2>Retraits membres</h2>
+              </div>
+              <div class="stat-icon">
+                <ion-icon name="arrow-up-circle-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="stat-values">
+              <p *ngFor="let revenu of financedata.withdrawmembers">
+                <span>{{ revenu.abreviation }}</span>
+                <strong>{{ revenu.totaltransactions | number }}</strong>
+              </p>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="12" size-md="6" size-lg="4">
+          <div class="stat-card balance-card">
+            <div class="stat-header">
+              <div>
+                <p class="stat-kicker">Comptes</p>
+                <h2>Solde comptes</h2>
+              </div>
+              <div class="stat-icon">
+                <ion-icon name="cash-outline"></ion-icon>
+              </div>
+            </div>
+
+            <div class="stat-values">
+              <p *ngFor="let revenu of financedata.soldtransactions">
+                <span>{{ revenu.abreviation }}</span>
+                <strong>{{ revenu.totalsoldtransactions | number }}</strong>
+              </p>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="12">
+          <div class="stat-card net-balance-card wide-card">
+            <div class="stat-header">
+              <div>
+                <p class="stat-kicker">Solde global</p>
+                <h2>Solde comptes Net</h2>
+              </div>
+              <div class="stat-icon">
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+              </div>
+            </div>
+
+            <ion-note class="net-note">
+              Ces montants sont des soldes des mises des membres dans leurs comptes du début jusqu'à maintenant.
+            </ion-note>
+
+            <div class="stat-values horizontal-values">
+              <p *ngFor="let item of financedata.soldaccountsnet">
+                <span>{{ item.abreviation }}</span>
+                <strong>{{ item.sold | number }}</strong>
+              </p>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+
+    <!-- CHART -->
+    <section class="chart-card">
+      <div class="section-header">
+        <div>
+          <p class="stat-kicker">Analyse</p>
+          <h2>Performance périodique</h2>
+        </div>
+        <ion-icon name="bar-chart-outline"></ion-icon>
+      </div>
+
+      <div class="chart-placeholder">
+        <canvas id="canvas">{{ chart }}</canvas>
+      </div>
+    </section>
+
+    <!-- TABLE HISTORY -->
+    <section class="transactions-card">
+      <div class="section-header">
+        <div>
+          <p class="stat-kicker">Historique</p>
           <h2>Historique bénéfique</h2>
-          <table>
-              <thead>
-                  <tr>
-                      <th>Date</th>
-                      <th>Total revenu</th>
-                      <th>Dépenses</th>
-                      <th>Bénéfices</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr *ngFor="let history of financedata.periodicdashboard">
-                      <td>{{history.date | date}}</td>
-                      <td>
-                        <p *ngFor="let revenu of history.periodictotalrevenu" class="font-size-15">{{revenu.abreviation}} {{revenu.totalrevenu | number}}</p>
-                      </td>
-                      <td>
-                        <p *ngFor="let expenditure of history.periodicexpenditures" class="font-size-15">{{expenditure.abreviation}} {{expenditure.totalexpenditures | number}}</p>
-                      </td>
-                      <td>
-                        <p *ngFor="let benefit of history.periodicbefenefits" class="font-size-15">{{benefit.abreviation}} {{benefit.totalbenefits | number}}</p>
-                      </td>
-                  </tr>
-              </tbody>
-          </table>
-      </section>
+        </div>
+        <ion-icon name="time-outline"></ion-icon>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="finance-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Total revenu</th>
+              <th>Dépenses</th>
+              <th>Bénéfices</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let history of financedata.periodicdashboard">
+              <td data-label="Date">
+                {{ history.date | date }}
+              </td>
+
+              <td data-label="Total revenu">
+                <p *ngFor="let revenu of history.periodictotalrevenu">
+                  {{ revenu.abreviation }} {{ revenu.totalrevenu | number }}
+                </p>
+              </td>
+
+              <td data-label="Dépenses">
+                <p *ngFor="let expenditure of history.periodicexpenditures">
+                  {{ expenditure.abreviation }} {{ expenditure.totalexpenditures | number }}
+                </p>
+              </td>
+
+              <td data-label="Bénéfices">
+                <p *ngFor="let benefit of history.periodicbefenefits">
+                  {{ benefit.abreviation }} {{ benefit.totalbenefits | number }}
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
   </main>
-  </ion-content>
- 
+</ion-content>
