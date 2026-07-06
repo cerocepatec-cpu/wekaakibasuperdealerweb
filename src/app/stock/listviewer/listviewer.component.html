@@ -1,0 +1,43 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none" class="contentbody">
+      <ion-icon name="chevron-back-outline"  color="primary" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text class="font-bold-500 font-size-15">Mouvements stock ({{stockhistories.length}})</ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-toolbar class="contentbody ion-padding-start">
+      <ion-segment mode="ios" slot="start" [(ngModel)]="invoicetypefilter">
+        <ion-segment-button value="all" (click)="filter('all')">Toutes</ion-segment-button>
+        <ion-segment-button value="entry" (click)="filter('entry')">Entrées</ion-segment-button>
+        <ion-segment-button value="wayout" (click)="filter('withdraw')">Sorties</ion-segment-button>
+      </ion-segment>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding"> 
+  <ion-searchbar mode="ios" [(ngModel)]="search" placeholder="Recherche" #defaultinput></ion-searchbar>
+  <br class="contentbody">
+  <ion-text class="font-bold-600">Total: {{totalgeneral}}</ion-text>
+  <ion-item class="bd-radius-10" color="warning" *ngIf="stockhistories.length<=0" >
+   <ion-text class="font-size-13">Aucune opération déjà faite</ion-text>
+  </ion-item>
+  <ion-item mode="ios" class="default-list-item3 contentbody"  lines="full" *ngFor="let mouv of stockhistories  | slice:0:10" >
+    <ion-avatar slot="start"><ion-icon name="document" size="small"></ion-icon></ion-avatar>
+    <ion-label>
+      <ion-text class="item-label-title" [color]="mouv.type==='withdraw'?'danger':''">{{mouv.name | titlecase}}</ion-text>
+        <h4 class="secondpara font-size-11" *ngIf="showentries">
+          <ion-note class="ion-margin-end">Entrees : {{mouv.total_entries?mouv.total_entries:0 | number}} {{mouv.uom_symbol}}</ion-note>
+        </h4>
+      <h4 class="secondpara font-size-11" *ngIf="showWithdraw">
+        Sorties : {{mouv.total_withdraw?mouv.total_withdraw:0 | number}} {{mouv.uom_symbol}}
+      </h4>
+      <h4 class="secondpara font-size-11">
+        <ion-note class="font-bold-600">{{appserv.defaultdate()| date}}</ion-note>
+      </h4>
+    </ion-label>
+    <ion-text slot="end" class="font-size-13" *ngIf="showWithdraw && showentries">
+      <ion-note class="font-bold-600">Solde : {{mouv.sold?mouv.sold:0 | number}} {{mouv.uom_symbol}}</ion-note>
+    </ion-text>
+    <ion-icon name="radio-button-on-outline" color="secondary" slot="end" size="small" class="unreadbutton" *ngIf="!mouv.read" ></ion-icon>
+  </ion-item>
+</ion-content>
+

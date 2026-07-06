@@ -1,0 +1,40 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="modal-toolbar">
+    <ion-title>Clôture des caisses</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Annuler</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="closure-modal ion-padding">
+  <div *ngFor="let fund of funds" class="fund-block">
+    <h3 class="fund-title">{{ fund.description }} - Solde: {{ fund.sold | number:'1.0-2' }} {{ fund.money_abreviation }}</h3>
+
+    <div class="bills-container">
+      <div class="bill-card bill-card-{{fund.id}}" *ngFor="let bill of billsOptions[fund.id]; let i = index">
+        <div class="bill-header">{{ bill.nominal }} {{ fund.money_abreviation }}</div>
+        <ion-input type="number" min="0" [(ngModel)]="bill.quantity" 
+          (ionChange)="onBillChange(fund.id, i)">
+        </ion-input>
+        <ion-button size="small" fill="outline" color="danger" (click)="removeBill(fund.id, i)">Supprimer</ion-button>
+      </div>
+    </div>
+
+    <ion-textarea [(ngModel)]="fund.closure_note" autoGrow="true" class="bd-square bd-radius-5 margin-top-5 ion-padding-start" rows="1" placeholder="Entrer une note..."></ion-textarea>
+
+    <ion-button fill="outline" color="secondary" size="small" (click)="addBill(fund.id)">
+      + Ajouter un billet
+    </ion-button>
+
+    <div class="total-container">
+      <h4>Total billeté: 
+        <span class="animated-total">{{ totalDisplayed[fund.id] | number:'1.0-2' }}</span> &nbsp;
+        <span class="currency">{{ fund.money_abreviation }}</span>
+      </h4>
+    </div>
+    <hr />
+  </div>
+</ion-content>
+<ion-footer>
+  <ion-button expand="block" color="primary" (click)="validateClosure()">Valider la clôture</ion-button>
+</ion-footer>

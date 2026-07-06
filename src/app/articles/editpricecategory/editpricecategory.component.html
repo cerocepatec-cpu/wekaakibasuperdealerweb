@@ -1,0 +1,24 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-text slot="start" color="primary" (click)="closemodal()" class="font-size-14">Annuler</ion-text>
+      <h4 slot="start" class="font-bold-600 font-size-14">Editer tarif</h4>
+      <ion-chip color="secondary" slot="end" (click)="addnew()"><ion-icon name="checkmark" color="success"></ion-icon></ion-chip>
+    </ion-item>
+    <ion-progress-bar mode="ios" type="indeterminate" *ngIf="showprogress" ></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <form class="contentbody" [formGroup]="newpricecategory">
+    <ion-item lines="full" class="font-size-12 contentbody">
+      <ion-input placeholder="Prix" type="number" formControlName="price"></ion-input>
+    </ion-item>
+    <ion-item lines="full" class="font-size-12 contentbody">
+      <ion-input placeholder="Libellé" type="text" formControlName="label"></ion-input>
+    </ion-item> 
+    <ion-item lines="full" class="font-size-12 contentbody" (click)="changemoney()">
+      <ion-text slot="start">Monnaie</ion-text>
+      <ion-label slot="start">{{actualmoney.abreviation?actualmoney.abreviation:actualmoney.money_name?actualmoney.money_name:'ajouter?'}}</ion-label>
+    </ion-item> 
+  </form>
+</ion-content>

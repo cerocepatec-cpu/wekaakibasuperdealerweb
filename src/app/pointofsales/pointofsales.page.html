@@ -1,0 +1,59 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="full">
+      <ion-text slot="start" class="font-size-30 font-bold-600">Points des ventes ({{listpos.length}})</ion-text>
+      <ion-icon name="add-circle-outline" size="large" color="primary" slot="end" (click)="newPos()" *ngIf="!showcheckbox"></ion-icon>
+      <ion-icon name="list-outline" slot="end" color="primary" (click)="showcheckbox=!showcheckbox" *ngIf="!showcheckbox"></ion-icon>
+      <!-- <ion-text slot="start" color="primary" (click)="showcheckbox=!showcheckbox; listselectedpos=[];" *ngIf="showcheckbox">Terminer</ion-text> -->
+      <ion-icon name="download-outline" color="primary" slot="end" [matMenuTriggerFor]="menuexport" *ngIf="!showcheckbox" size="large"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" *ngIf="showdefaultprogress" mode="ios" color="primary"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données...">
+    </ion-refresher-content>
+  </ion-refresher>
+ 
+  <ion-item lines="none" class="contentbody margin-left-moins-15">
+    <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche" [(ngModel)]="keyword" ></ion-searchbar>
+    <ion-icon name="filter-outline" slot="end" [matMenuTriggerFor]="animals2" color="primary"></ion-icon>
+    <mat-menu #animals2="matMenu">
+      <button mat-menu-item (click)="deletingfilter()"> <ion-text class="font-size-11" color="danger"> Annuler le filtre</ion-text></button>
+    </mat-menu>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item (click)="excelexport()"> <ion-text class="font-size-11">Exporter en Excel</ion-text></button>
+      <button mat-menu-item (click)="pdfdownload ()"> <ion-text class="font-size-11">Exporter en PDF</ion-text></button>
+    </mat-menu>
+  </ion-item>
+  <hr class="hr">
+      <ion-item class="contentbody default-list-item" *ngFor="let pos of listpos |filter:keyword" (click)="posmenu(pos)" lines="inset" detail="true">
+        <ion-avatar slot="start">
+          <ion-text class="ion-text-uppercase">{{pos.name | slice:0:2}}</ion-text>
+        </ion-avatar>
+        <ion-label>
+          <p class="item-label-title">
+            <ion-text>{{pos.name | titlecase}}</ion-text> 
+          </p>
+          <p class="secondpara">
+            {{pos.description | titlecase}}
+          </p> 
+          <p class="secondpara">
+            <span class="reqtotalprinted font-size-11 font-bold-600">Type. {{pos.type | titlecase}}</span>
+          </p>
+        </ion-label>
+        <ion-icon name="radio-button-on-outline" [color]="pos.status==='enabled'?'success':'danger'" size="small"></ion-icon>
+      </ion-item>
+</ion-content>
+<ion-footer class="ion-no-border" [translucent]="true" *ngIf="showcheckbox && listselectedpos.length>0">
+  <ion-toolbar>
+    <ion-item lines="none" class="font-size-14">
+      <ion-text slot="start" color="danger" (click)="multipledelete()">Supprimer</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,503 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="full">
+      <ion-text class="font-bold-600 font-size-30" slot="start"
+        >Caisses</ion-text
+      >
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar
+    mode="ios"
+    type="indeterminate"
+    *ngIf="showprogress"
+  ></ion-progress-bar>
+</ion-header>
+<ion-content class="content-body" fullscreen>
+  <ion-refresher slot="fixed" (ionRefresh)="refreshingdata($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      [pullingText]="'updating data'"
+      refreshingSpinner="circles"
+      [refreshingText]="'update' + '...'"
+    >
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <ion-icon name="book-outline"></ion-icon> &nbsp; Mes caisses
+      </ng-template>
+      <br />
+      <div class="ion-padding bd-square bd-radius-5">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" class="ion-padding">
+              <ion-grid>
+                <ion-row>
+                  <ion-col
+                    size="12"
+                    [sizeMd]="
+                      appserv.actualUser.user_type === 'super_admin' ? 8 : 12
+                    "
+                    [sizeSm]="
+                      appserv.actualUser.user_type === 'super_admin' ? 8 : 12
+                    "
+                    [sizeLg]="
+                      appserv.actualUser.user_type === 'super_admin' ? 8 : 12
+                    "
+                  >
+                    <ion-grid>
+                      <ion-row>
+                        <ion-col size="12">
+                          <ion-searchbar
+                            placeholder="Recherche"
+                            mode="ios"
+                            [(ngModel)]="searchtub"
+                            class="font-size-12"
+                            #defaultinput
+                          ></ion-searchbar>
+                          &nbsp;&nbsp; &nbsp;<ion-note
+                            class="font-size-12 totalfund"
+                            >Total trouvée{{ listtubs.length > 1 ? "s" : "" }}
+                            {{ listtubs.length }}</ion-note
+                          >
+                          <ng-container *ngIf="!load">
+                            <ion-item
+                              lines="none"
+                              *ngFor="let tub of listtubs | filter : searchtub"
+                              class="default-list-item contentbody ion-margin-bottom bd-radius-10"
+                              (click)="opentubdetails(tub)"
+                            >
+                              <ion-label>
+                                <p class="item-label-title">
+                                  <ion-text class="text-icon-inline">
+                                    {{ tub.description | titlecase }}
+                                  </ion-text>
+                                </p>
+                                <p class="secondpara">
+                                  <span class="reqtotalprinted">Solde</span
+                                  ><span class="point">.</span>
+                                  <span
+                                    >{{ tub.sold | number }}
+                                    {{ tub.money_abreviation }} </span
+                                  ><span class="point">.</span
+                                  ><span
+                                    ><ion-text class="reqtotalprinted"
+                                      >Caissier.ère. </ion-text
+                                    >{{ tub.user_name | titlecase }}
+                                    <span class="point">.</span
+                                    ><span class="reqtotalprinted"
+                                      >Créée le
+                                    </span>
+                                    <span>{{ tub.created_at | date }}</span>
+                                  </span>
+                                </p>
+                              </ion-label>
+                              <ion-badge color="warning" class="font-size-11">{{
+                                tub.principal === 1 ? "P" : ""
+                              }}</ion-badge>
+                              <ion-icon
+                                name="alarm-outline"
+                                *ngIf="tub.type === 'automatic'"
+                                size="small"
+                                color="success"
+                              ></ion-icon>
+                            </ion-item>
+                          </ng-container>
+
+                          <app-skeleton-loader
+                            type="list"
+                            *ngIf="load"
+                          ></app-skeleton-loader>
+                        </ion-col>
+                      </ion-row>
+                    </ion-grid>
+                  </ion-col>
+                  <ion-col
+                    size="12"
+                    sizeMd="4"
+                    sizeSm="4"
+                    sizeLg="4"
+                    *ngIf="
+                      appserv.actualUser.user_type === 'super_admin' &&
+                      appserv.permissionFilter('Caisses', 'add')
+                    "
+                  >
+                    <ion-card mode="ios">
+                      <ion-card-title class="ion-padding-start">
+                        <ion-text class="font-size-12"
+                          >Nouvelle caisse</ion-text
+                        >
+                      </ion-card-title>
+                      <ion-card-content>
+                        <form [formGroup]="newtub" class="form">
+                          <ion-item lines="none" class="font-size-12">
+                            <ion-label class="medium">Principale?</ion-label>
+                            <ion-checkbox
+                              formControlName="principal"
+                            ></ion-checkbox>
+                          </ion-item>
+
+                          <ion-item
+                            lines="none"
+                            class="font-size-11 bd-square ion-margin-bottom"
+                          >
+                            <ion-label position="floating" class="medium"
+                              >Déscription</ion-label
+                            >
+                            <ion-input
+                              placeholder="Description de la caisse"
+                              formControlName="description"
+                            ></ion-input>
+                          </ion-item>
+
+                          <ion-item
+                            lines="none"
+                            class="font-size-11 bd-square ion-margin-bottom"
+                          >
+                            <ion-label class="medium">Type</ion-label>
+                            <ion-select
+                              formControlName="type"
+                              interface="popover"
+                            >
+                              <ion-select-option value="internal"
+                                >Internal</ion-select-option
+                              >
+                              <ion-select-option value="external"
+                                >External</ion-select-option
+                              >
+                              <ion-select-option value="bank"
+                                >Bank</ion-select-option
+                              >
+                              <ion-select-option value="automatic"
+                                >Automatic Ops</ion-select-option
+                              >
+                              <ion-select-option value="salenotebooks"
+                                >Ventes carnets</ion-select-option
+                              >
+                              <ion-select-option value="virtual_sale"
+                                >Ventes Virtuel</ion-select-option
+                              >
+                            </ion-select>
+                          </ion-item>
+
+                          <ion-item
+                            lines="none"
+                            class="font-size-11 bd-square ion-margin-bottom"
+                          >
+                            <ion-label class="medium">Monnaie</ion-label>
+                            <ion-select
+                              formControlName="money_id"
+                              interface="popover"
+                            >
+                              <ion-select-option
+                                *ngFor="let money of listmoney"
+                                [value]="money?.id"
+                              >
+                                {{ money.abreviation }}
+                              </ion-select-option>
+                            </ion-select>
+                          </ion-item>
+
+                          <ion-item
+                            lines="none"
+                            class="font-size-11 bd-square ion-margin-bottom"
+                          >
+                            <ion-label class="medium">Caissier</ion-label>
+                            <ion-select
+                              formControlName="user_id"
+                              interface="popover"
+                            >
+                              <ion-select-option
+                                *ngFor="let agent of listagents"
+                                [value]="agent?.id"
+                              >
+                                {{
+                                  (agent.full_name
+                                    ? agent.full_name
+                                    : agent.user_name
+                                  ) | titlecase
+                                }}
+                              </ion-select-option>
+                            </ion-select>
+                          </ion-item>
+
+                          <div class="buttons-group ion-margin-bottom">
+                            <ion-chip
+                              class="submitbutton"
+                              *ngIf="showsaveprogress"
+                            >
+                              Enregistrement &nbsp;
+                              <ion-spinner name="dots"></ion-spinner>
+                            </ion-chip>
+                            <ion-chip
+                              class="submitbutton"
+                              *ngIf="!showsaveprogress"
+                              (click)="savenewtub()"
+                            >
+                              Ajouter
+                            </ion-chip>
+                          </div>
+                        </form>
+                      </ion-card-content>
+                    </ion-card>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <ion-icon name="list-outline"></ion-icon> &nbsp; Livre de caisse
+      </ng-template>
+      <br />
+      <div class="ion-padding bd-square bd-radius-5">
+        <div class="ion-padding-bottom">
+          <ion-grid>
+            <ion-row>
+              <ion-col size="6">
+                <ion-note
+                  *ngIf="listtubselected.length > 0"
+                  class="font-size-12"
+                  >Total sélectionnées: {{ listtubselected.length }}</ion-note
+                >
+              </ion-col>
+              <ion-col size="6">
+                <ion-buttons class="ion-float-right">
+                  <ion-button
+                    size="small"
+                    mode="ios"
+                    *ngIf="listtubselected.length > 0"
+                    (click)="filterbyfunds()"
+                  >
+                    <ion-icon
+                      name="filter"
+                      size="small"
+                      class="strock-icon-10px cursor-pointer"
+                    ></ion-icon>
+                  </ion-button>
+                  <ion-button
+                    size="small"
+                    mode="ios"
+                    *ngIf="listtubselected.length > 0"
+                    (click)="resetfundsfilter()"
+                  >
+                    <ion-icon
+                      name="close"
+                      size="small"
+                      class="strock-icon-10px"
+                    ></ion-icon>
+                  </ion-button>
+                </ion-buttons>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+          <ion-chip
+            *ngFor="let fund of listtubs"
+            class="font-size-10"
+            [color]="fund.selected ? 'primary' : ''"
+            (click)="selectitem(fund)"
+          >
+            {{ fund.description | titlecase }}
+            <ion-icon
+              name="close-circle-outline"
+              size="small"
+              color="danger"
+              *ngIf="fund.selected"
+            ></ion-icon>
+          </ion-chip>
+        </div>
+        <table class="table" border="1" style="width: 100%; font-size: 12px">
+          <thead>
+            <th class="text-left">N°</th>
+            <th class="text-left">DATE</th>
+            <th class="text-left">CAISSE</th>
+            <th class="text-left">LIBELLE</th>
+            <th class="text-right">DEBIT</th>
+            <th class="text-right">CREDIT</th>
+            <th class="text-left">IMPUTATION</th>
+            <th class="text-right">SOLDES</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let mouv of listoperations; let i = index">
+              <td class="text-left font-size-11">{{ i + 1 }}</td>
+              <td class="text-left font-size-11">
+                {{ appserv.frdate(mouv.done_at) }}
+              </td>
+              <td class="text-left font-size-11">{{ mouv.fund_name }}</td>
+              <td class="text-left font-size-11">{{ mouv.motif }}</td>
+              <td class="text-right font-size-11">
+                {{ (mouv.type === "entry" ? mouv.amount : "") | number }}
+                {{ mouv.type === "entry" ? mouv.abreviation : "" }}
+              </td>
+              <td class="text-right font-size-11">
+                {{ (mouv.type === "withdraw" ? mouv.amount : "") | number }}
+                {{ mouv.type === "withdraw" ? mouv.abreviation : "" }}
+              </td>
+              <td class="text-left font-size-11">{{ mouv.account_name }}</td>
+              <td class="text-right font-size-11">
+                {{ mouv.sold | number }} {{ mouv.abreviation }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <br />
+        <div>
+          <ion-grid>
+            <ion-row class="ion-padding-bottom">
+              <ion-col size="2">
+                <ion-text class="font-size-12" color="medium">
+                  Nombre total opérations: {{ listoperations.length }}
+                </ion-text>
+              </ion-col>
+              <ion-col size="10">
+                <ion-buttons class="ion-float-right">
+                  <ion-button
+                    size="small"
+                    mode="ios"
+                    [disabled]="operationstosend.length <= 0"
+                    (click)="saveoperations()"
+                  >
+                    <ion-icon
+                      name="save"
+                      size="small"
+                      class="strock-icon-10px"
+                    ></ion-icon>
+                  </ion-button>
+                  <ion-button
+                    size="small"
+                    mode="ios"
+                    [disabled]="operationstosend.length <= 0"
+                    (click)="removeallitems()"
+                  >
+                    <ion-icon
+                      name="trash"
+                      size="small"
+                      class="strock-icon-10px"
+                    ></ion-icon>
+                  </ion-button>
+                </ion-buttons>
+              </ion-col>
+            </ion-row>
+            <ion-row
+              class="bd-square bd-radius-10"
+              *ngFor="let newline of operationstosend"
+            >
+              <ion-col size="0.5">
+                <ion-item
+                  class="contentbody border-right-gray-1px font-size-12 cursor-pointer"
+                  lines="none"
+                  (click)="removeitem(newline)"
+                >
+                  <ion-icon name="trash" size="small" color="danger"></ion-icon>
+                </ion-item>
+              </ion-col>
+              <ion-col>
+                <ion-item
+                  class="contentbody border-right-gray-1px font-size-12"
+                  lines="none"
+                >
+                  <ion-input
+                    type="date"
+                    mode="ios"
+                    [(ngModel)]="newline.done_at"
+                  ></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col>
+                <ion-item
+                  class="contentbody border-right-gray-1px font-size-12"
+                  lines="none"
+                  [color]="newline.fund_mistaken ? 'danger' : ''"
+                >
+                  <ion-select
+                    label="Caisse"
+                    mode="ios"
+                    [(ngModel)]="newline.fund_id"
+                    (ionChange)="fundhandlechange($event)"
+                  >
+                    <ion-select-option
+                      *ngFor="let tub of agentlisttubs"
+                      [value]="tub?.id"
+                    >
+                      {{ tub.description }}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+              <ion-col>
+                <ion-item
+                  class="contentbody border-right-gray-1px font-size-12"
+                  lines="none"
+                  [color]="newline.type_mistaken ? 'danger' : ''"
+                >
+                  <ion-select
+                    label="Opération"
+                    mode="ios"
+                    [(ngModel)]="newline.type"
+                  >
+                    <ion-select-option value="entry">Débit</ion-select-option>
+                    <ion-select-option value="withdraw"
+                      >Crédit</ion-select-option
+                    >
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+              <ion-col>
+                <ion-item
+                  class="contentbody border-right-gray-1px font-size-12"
+                  lines="none"
+                  [color]="newline.motif_mistaken ? 'danger' : ''"
+                >
+                  <ion-input
+                    type="text"
+                    placeholder="Libellé"
+                    mode="ios"
+                    [(ngModel)]="newline.motif"
+                  ></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col>
+                <ion-item
+                  class="contentbody border-right-gray-1px font-size-12"
+                  lines="none"
+                  [color]="newline.amount_mistaken ? 'danger' : ''"
+                >
+                  <ion-input
+                    type="number"
+                    mode="ios"
+                    label="Montant"
+                    [(ngModel)]="newline.amount"
+                  ></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col>
+                <ion-item class="contentbody font-size-12" lines="none">
+                  <ion-select
+                    label="Imputation"
+                    mode="ios"
+                    [(ngModel)]="newline.account_id"
+                  >
+                    <ion-select-option
+                      *ngFor="let account of accounts"
+                      [value]="account?.id"
+                    >
+                      {{ account.name }}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+        <ion-button mode="ios" size="small" color="medium" (click)="additem()" *ngIf="appserv.permissionFilter('caisses','entry') || appserv.permissionFilter('caisses','withdraw')"
+          >Nouvelle opération</ion-button
+        >
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</ion-content>

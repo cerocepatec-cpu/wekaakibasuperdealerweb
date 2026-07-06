@@ -1,0 +1,415 @@
+<ion-header translucent="true" class="border-b dark:border-slate-800">
+  <!-- ===== TOP BAR ===== -->
+  <ion-toolbar class="px-4">
+    <div class="flex items-center justify-between w-full">
+      <!-- Title -->
+      <div>
+        <h1 class="text-lg font-semibold font-size-20">Frais de transaction</h1>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3">
+        <!-- Toggle Filters -->
+        <button
+          (click)="showFilters = !showFilters"
+          class="relative flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+        >
+          <span>Filtres</span>
+
+          <!-- Badge si filtres actifs -->
+          <span
+            *ngIf="activeFiltersCount > 0"
+            class="absolute -top-1 -right-1 text-xs bg-emerald-500 text-white px-1.5 py-0.5 rounded-full"
+          >
+            {{ activeFiltersCount }}
+          </span>
+
+          <svg
+            class="w-4 h-4 transition-transform duration-300"
+            [class.rotate-180]="showFilters"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+
+        <!-- New -->
+        <button
+          (click)="openCreate()"
+          class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition"
+        >
+          Nouvelle tranche
+        </button>
+      </div>
+    </div>
+  </ion-toolbar>
+
+  <!-- ===== SEARCH BAR ===== -->
+  <ion-toolbar class="px-4 pb-3">
+    <div class="relative w-full">
+      <input
+        type="text"
+        placeholder="Rechercher..."
+        [(ngModel)]="search"
+        #searchInput
+        class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+      />
+
+      <!-- Icon -->
+      <svg
+        class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+    </div>
+  </ion-toolbar>
+
+  <!-- ===== FILTER PANEL ===== -->
+  <div
+    class="overflow-hidden transition-all duration-300 px-4"
+    [ngClass]="
+      showFilters ? 'max-h-[600px] opacity-100 pb-4' : 'max-h-0 opacity-0'
+    "
+  >
+    <div
+      class="bg-white dark:bg-slate-900 border dark:border-slate-700 rounded-2xl shadow-sm p-4 space-y-4"
+    >
+      <!-- GRID -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Devise -->
+        <div>
+          <label
+            class="block text-xs font-semibold mb-1 text-gray-500 dark:text-gray-400"
+          >
+            Devise
+          </label>
+
+          <select
+            (change)="onMoneyFilter($event)"
+            class="w-full px-3 py-2 rounded-xl border bg-gray-50 dark:bg-slate-800 border-gray-300 dark:border-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          >
+            <option value="">Toutes les devises</option>
+
+            <option *ngFor="let m of moneys" [value]="m.id">
+              {{ m.abreviation }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Montant Min -->
+        <div>
+          <label
+            class="block text-xs font-semibold mb-1 text-gray-500 dark:text-gray-400"
+          >
+            Montant minimum
+          </label>
+
+          <input
+            type="number"
+            (input)="onMinFilter($event)"
+            placeholder="0"
+            class="w-full px-3 py-2 rounded-xl border bg-gray-50 dark:bg-slate-800 border-gray-300 dark:border-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          />
+        </div>
+
+        <!-- Montant Max -->
+        <div>
+          <label
+            class="block text-xs font-semibold mb-1 text-gray-500 dark:text-gray-400"
+          >
+            Montant maximum
+          </label>
+
+          <input
+            type="number"
+            (input)="onMaxFilter($event)"
+            placeholder="∞"
+            class="w-full px-3 py-2 rounded-xl border bg-gray-50 dark:bg-slate-800 border-gray-300 dark:border-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          />
+        </div>
+
+        <!-- Reset -->
+        <div class="flex items-end">
+          <button
+            (click)="resetFilters()"
+            class="w-full px-4 py-2 rounded-xl bg-gray-200 dark:bg-slate-700 text-sm font-medium hover:bg-gray-300 dark:hover:bg-slate-600 transition"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-header>
+
+<!-- ================= CONTENT ================= -->
+<ion-content [fullscreen]="true" class="ion-padding">
+  <!-- LOADING -->
+  <div *ngIf="loading" class="text-center py-8">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <!-- ================= MOBILE CARDS ================= -->
+  <div class="space-y-4 md:hidden">
+    <div
+      *ngFor="let fee of fees | filter : search"
+      class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow"
+    >
+      <div class="flex justify-between items-center">
+        <span class="font-semibold text-lg">
+          {{ fee.money?.abreviation }}
+        </span>
+
+        <span class="text-xs text-gray-500">
+          {{ fee.min_amount | number}} - {{ (fee.max_amount | number) || "∞" }}
+        </span>
+      </div>
+
+      <div class="mt-3 text-sm space-y-1">
+        <div>
+          Retrait :
+          <span class="font-semibold text-red-500">
+            {{ fee.withdraw_percent }}%
+          </span>
+        </div>
+
+        <div>
+          Envoi :
+          <span class="font-semibold text-blue-500">
+            {{ fee.send_percent }}%
+          </span>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <ion-button
+          size="small"
+          fill="clear"
+          color="primary"
+          (click)="edit(fee)"
+        >
+          Modifier
+        </ion-button>
+
+        <ion-button
+          size="small"
+          fill="clear"
+          color="danger"
+          (click)="delete(fee.id)"
+        >
+          Supprimer
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DESKTOP TABLE ================= -->
+  <div class="hidden md:block">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-100 dark:bg-slate-700">
+          <tr>
+            <th class="p-3 text-left">Devise</th>
+            <th class="p-3 text-left">Min</th>
+            <th class="p-3 text-left">Max</th>
+            <th class="p-3 text-left">Retrait %</th>
+            <th class="p-3 text-left">Envoi %</th>
+            <th class="p-3 text-right">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="let fee of fees"
+            class="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700"
+          >
+            <td class="p-3 font-semibold">
+              {{ fee.money?.abreviation }}
+            </td>
+
+            <td class="p-3">
+              {{ fee.min_amount | number }}
+            </td>
+
+            <td class="p-3">
+              {{ (fee.max_amount | number) || "∞" }}
+            </td>
+
+            <td class="p-3 text-red-500">{{ fee.withdraw_percent }}%</td>
+
+            <td class="p-3 text-blue-500">{{ fee.send_percent }}%</td>
+
+            <td class="p-3 text-right space-x-2">
+              <ion-button size="small" fill="clear" (click)="edit(fee)">
+                ✏️
+              </ion-button>
+
+              <ion-button
+                size="small"
+                fill="clear"
+                color="danger"
+                (click)="delete(fee.id)"
+              >
+                🗑
+              </ion-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ================= PAGINATION ================= -->
+  <div class="flex justify-center items-center gap-3 py-6">
+    <ion-button
+      size="small"
+      fill="outline"
+      (click)="changePage(currentPage - 1)"
+    >
+      ←
+    </ion-button>
+
+    <span class="text-sm"> Page {{ currentPage }} / {{ lastPage }} </span>
+
+    <ion-button
+      size="small"
+      fill="outline"
+      (click)="changePage(currentPage + 1)"
+    >
+      →
+    </ion-button>
+  </div>
+  <ion-modal
+    [isOpen]="showModal"
+    (didDismiss)="showModal = false"
+    class="fee-modal modal-border-radius-20"
+  >
+    <ng-template>
+      <!-- HEADER -->
+      <div
+        class="flex justify-between items-center px-6 py-4 border-b dark:border-slate-700"
+      >
+        <h3 class="text-lg font-bold dark:text-white">
+          {{ editing ? "Modifier tranche" : "Nouvelle tranche" }}
+        </h3>
+
+        <button
+          (click)="showModal = false"
+          class="text-gray-500 hover:text-red-500 text-xl"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- BODY -->
+      <div class="p-6 overflow-y-auto max-h-[80vh]">
+        <form [formGroup]="form" (ngSubmit)="save()" class="space-y-5">
+          <!-- Devise -->
+          <div>
+            <label class="block text-sm font-medium mb-1 dark:text-gray-300">
+              Devise
+            </label>
+
+            <select
+              formControlName="money_id"
+              class="w-full px-3 py-2 rounded-xl border bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            >
+              <option value="">Sélectionner</option>
+              <option *ngFor="let m of moneys" [value]="m.id">
+                {{ m.abreviation }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Montant minimum -->
+          <div>
+            <label class="block text-sm font-medium mb-1 dark:text-gray-300">
+              Montant minimum
+            </label>
+
+            <input
+              type="number"
+              formControlName="min_amount"
+              class="w-full px-3 py-2 rounded-xl border bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            />
+          </div>
+
+          <!-- Montant maximum -->
+          <div>
+            <label class="block text-sm font-medium mb-1 dark:text-gray-300">
+              Montant maximum
+            </label>
+
+            <input
+              type="number"
+              formControlName="max_amount"
+              class="w-full px-3 py-2 rounded-xl border bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            />
+          </div>
+
+          <!-- % Retrait -->
+          <div>
+            <label class="block text-sm font-medium mb-1 dark:text-gray-300">
+              % Retrait
+            </label>
+
+            <input
+              type="number"
+              step="0.01"
+              formControlName="withdraw_percent"
+              class="w-full px-3 py-2 rounded-xl border bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 focus:ring-2 focus:ring-red-500 focus:outline-none"
+            />
+          </div>
+
+          <!-- % Envoi -->
+          <div>
+            <label class="block text-sm font-medium mb-1 dark:text-gray-300">
+              % Envoi
+            </label>
+
+            <input
+              type="number"
+              step="0.01"
+              formControlName="send_percent"
+              class="w-full px-3 py-2 rounded-xl border bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              (click)="showModal = false"
+              class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200 hover:opacity-90"
+            >
+              Annuler
+            </button>
+
+            <button
+              type="submit"
+              [disabled]="form.invalid"
+              class="px-5 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+            >
+              {{ editing ? "Mettre à jour" : "Enregistrer" }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+  </ion-modal>
+</ion-content>

@@ -1,0 +1,193 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Détail Crédit</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gray-50 dark:bg-gray-900 p-4" fullscreen>
+<br>
+    <div *ngIf="loading" class="text-center py-10">Chargement...</div>
+
+    <div *ngIf="credit" class="space-y-6 max-w-4xl mx-auto">
+      <!-- =============================
+         HEADER CARD
+    ============================== -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-lg font-semibold">
+              {{ credit.beneficiary?.name }}
+            </h2>
+            <div class="text-sm text-gray-500">Crédit #{{ credit.id }}</div>
+          </div>
+
+          <span
+            class="px-3 py-1 rounded-full text-xs"
+            [ngClass]="{
+              'bg-green-100 text-green-700': credit.status === 'active',
+              'bg-blue-100 text-blue-700': credit.status === 'approved',
+              'bg-yellow-100 text-yellow-700': credit.status === 'pending',
+              'bg-gray-200 text-gray-600': credit.status === 'completed',
+              'bg-red-100 text-red-700': credit.status === 'defaulted'
+            }"
+          >
+            {{ credit.status }}
+          </span>
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="mt-4">
+          <div class="flex justify-between text-xs mb-1">
+            <span>Progression</span>
+            <span>{{ progress | number : "1.0-0" }}%</span>
+          </div>
+
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div
+              class="bg-green-500 h-2 rounded-full transition-all duration-500"
+              [style.width.%]="progress"
+            ></div>
+          </div>
+        </div>
+
+        <!-- AMOUNTS -->
+        <div class="grid grid-cols-2 gap-4 mt-4 text-sm">
+          <div>
+            <div class="text-gray-500">Montant total</div>
+            <div class="font-semibold">
+              {{ credit.total_amount | number }} {{ credit.money?.abreviation }}
+            </div>
+          </div>
+
+          <div>
+            <div class="text-gray-500">Reste à payer</div>
+            <div class="font-semibold text-orange-600">
+              {{ credit.remaining_to_pay | number }} {{ credit.money?.abreviation }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =============================
+         TIMELINE
+    ============================== -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+        <h3 class="font-semibold mb-4">Timeline</h3>
+
+        <div class="space-y-4 text-sm">
+          <div *ngIf="credit.created_at">
+            🟢 Créé le {{ credit.created_at | date : "dd/MM/yyyy HH:mm" }}
+          </div>
+
+          <div *ngIf="credit.approved_at">
+            🔵 Approuvé le {{ credit.approved_at | date : "dd/MM/yyyy HH:mm" }}
+          </div>
+
+          <div *ngIf="credit.disbursed_at">
+            🟣 Servi le {{ credit.disbursed_at | date : "dd/MM/yyyy HH:mm" }}
+          </div>
+
+          <div *ngIf="credit.start_date">
+            🟡 Début remboursement :
+            {{ credit.start_date | date : "dd/MM/yyyy" }}
+          </div>
+
+          <div *ngIf="credit.end_date">
+            ⚫ Clôturé le {{ credit.end_date | date : "dd/MM/yyyy" }}
+          </div>
+        </div>
+      </div>
+
+      <!-- =============================
+         INSTALLMENTS
+    ============================== -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+        <h3 class="font-semibold mb-4">Échéances</h3>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-gray-500 border-b dark:border-gray-700">
+              <tr>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Payé</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let i of credit.installments"
+                class="border-b dark:border-gray-700"
+              >
+                <td>{{ i.due_date | date : "dd/MM/yyyy" }}</td>
+                <td>{{ i.amount | number}}</td>
+                <td>{{ i.paid_amount | number}}</td>
+                <td>
+                  <span
+                    class="text-xs px-2 py-1 rounded"
+                    [ngClass]="{
+                      'bg-green-100 text-green-700': i.status === 'paid',
+                      'bg-yellow-100 text-yellow-700': i.status === 'partial',
+                      'bg-red-100 text-red-700': i.status === 'late'
+                    }"
+                  >
+                    {{ i.status }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- =============================
+         PAYMENTS
+    ============================== -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+        <h3 class="font-semibold mb-4">Paiements</h3>
+
+        <div class="space-y-3 text-sm">
+          <div
+            *ngFor="let p of credit.payments"
+            class="p-3 border rounded dark:border-gray-700 flex justify-between"
+          >
+            <div>
+              <div class="font-medium">
+                {{ p.amount | number}} {{ credit.money?.abreviation }}
+              </div>
+              <div class="text-xs text-gray-500">
+                {{ p.created_at | date : "dd/MM/yyyy HH:mm" }}
+              </div>
+            </div>
+            <div>
+              <span
+                class="text-xs px-2 py-1 rounded"
+                [ngClass]="{
+                  'bg-green-100 text-green-700': p.status === 'confirmed',
+                  'bg-yellow-100 text-yellow-700': p.status === 'pending'
+                }"
+              >
+                {{ p.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =============================
+         PENALTIES
+    ============================== -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+        <h3 class="font-semibold mb-4">Pénalités</h3>
+
+        <div *ngIf="credit.installments?.length">
+          <div *ngFor="let i of credit.installments">
+            <div *ngFor="let pen of i.penalties" class="text-sm text-red-600">
+              {{ pen.amount | number}} ({{ pen.reason }})
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</ion-content>

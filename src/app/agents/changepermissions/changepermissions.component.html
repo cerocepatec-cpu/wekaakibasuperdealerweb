@@ -1,0 +1,42 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+      <ion-item lines="none" class="default-list-item">
+        <ion-icon name="chevron-back-outline" (click)="appserv.closemodal()" color="primary" size="large"></ion-icon>
+        <ion-avatar>
+          <ion-img [src]="usersent.avatar?appserv.imgUrl+usersent.avatar:''" *ngIf="usersent.avatar"></ion-img>
+          <ion-icon name="person-outline" size="small" *ngIf="!usersent.avatar"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <p class="item-label-title font-size-20">{{(usersent.user_name?usersent.user_name:usersent.user_mail) | titlecase}}</p>
+          <p class="secondpara font-size-16">
+            Permissions
+          </p>
+        </ion-label>
+      </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" *ngIf="showprogress" mode="ios"></ion-progress-bar>
+</ion-header>
+<ion-content class="content-body ion-padding">
+  <ion-searchbar mode="ios" placeholder="Rechercher..." #defaultinput></ion-searchbar>
+<ion-card *ngFor="let group of (groupedPermissions | keyvalue)" class="permission-card">
+  <ion-card-header>
+    <ion-card-title>
+      <ion-icon name="shield-checkmark-outline" class="icon-title"></ion-icon>
+      {{ group.key | titlecase }}
+    </ion-card-title>
+  </ion-card-header>
+
+  <ion-card-content>
+    <ion-list lines="none">
+      <ion-item *ngFor="let permission of group.value">
+        <ion-toggle
+          [checked]="true"
+          (ionChange)="togglePermission($event, permission)">
+          {{ permission.split('.')[1] | titlecase }}
+        </ion-toggle>
+      </ion-item>
+    </ion-list>
+  </ion-card-content>
+</ion-card>
+
+</ion-content>

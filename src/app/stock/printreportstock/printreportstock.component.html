@@ -1,0 +1,191 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="appserv.closemodal()" mode="ios">Annuler</ion-button>
+    </ion-buttons>
+    <ion-title style="text-align:center;">Impréssion fiche de stock</ion-title>
+    <ion-buttons slot="end">
+      <ion-button  (click)="printToCart('print-section')" [strong]="true" mode="ios">Imprimer</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ng-container *ngIf="criteriasent === 'detail'">
+    <div id="content-printer">
+      <div class="font-size-12">
+        <ion-text *ngIf="posprintoptions.name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.adresse">{{appserv.getactualEse().adresse}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.description">{{appserv.getactualEse().description}}</ion-text>
+        <ion-text *ngIf="posprintoptions.num_impot">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.phone">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br>
+      </div>
+      <hr class="hr">
+      <br>
+      <div class="suheader ion-no-padding">
+          <ion-text class="font-bold-600 font-size-16">Fiche de Stock détaillée du {{from | date}} au {{to | date}}</ion-text> <br>
+        <ion-text class="font-size-10 ion-float-end">Imprimée le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+        <ion-text class="font-size-10 ion-float-end">Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+      </div>
+      <br>
+      <div class="body">
+        <table border="1" style="width:100% ;font-size: 12px;">
+          <thead>
+            <tr>
+              <th class="text-left">N°</th>
+              <th class="text-left">Date</th>
+              <th class="text-left">Type</th>
+              <th class="text-left">Dépôt</th>
+              <th class="text-left">Article</th>
+              <th class="text-left">Qté</th>
+              <th class="text-left">Stock inital</th>
+              <th class="text-left">Solde</th>
+              <th class="text-left">Fait par</th>
+            </tr>
+          </thead>
+          <tbody class="body">
+            <tr *ngFor="let mouv of listsent; let i =index;">
+                <td>{{i+1}}</td>
+                <td>{{mouv.created_at | date}}</td>
+                <td>{{mouv.type==='withdraw'?'sortie':'entrée'}}</td>
+                <td>{{mouv.deposit_name}}</td>
+                <td>{{mouv.service_name}}</td>
+                <td class="text-right">{{mouv.quantity | number}}</td>
+                <td class="text-right">{{mouv.quantity_before | number}}</td>
+                <td class="text-right">{{(mouv.type==='withdraw'?mouv.quantity_before>0?mouv.quantity_before-mouv.quantity:mouv.quantity:mouv.quantity_before>0?mouv.quantity_before+mouv.quantity:mouv.quantity) | number}} ({{mouv.uom_symbol |lowercase}})</td>
+                <td class="text-right">{{mouv.done_by_name | titlecase}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="criteriasent === 'deposit'">
+    <div id="content-printer">
+      <div class="font-size-12">
+        <ion-text *ngIf="posprintoptions.name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.adresse">{{appserv.getactualEse().adresse}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.description">{{appserv.getactualEse().description}}</ion-text>
+        <ion-text *ngIf="posprintoptions.num_impot">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.phone">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br>
+      </div>
+      <hr class="hr">
+      <br>
+      <div class="suheader ion-no-padding">
+          <ion-text class="font-bold-600 font-size-16">Fiche de Stock groupée par dépôt du {{from | date}} au {{to | date}}</ion-text> <br>
+          <ion-text class="font-size-10 ion-float-end">Imprimée le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+          <ion-text class="font-size-10 ion-float-end">Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+      </div>
+      <br>
+      <div class="body">
+        <ion-list *ngFor="let depot of listsent" class="contentbody">
+          <ion-list-header class="font-size-20 font-bold-600 contentbody">
+            {{depot.deposit.name | titlecase}}
+          </ion-list-header>
+          <ion-item class="contentbody default-list-item" *ngFor="let article of depot.articles" lines="inset">
+            <ion-avatar slot="start">
+              <ion-text class="ion-text-uppercase">{{article.name | slice:0:2}}</ion-text>
+            </ion-avatar>
+            <ion-label>
+              <p class="item-label-title">
+                <ion-text>{{article.name | titlecase}}</ion-text> 
+              </p>
+            </ion-label>
+            <ion-text class="font-size-14">Qté. {{article.quantity_total | number}} {{article.symbol}}</ion-text>
+          </ion-item>
+        </ion-list>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="criteriasent === 'article'">
+    <div id="content-printer">
+      <div class="font-size-12">
+        <ion-text *ngIf="posprintoptions.name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.adresse">{{appserv.getactualEse().adresse}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.description">{{appserv.getactualEse().description}}</ion-text>
+        <ion-text *ngIf="posprintoptions.num_impot">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.phone">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br>
+      </div>
+      <hr class="hr">
+      <br>
+      <div class="suheader ion-no-padding">
+          <ion-text class="font-bold-600 font-size-16">Fiche de stock groupée par article du {{from | date}} au {{to | date}}</ion-text> <br>
+          <ion-text class="font-size-10 ion-float-end">Imprimé le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+          <ion-text class="font-size-10 ion-float-end">Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+      </div>
+      <br>
+      <div class="body">
+        <table border="1" style="width:100% ;font-size: 12px;">
+          <thead>
+            <tr>
+              <th class="text-left">N°</th>
+              <th class="text-left">Article</th>
+              <th class="text-right">Quantité</th>
+              <!-- <th class="text-right">Sorties</th>
+              <th class="text-right">Solde</th> -->
+            </tr>
+          </thead>
+          <tbody class="body">
+            <tr *ngFor="let mouv of listsent; let i =index;">
+                <td>{{i+1}}</td>
+                <td>{{mouv.name}}</td>
+                <td class="text-right">{{mouv.quantity_total | number}} {{mouv.symbol}}</td>
+                <!-- <td class="text-right">{{mouv.quantity_total | number}} {{mouv.symbol}}</td>
+                <td class="text-right">{{mouv.quantity_total | number}} {{mouv.symbol}}</td> -->
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="criteriasent === 'tabular'">
+    <div id="content-printer">
+      <div class="font-size-12">
+        <ion-text *ngIf="posprintoptions.name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.adresse">{{appserv.getactualEse().adresse}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.description">{{appserv.getactualEse().description}}</ion-text>
+        <ion-text *ngIf="posprintoptions.num_impot">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+        <ion-text *ngIf="posprintoptions.phone">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br>
+      </div>
+      <hr class="hr">
+      <br>
+      <div class="suheader ion-no-padding">
+          <ion-text class="font-bold-600 font-size-16">Rapport de stock groupé par article du {{from | date}} au {{to | date}}</ion-text> <br>
+          <ion-text class="font-size-10 ion-float-end">Imprimée le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+          <ion-text class="font-size-10 ion-float-end">Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+      </div>
+      <br>
+      <div class="body">
+        <table border="1" style="width:100% ;font-size: 12px;">
+          <thead>
+            <tr>
+              <th class="text-left">N°</th>
+              <th class="text-left">Désignation</th>
+              <th class="text-left">Catégorie</th>
+              <th class="text-right">Tot. Entrées</th>
+              <th class="text-right">Tot. Sorties</th>
+              <th class="text-right">Solde</th>
+            </tr>
+          </thead>
+          <tbody class="body">
+            <tr *ngFor="let mouv of listsent; let i =index;">
+                <td>{{i+1}}</td>
+                <td>{{mouv.service.name | titlecase}}</td>
+                <td>{{mouv.service.category_name | titlecase}}</td>
+                <td class="text-right">{{mouv.totalEntries?mouv.totalEntries:0 | number}} {{mouv.service.uom_symbol}}</td>
+                <td class="text-right">{{mouv.totalWithdraw?mouv.totalWithdraw:0 | number}} {{mouv.service.uom_symbol}}</td>
+                <td class="text-right">{{mouv.sold?mouv.sold:0 | number}} {{mouv.service.uom_symbol}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+</ion-content>

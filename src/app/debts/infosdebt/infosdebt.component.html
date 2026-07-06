@@ -1,0 +1,40 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" slot="start" color="primary" size="large" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text slot="start">Détails dette</ion-text>
+      <ion-text slot="end">{{debtsent.debt.customerName?debtsent.debt.customerName:debtsent.debt.invoiceUuid | titlecase}}</ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" color="warning"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-searchbar [(ngModel)]="keyword" mode="ios"></ion-searchbar>
+  <ion-list class="contentbody">
+    <ion-list-header class="font-size-20">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6"> Paiements ({{debtsent.payments.length}})</ion-col>
+          <ion-col size="6">
+            Total :{{total | number}} {{debtsent.debt.abreviation}}
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      
+    </ion-list-header>
+    <ion-item class="contentbody default-list-item" *ngFor="let payment of debtsent.payments |filter:keyword" lines="inset" detail="true">
+      <ion-label>
+        <p class="item-label-title">
+          <ion-text>Op. ID: {{payment.uuid}}</ion-text> 
+        </p>
+        <p class="secondpara">
+          Date: {{payment.created_at | date}}
+        </p> 
+        <p class="secondpara">
+          <span class="reqtotalprinted font-size-11 font-bold-600">Par : {{payment.user_name | titlecase}}</span>
+        </p>
+      </ion-label>
+      <ion-text slot="end">{{payment.amount_payed | number}} {{debtsent.debt.abreviation}}</ion-text>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -1,0 +1,140 @@
+<div class="p-4 space-y-6">
+
+  <!-- HEADER -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+
+    <div>
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+        Taux de change
+      </h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Gestion des conversions multi-devise
+      </p>
+    </div>
+
+    <button
+      (click)="openCreate()"
+      class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700
+             text-white px-4 py-2 rounded-xl text-sm font-medium
+             transition shadow-md">
+      Nouveau taux
+    </button>
+
+  </div>
+
+  <!-- ================= MOBILE VIEW ================= -->
+  <div class="space-y-4 sm:hidden">
+
+    <div *ngFor="let rate of rates"
+         class="bg-white dark:bg-slate-900
+                border border-gray-200 dark:border-slate-800
+                rounded-2xl p-4 shadow-sm space-y-3">
+
+      <!-- Top Row -->
+      <div class="flex justify-between items-center">
+
+        <div class="flex items-center gap-2 text-sm font-semibold">
+          <span class="px-2 py-1 rounded-lg bg-gray-100 dark:bg-slate-800">
+            {{ rate.from_money?.abreviation }}
+          </span>
+
+          <span class="text-gray-400">→</span>
+
+          <span class="px-2 py-1 rounded-lg bg-gray-100 dark:bg-slate-800">
+            {{ rate.to_money?.abreviation }}
+          </span>
+        </div>
+
+        <button
+          (click)="edit(rate)"
+          class="text-emerald-600 text-xs font-medium">
+          Modifier
+        </button>
+
+      </div>
+
+      <!-- Rate -->
+      <div>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          Taux
+        </p>
+        <p class="text-lg font-bold text-gray-800 dark:text-white">
+          {{ rate.rate | number:'1.2-8' }}
+        </p>
+      </div>
+
+      <!-- Date -->
+      <div>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          Valide depuis
+        </p>
+        <p class="text-sm text-gray-700 dark:text-gray-300">
+          {{ rate.valid_from | date:'short' }}
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= DESKTOP VIEW ================= -->
+  <div class="hidden sm:block bg-white dark:bg-slate-900
+              border border-gray-200 dark:border-slate-800
+              rounded-2xl shadow overflow-hidden">
+
+    <table class="w-full text-sm">
+
+      <thead class="bg-gray-50 dark:bg-slate-800">
+        <tr>
+          <th class="p-4 text-left font-medium">De</th>
+          <th class="p-4 text-left font-medium">Vers</th>
+          <th class="p-4 text-left font-medium">Taux</th>
+          <th class="p-4 text-left font-medium">Validité</th>
+          <th class="p-4 text-right font-medium">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let rate of rates"
+            class="border-t dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition">
+
+          <td class="p-4">
+            <span class="px-2 py-1 rounded-lg bg-gray-100 dark:bg-slate-800">
+              {{ rate.from_money?.abreviation }}
+            </span>
+          </td>
+
+          <td class="p-4">
+            <span class="px-2 py-1 rounded-lg bg-gray-100 dark:bg-slate-800">
+              {{ rate.to_money?.abreviation }}
+            </span>
+          </td>
+
+          <td class="p-4 font-semibold">
+            {{ rate.rate | number:'1.2-8' }}
+          </td>
+
+          <td class="p-4">
+            {{ rate.valid_from | date:'short' }}
+          </td>
+
+          <td class="p-4 text-right">
+
+            <button
+              (click)="edit(rate)"
+              class="text-emerald-600 hover:underline text-sm font-medium">
+              Modifier
+            </button>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>

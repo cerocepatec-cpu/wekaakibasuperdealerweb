@@ -1,0 +1,46 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon slot="start" color="primary" (click)="closemodal()" name="chevron-back-outline">Annuler</ion-icon>
+      <h4 slot="start" class="font-bold-600 font-size-14">Nouveau tarif</h4>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" type="indeterminate" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <form class="contentbody" [formGroup]="newpricecategory">
+    <ion-item lines="full" class="font-size-12 contentbody">
+      <ion-input placeholder="Prix" type="number" formControlName="price"></ion-input>
+    </ion-item>
+    <ion-item lines="full" class="font-size-12 contentbody">
+      <ion-input placeholder="Libellé" type="text" formControlName="label"></ion-input>
+    </ion-item> 
+    <ion-item lines="full" class="font-size-12 contentbody">
+      <ion-text slot="start">Concerne</ion-text>
+      <ion-select formControlName="concerns">
+        <ion-select-option value="sale_super_dealer">Vente Super Dealer</ion-select-option>
+        <ion-select-option value="buy_super_dealer">Achat Super Dealer</ion-select-option>
+        <ion-select-option value="sale_collector">Vente Collecteur</ion-select-option>
+        <ion-select-option value="buy_collector">Achat Collecteur</ion-select-option>
+      </ion-select>
+    </ion-item> 
+    <ion-item lines="full" class="font-size-12 contentbody" (click)="changemoney()">
+      <ion-text slot="start">Monnaie</ion-text>
+      <ion-label slot="start" *ngIf="actualmoney" ><ion-chip>{{actualmoney.abreviation?actualmoney.abreviation:actualmoney.money_name?actualmoney.money_name:'ajouter?'}}</ion-chip></ion-label>
+      <ion-label slot="start" *ngIf="!actualmoney">ajouter?</ion-label>
+    </ion-item> 
+  </form>
+
+  <ion-card color="warning" mode="ios" class="ion-padding">
+    <ion-text class="font-size-11">
+      Si vous ne choisissez aucune monnaie, le système va utiliser la monnaie par défaut!
+    </ion-text>
+  </ion-card>
+</ion-content>
+<ion-footer class="ion-no-border ion-padding">
+  
+  <div class="buttons-group">
+    <ion-chip class="lightbutton" (click)="saveandexit=false;addnew();" [disabled]="!newpricecategory.valid">Enregistrer et continuer</ion-chip>
+    <ion-chip class="submitbutton" (click)="saveandexit=true;addnew();" [disabled]="!newpricecategory.valid">Enregistrer et fermer</ion-chip>
+  </div>
+</ion-footer>

@@ -1,0 +1,1285 @@
+
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" lines="full">
+      <ion-title class="font-size-30 font-bold-600" slot="start">Rapports</ion-title>
+      <ion-icon name="print-outline" color="secondary" slot="end"  [matMenuTriggerFor]="menuprint" size="large"></ion-icon>
+      <ion-icon name="download-outline" color="success" slot="end" [matMenuTriggerFor]="menuexport" size="large"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item (click)="export('stock')"><ion-text class="font-size-12">Fiche de stock en Excel</ion-text></button>
+      <button mat-menu-item (click)="export('sell')"><ion-text class="font-size-12">Rapport de vente en Excel</ion-text></button>
+      <!-- <button mat-menu-item (click)="export('credits')"><ion-text class="font-size-12">Rapport des crédits en Excel</ion-text></button> -->
+      <button mat-menu-item (click)="export('cashbook')"><ion-text class="font-size-12">Livre de caisse en Excel</ion-text></button>
+    </mat-menu> 
+    <mat-menu #menuprint="matMenu">
+      <button mat-menu-item (click)="print('stock_bloc')"><ion-text class="font-size-12">Stock</ion-text></button>
+      <button mat-menu-item (click)="print('selling-bloc')"><ion-text class="font-size-12">Ventes</ion-text></button>
+      <button mat-menu-item (click)="print('credits-bloc')"><ion-text class="font-size-12">Crédits</ion-text></button>
+      <button mat-menu-item (click)="print('payments-bloc')"><ion-text class="font-size-12">Paiements</ion-text></button>
+      <button mat-menu-item (click)="print('cash-book-bloc')"><ion-text class="font-size-12">Dépenses et entrées</ion-text></button>
+      <button mat-menu-item (click)="print('cash-book-bloc2')"><ion-text class="font-size-12">Livre de caisse</ion-text></button>
+      
+    </mat-menu>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [scrollY]="true" [scrollX]="true" style="height: fit-content!important;scrollbar-width: thin;" fullscreen="true">
+  <div id="header-bloc" hidden>
+    <div class="header">
+      <ion-text class="font-size-20 font-bold-600" *ngIf="posprintoptions.name && appserv.getactualEse().name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br *ngIf="posprintoptions.name && appserv.getactualEse().name">
+      <ion-text *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">{{appserv.getactualEse().adresse}}</ion-text> <br *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">
+      <ion-text *ngIf="posprintoptions.description && appserv.getactualEse().description ">{{appserv.getactualEse().description}}</ion-text>
+      <ion-text *ngIf="posprintoptions.num_impot && appserv.getactualEse().num_impot ">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br *ngIf="posprintoptions.description && appserv.getactualEse().description ">
+      <ion-text *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">
+      <ion-text *ngIf="posprintoptions.rccm && appserv.getactualEse().rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+      <ion-text *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">
+    </div>
+    <div class="suheader ion-no-padding">
+      <ion-text>Imprimé le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+      <ion-text>Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+    </div>
+  </div>
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedTabChange)="handletabchanged($event)">
+    <mat-tab *ngIf="appserv.permissionFilter('rapports','sell')">
+      <ng-template mat-tab-label>
+        <ion-icon name="cart-outline"></ion-icon> &nbsp;
+        Ventes
+      </ng-template>
+        <br>
+        <div class="content ion-padding">
+          <div class="filterbloc bd-radius-10 bd-rounded" *ngIf="isSellModalOpen">
+            <ion-grid>
+              <ion-row>
+                <ion-col size="12" size-lg="3" class="border-right-2px" *ngIf="appserv.actualUser.user_type==='super_admin'">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label>
+                      <p class="item-label-title" (click)="gotosellarticlepicker()">
+                        <ion-text>Par Articles</ion-text>
+                      </p>
+                      <p class="secondpara">
+                        <ion-text *ngIf="actualarticlesSell.length<=0">Sélectionner les articles</ion-text>
+                        <ion-text class="articles-list" (click)="selldynamiviewer('articles',actualarticlesSell)">
+                          <span *ngFor="let article of actualarticlesSell" class="font-size-10">{{article.service.name | titlecase}},</span>
+                          <br>
+                        </ion-text>
+                        <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetsellarticleslist()" *ngIf="actualarticlesSell.length>0"></ion-icon>
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" [disabled]="actualarticlesSell.length<=0" class="font-size-10" color="primary" (click)="SellReportByArticles()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col> 
+                <ion-col size="12" size-lg="3" class="border-right-2px" *ngIf="appserv.actualUser.user_type==='super_admin'"> 
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label>
+                      <p class="item-label-title" (click)="sellpickdeposits()">
+                        <ion-text *ngIf="listdepositsSell.length<=0">Par dépôts</ion-text>
+                        <span *ngFor="let item of listdepositsSell" class="font-size-10">{{item.name | titlecase}},</span>
+                      </p>
+                      <p class="secondpara">
+                        <ion-text *ngIf="actualarticlesSell.length<=0">Sélectionner les articles</ion-text>
+                        <ion-text class="articles-list" (click)="selldynamiviewer('articles',actualarticlesSell)">
+                          <span *ngFor="let article of actualarticlesSell" class="font-size-10">{{article.service.name | titlecase}},</span>
+                          <br>
+                        </ion-text>
+                        <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetsellarticleslist()" *ngIf="actualarticlesSell.length>0"></ion-icon>
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" [disabled]="listdepositsSell.length<=0" color="primary" (click)="reportdepositsandarticlesSell()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="12" size-lg="3">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label (click)="selldatefilter()">
+                      <p class="item-label-title">
+                        <ion-text>Par Date</ion-text>
+                      </p>
+                      <p class="secondpara" *ngIf="sell_from || sell_to">
+                        {{sell_from}} - {{sell_to}}
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" color="primary" (click)="sellsReport()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="12" size-lg="3" *ngIf="appserv.actualUser.user_type==='super_admin'">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true" >
+                    <ion-label>
+                      <p class="item-label-title" (click)="sellagentsfilter()">
+                        <ion-text>Par Agent</ion-text>
+                      </p>
+                      <p class="secondpara">
+                        <ion-text *ngIf="listagentsSell.length<=0">Sélectionner les agents</ion-text>
+                        <ion-text class="articles-list" (click)="selldynamiviewer('agents',listagentsSell)">
+                          <span *ngFor="let agent of listagentsSell" class="font-size-10">{{agent.user_name| titlecase}},</span>
+                          <br>
+                        </ion-text>
+                        <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetsellagentslist()" *ngIf="listagentsSell.length>0"></ion-icon>
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" color="primary" (click)="sellsReportbyAgents()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+          <div class="ion-float-right">
+            <ion-chip color="secondary" class="font-size-11" (click)="isSellModalOpen=!isSellModalOpen">
+              <ion-icon style="margin-left: -5px!important;" [name]="isSellModalOpen?'filter-circle-outline':'filter-outline'" size="small"></ion-icon>
+            </ion-chip>
+            <ion-chip class="font-size-11" (click)="groupreportbyprices()" color="dark" *ngIf="appserv.actualUser.user_type==='super_admin'">Groupé par prix</ion-chip>
+            <ion-chip class="font-size-11" (click)="sellreportgroupedbydates()" color="dark" *ngIf="appserv.actualUser.user_type==='super_admin'">Groupé par date</ion-chip>
+            <ion-chip class="font-size-11" (click)="sellsReport()" color="dark" *ngIf="appserv.actualUser.user_type==='super_admin'">Cumulatif</ion-chip>
+            <ion-chip class="font-size-11"  (click)="sellReportwithDetails=!sellReportwithDetails;sellsReport()" color="dark">{{sellReportwithDetails?"Cacher détails":"Afficher détails"}}</ion-chip>
+          </div>
+          <div #sellingBloc id="selling-bloc" class="content ion-padding">
+            <h2 *ngIf="sell_from!==sell_to">Rapport de vente pour la période du {{sell_from}} au {{sell_to}}</h2>
+            <h2 *ngIf="sell_from===sell_to">Rapport de vente du {{sell_from}}</h2>
+            
+            <hr class="hr">
+            <ng-container *ngIf="showreportsellgroupedbyprices">
+              <h4>CUMUL GENERAL</h4>
+              <div class="ion-padding">
+                <div *ngFor="let price of sellsgroupedbyprices?.cumul" class="ion-padding-start">
+                  <hr class="hr">
+                  <span>{{price.price | number}} {{defaultMoney.abreviation}} ({{(price.label?price.label:'aucun label') | titlecase}})</span> 
+                  <hr class="hr">
+                    <ion-item lines="none" *ngFor="let service of price.details" class="contentbody">
+                      <ion-label>
+                        <h4>
+                          {{service.service_detail.name | titlecase}} : <span class="ion-color-medium">{{service.totalquantities | number}} {{service.service_detail.symbol?service.service_detail.symbol:service.service_detail.uom_name}} pour {{service.totalprices | number}} {{defaultMoney.abreviation}} </span>
+                        </h4>
+                      </ion-label>
+                    </ion-item>
+                </div>
+              </div>
+              <hr class="hr">
+              <h4>DETAILS</h4>
+              <div *ngFor="let user of sellsgroupedbyprices.data" class="ion-padding">
+                <h6 class="bg-medium-clean font-bold-500 bd-radius-10 ion-padding-start">{{user.user.user_name | titlecase}}</h6> <br>
+                  <div class="ion-padding bd-square bd-radius-10">
+                    <div *ngFor="let price of user.prices">
+                      <hr class="hr">
+                      <span>{{price.price | number}} {{defaultMoney.abreviation}} ({{(price.label?price.label:'aucun label') | titlecase}})</span> 
+                      <hr class="hr">
+                        <ion-item lines="none" *ngFor="let service of price.details" class="contentbody">
+                          <ion-label>
+                            <h4>
+                              {{service.service_detail.name | titlecase}} : <span class="ion-color-medium">{{service.totalquantities | number}} {{service.service_detail.symbol?service.service_detail.symbol:service.service_detail.uom_name}} pour {{service.totalprices | number}} {{defaultMoney.abreviation}} </span>
+                            </h4>
+                          </ion-label>
+                        </ion-item>
+                    </div>
+                  </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="showreportsellgrouped">
+              <div class="ion-padding">
+                <h6>CUMUL GENERAL</h6>
+                  <table class="table" border="1" style="width:100% ;font-size: 12px;">
+                    <thead>
+                      <tr>
+                        <th class="text-left font-size-15">N°</th>
+                        <th class="text-left font-size-15">Vendeur</th>
+                        <th class="text-right font-size-15">Total HT</th>
+                        <th class="text-right font-size-15">Taxes</th>
+                        <th class="text-right font-size-15">Total TTC</th>
+                        <th class="text-right font-size-15">Total Cash</th>
+                        <th class="text-right font-size-15">Total Crédit</th>
+                        <th class="text-right font-size-15">solde</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let sell of cumuldateoperations.data; let i=index;">
+                        <td>{{i+1}}</td>
+                        <td>{{sell.user_name | uppercase}}</td>
+                        <td class="text-right">{{sell.total_ht | number}} {{defaultMoney.abreviation}}</td>
+                        <td class="text-right">{{sell.totalVatAmount | number}} {{defaultMoney.abreviation}}</td>
+                        <td class="text-right">{{sell.total_ttc | number}} {{defaultMoney.abreviation}}</td>
+                        <td class="text-right">{{sell.cash | number}} {{defaultMoney.abreviation}}</td>
+                        <td class="text-right">{{sell.credits | number}} {{defaultMoney.abreviation}}</td>
+                        <td class="text-right">{{sell.sold | number}} {{defaultMoney.abreviation}}</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <th colspan="2" class="font-size-16 text-right">SOUS TOTAUX</th>
+                        <th class="text-right font-size-16 text-right">{{(cumuldateoperations.subtot_ht?cumuldateoperations.subtot_ht:0) | number}} {{defaultMoney.abreviation}}</th>
+                        <th class="text-right font-size-16 text-right">{{(cumuldateoperations.subtot_tva?cumuldateoperations.subtot_tva:0) | number}} {{defaultMoney.abreviation}}</th>
+                        <th class="text-right font-size-16 text-right">{{(cumuldateoperations.subtot_ttc?cumuldateoperations.subtot_ttc:0) | number}} {{defaultMoney.abreviation}}</th>
+                        <th class="text-right font-size-16 text-right">{{(cumuldateoperations.subtot_cash?cumuldateoperations.subtot_cash:0) | number}} {{defaultMoney.abreviation}}</th>
+                        <th class="text-right font-size-16 text-right">{{(cumuldateoperations.subtot_credits?cumuldateoperations.subtot_credits:0) | number}} {{defaultMoney.abreviation}}</th>
+                        <th class="text-right font-size-16 text-right">{{(cumuldateoperations.subtot_sold?cumuldateoperations.subtot_sold:0) | number}} {{defaultMoney.abreviation}}</th>
+                      </tr> 
+                    </tfoot>
+                  </table>
+              </div>
+              <div class="" *ngFor="let dateoperation of sellsgroupedbydates">
+                <h4 class="bg-medium-clean font-bold-500 bd-radius-10 ion-padding-start">{{dateoperation.from | date}}</h4> <br>
+                  <div class="ion-padding bd-square bd-radius-10">
+                      <h6 class="font-size-14">Cumul en la date du {{dateoperation.from | date}}</h6>
+                        <table class="table" border="1" style="width:100% ;font-size: 12px;">
+                          <thead>
+                            <tr>
+                              <th class="text-left font-size-15">N°</th>
+                              <th class="text-left font-size-15">Vendeur</th>
+                              <th class="text-right font-size-15">Total HT</th>
+                              <th class="text-right font-size-15">Taxes</th>
+                              <th class="text-right font-size-15">Total TTC</th>
+                              <th class="text-right font-size-15">Total Cash</th>
+                              <th class="text-right font-size-15">Total Crédit</th>
+                              <th class="text-right font-size-15">solde</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let sell of dateoperation.data; let i=index;">
+                              <td>{{i+1}}</td>
+                              <td>{{sell.user_name | uppercase}}</td>
+                              <td class="text-right">{{sell.total_ht | number}} {{defaultMoney.abreviation}}</td>
+                              <td class="text-right">{{sell.totalVatAmount | number}} {{defaultMoney.abreviation}}</td>
+                              <td class="text-right">{{sell.total_ttc| number}} {{defaultMoney.abreviation}}</td>
+                              <td class="text-right">{{sell.cash | number}} {{defaultMoney.abreviation}}</td>
+                              <td class="text-right">{{sell.credits | number}} {{defaultMoney.abreviation}}</td>
+                              <td class="text-right">{{sell.sold| number}} {{defaultMoney.abreviation}}</td>
+                            </tr>
+                          </tbody>
+                          <tfoot>
+                            <tr>
+                              <th colspan="2" class="font-size-16 text-right">SOUS TOTAUX</th>
+                              <th class="text-right font-size-16 text-right">{{(dateoperation.subtot_ht?dateoperation.subtot_ht:0) | number}} {{defaultMoney.abreviation}}</th>
+                              <th class="text-right font-size-16 text-right">{{(dateoperation.subtot_tva?dateoperation.subtot_tva:0) | number}} {{defaultMoney.abreviation}}</th>
+                              <th class="text-right font-size-16 text-right">{{(dateoperation.subtot_ttc?dateoperation.subtot_ttc:0) | number}} {{defaultMoney.abreviation}}</th>
+                              <th class="text-right font-size-16 text-right">{{(dateoperation.subtot_cash?dateoperation.subtot_cash:0) | number}} {{defaultMoney.abreviation}}</th>
+                              <th class="text-right font-size-16 text-right">{{(dateoperation.subtot_credits?dateoperation.subtot_credits:0) | number}} {{defaultMoney.abreviation}}</th>
+                              <th class="text-right font-size-16 text-right">{{(dateoperation.subtot_sold?dateoperation.subtot_sold:0) | number}} {{defaultMoney.abreviation}}</th>
+                            </tr> 
+                          </tfoot>
+                        </table>
+
+                        <h6>DETAILS <span *ngIf="dateoperation.data.length>1">PAR VENDEUR</span></h6>
+                        <div class="sells-body" *ngFor="let seller of dateoperation.data">
+                            <h6 class="font-bold-500">{{seller.user_name | uppercase}}</h6>
+                            <table class="table" border="1" style="width:100% ;font-size: 13px;">
+                              <thead>
+                                <tr>
+                                  <th class="text-left font-size-16">N°</th>
+                                  <th class="text-left font-size-16">Produit</th>
+                                  <th class="text-left font-size-16">Catégorie</th>
+                                  <th class="text-right font-size-16">Quantité</th>
+                                  <th class="text-right font-size-16">Total</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let sell of seller.details; let c=index;">
+                                  <td class="text-left">{{c+1}}</td>
+                                  <td class="text-left">{{sell.name | titlecase}}</td>
+                                  <td class="text-left">{{sell.category_name | titlecase}}</td>
+                                  <td class="text-right">{{sell.total_quantity | number}} ({{sell.uom_symbol}})</td>
+                                  <td class="text-right">{{sell.total_sell | number}} {{defaultMoney.abreviation}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="showreportcumulative">
+                <h4>CUMUL</h4>
+                <table class="table" border="1" style="width:100% ;font-size: 12px;">
+                  <thead>
+                    <tr>
+                      <th class="text-left font-size-15">N°</th>
+                      <th class="text-left font-size-15">Vendeur</th>
+                      <th class="text-right font-size-15">Total HT</th>
+                      <th class="text-right font-size-15">Taxes</th>
+                      <th class="text-right font-size-15">Total TTC</th>
+                      <th class="text-right font-size-15">Total Cash</th>
+                      <th class="text-right font-size-15">Total Crédit</th>
+                      <th class="text-right font-size-15">solde</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let sell of sells; let i=index;">
+                      <td>{{i+1}}</td>
+                      <td>{{sell.user_name | uppercase}}</td>
+                      <td class="text-right">{{sell.total_ht | number}} {{defaultMoney.abreviation}}</td>
+                      <td class="text-right">{{sell.totalVatAmount | number}} {{defaultMoney.abreviation}}</td>
+                      <td class="text-right">{{sell.total_ttc | number}} {{defaultMoney.abreviation}}</td>
+                      <td class="text-right">{{sell.cash | number}} {{defaultMoney.abreviation}}</td>
+                      <td class="text-right">{{sell.credits | number}} {{defaultMoney.abreviation}}</td>
+                      <td class="text-right">{{sell.sold | number}} {{defaultMoney.abreviation}}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th colspan="2" class="font-size-16 text-right">SOUS TOTAUX</th>
+                      <th class="text-right font-size-16 text-right">{{(sellsubtot.subtot_ht?sellsubtot.subtot_ht:0) | number}} {{defaultMoney.abreviation}}</th>
+                      <th class="text-right font-size-16 text-right">{{(sellsubtot.subtot_tva?sellsubtot.subtot_tva:0) | number}} {{defaultMoney.abreviation}}</th>
+                      <th class="text-right font-size-16 text-right">{{(sellsubtot.subtot_ttc?sellsubtot.subtot_ttc:0)| number}} {{defaultMoney.abreviation}}</th>
+                      <th class="text-right font-size-16 text-right">{{(sellsubtot.subtot_cash?sellsubtot.subtot_cash:0) | number}} {{defaultMoney.abreviation}}</th>
+                      <th class="text-right font-size-16 text-right">{{(sellsubtot.subtot_credits?sellsubtot.subtot_credits:0) | number}} {{defaultMoney.abreviation}}</th>
+                      <th class="text-right font-size-16 text-right">{{(sellsubtot.subtot_sold?sellsubtot.subtot_sold:0) | number}} {{defaultMoney.abreviation}}</th>
+                    </tr> 
+                  </tfoot>
+                </table>
+                <div *ngIf="appserv.actualUser.user_type==='super_admin'">
+                  <h4>PORTEFEUILLE FIDELITE</h4>
+                  <table class="table" border="1" style="width:100% ;font-size: 12px;">
+                    <thead>
+                      <tr>
+                        <th class="text-left font-size-15">POINTS</th>
+                        <th class="text-left font-size-15">BONUS</th>
+                        <th class="text-left font-size-15">CAUTIONS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          Octroyées: {{totalEntriesPoints?totalEntriesPoints:0 | number}} {{defaultMoney.abreviation}} <br>
+                          Utilisées: {{totalSellBypoints?totalSellBypoints:0 | number}} {{defaultMoney.abreviation}}
+                        </td>
+                        <td>
+                          Octroyées: {{totalEntriesBonus?totalEntriesBonus:0| number}} {{defaultMoney.abreviation}} <br>
+                          Utilisées: {{totalSellByBonus?totalSellByBonus:0| number}} {{defaultMoney.abreviation}}
+                        </td>
+                        <td>
+                        Entrées : {{totalEntriesCautions?totalEntriesCautions:0| number}} {{defaultMoney.abreviation}} <br>
+                          
+                          Utilisées :  {{totalSellByCautions?totalSellByCautions:0| number}} {{defaultMoney.abreviation}}
+                          
+                        </td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <th colspan="3" class="font-size-16 text-left">Total {{totalfidelity | number}} {{defaultMoney.abreviation}}</th>
+                      </tr> 
+                    </tfoot>
+                  </table> 
+                </div>
+                <ng-container *ngIf="sellReportwithDetails">
+                  <h4>DETAILS <span *ngIf="sells.length>1">PAR VENDEUR</span></h4>
+                  <div class="sells-body" *ngFor="let seller of sells">
+                      <h6 class="bg-medium-clean font-bold-500">{{seller.user_name | uppercase}}</h6>
+                      <table class="table" border="1" style="width:100% ;font-size: 13px;">
+                        <thead>
+                          <tr>
+                            <th class="text-left font-size-16">N°</th>
+                            <th class="text-left font-size-16">Produit</th>
+                            <th class="text-left font-size-16">Catégorie</th>
+                            <th class="text-right font-size-16">Quantité</th>
+                            <th class="text-right font-size-16">Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let sell of seller.details; let c=index;">
+                            <td class="text-left">{{c+1}}</td>
+                            <td class="text-left">{{sell.name | titlecase}}</td>
+                            <td class="text-left">{{sell.category_name | titlecase}}</td>
+                            <td class="text-right">{{sell.total_quantity | number}} ({{sell.uom_symbol}})</td>
+                            <td class="text-right">{{sell.total_sell | number}} {{defaultMoney.abreviation}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                  </div>
+                </ng-container>
+              </ng-container>
+          </div>
+        </div>
+    </mat-tab>
+    <mat-tab *ngIf="appserv.permissionFilter('rapports','stock')">
+      <ng-template mat-tab-label>
+        <ion-icon name="server-outline"></ion-icon> &nbsp;
+        Stock
+      </ng-template>
+        <div #stockbloc class="content ion-padding">
+          <div class="filterbloc bd-radius-10 bd-rounded" *ngIf="isStockModalOpen">
+            <ion-grid>
+              <ion-row>
+                <ion-col  size="12" size-lg="3" class="border-right-2px" *ngIf="appserv.actualUser.user_type==='super_admin'">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label>
+                      <p class="item-label-title" (click)="gotostockarticlepicker()">
+                        <ion-text>Par Articles</ion-text>
+                      </p>
+                      <p class="secondpara">
+                        <ion-text *ngIf="actualarticles.length<=0">Sélectionner les articles</ion-text>
+                        <ion-text class="articles-list" (click)="dynamiviewer('articles',actualarticles)">
+                          <span *ngFor="let article of actualarticles" class="font-size-10">{{article.service.name | titlecase}},</span>
+                          <br>
+                        </ion-text>
+                        <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetarticleslist()" *ngIf="actualarticles.length>0"></ion-icon>
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" [disabled]="actualarticles.length<=0" class="font-size-10" color="primary" (click)="reportstockbyarticles()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col> 
+                <ion-col size="12" size-lg="3" class="border-right-2px"> 
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label>
+                      <p class="item-label-title" (click)="pickdeposits()">
+                        <ion-text *ngIf="listdeposits.length<=0">Par dépôts</ion-text>
+                        <span *ngFor="let item of listdeposits" class="font-size-10">{{item.name | titlecase}},</span>
+                      </p>
+                      <p class="secondpara">
+                        <ion-text *ngIf="actualarticles.length<=0">Sélectionner les articles</ion-text>
+                        <ion-text class="articles-list" (click)="dynamiviewer('articles',actualarticles)">
+                          <span *ngFor="let article of actualarticles" class="font-size-10">{{article.service.name | titlecase}},</span>
+                          <br>
+                        </ion-text>
+                        <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetarticleslist()" *ngIf="actualarticles.length>0"></ion-icon>
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" [disabled]="listdeposits.length<=0" color="primary" (click)="reportdepositsandarticles()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="12" size-lg="3" class="border-right-2px"> 
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true" routerLink="/uzisha/stock/inventory">
+                    <ion-label>
+                      <p class="item-label-title">
+                        <ion-chip>Inventaire</ion-chip>
+                      </p> 
+                      <p class="secondpara">
+                        <span class="font-size-10">Faites l'inventaire de votre stock des carnets en un clein d'oeil</span>
+                      </p>
+                    </ion-label>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="12" size-lg="3">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label (click)="stockdatefilter()">
+                      <p class="item-label-title">
+                        <ion-text>Par Date</ion-text>
+                      </p>
+                      <p class="secondpara">
+                        {{stock_from}} - {{stock_to}}
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" color="primary" (click)="gettingstockreport()">
+                      <span>Afficher résultat</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+          <div class="filtered-details-bloc ion-float-right">
+            <ion-chip color="secondary" class="font-size-11" (click)="isStockModalOpen=!isStockModalOpen">
+              <ion-icon style="margin-left: -5px!important;" [name]="isStockModalOpen?'filter-circle-outline':'filter-outline'" size="small"></ion-icon>
+            </ion-chip>
+            <ion-chip class="font-size-11" (click)="stockreportgroupedbydates()" color="dark" *ngIf="appserv.actualUser.user_type==='super_admin'">Groupé par date</ion-chip>
+            <ion-chip class="font-size-11" (click)="gettingstockreport()" color="dark" *ngIf="appserv.actualUser.user_type==='super_admin'">Cumulatif</ion-chip>
+            <ion-chip class="font-size-11" color="dark" (click)="gettingstockreportwithdetails()">Afficher détails</ion-chip>
+          </div>
+          <div id="stock_bloc">
+            <h2 *ngIf="stock_from!==stock_to">Rapport de stock pour la période du {{stock_from}} au {{stock_to}}</h2>
+            <h2 *ngIf="stock_from===stock_to">Rapport de stock du {{stock_from}}</h2>
+           
+            <ng-container *ngIf="showreportstockcumul">
+              <table class="table" border="1" class="table" style="width:100% ;font-size: 12px;">
+                <thead>
+                  <tr>
+                    <th class="text-left font-size-14">N°</th>
+                    <th class="text-left font-size-14">Désignation</th>
+                    <th class="text-left font-size-14">Catégorie</th>
+                    <th class="text-right font-size-14">Stock Initial</th>
+                    <th class="text-right font-size-14">Tot. Entrées</th>
+                    <th class="text-right font-size-14">Tot. Sorties</th>
+                    <th class="text-right font-size-14">solde</th>
+                  </tr>
+                </thead>
+                <tbody class="body">
+                  <tr *ngFor="let mouv of stockmouvements; let i =index;">
+                      <td>{{i+1}}</td>
+                      <td class="text-left">{{mouv.service.name | titlecase}}</td>
+                      <td class="text-left">{{mouv.service.category_name | titlecase}}</td>
+                      <td class="text-right">{{(mouv.totalBefore?mouv.totalBefore:0) | number}} {{mouv.service.uom_symbol}}</td>
+                      <td class="text-right">{{(mouv.totalEntries?mouv.totalEntries:0) | number}} {{mouv.service.uom_symbol}}</td>
+                      <td class="text-right">{{mouv.totalWithdraw | number}} {{mouv.service.uom_symbol}}</td>
+                      <td class="text-right">{{mouv.soldinventory | number}} {{mouv.service.uom_symbol}}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="3" class="font-size-16 text-right">Sous totaux</th>
+                    <th class="text-right font-size-16">{{totalTotalBefore | number}}</th>
+                    <th class="text-right font-size-16">{{totalEntriesStock | number}}</th>
+                    <th class="text-right font-size-16">{{totalWithdrawStock | number}}</th>
+                    <th class="text-right font-size-16">{{totalsoldinventory | number}}</th>
+                  </tr>
+                </tfoot>
+              </table>
+            </ng-container>
+           
+            <ng-container *ngIf="showstockdetails">
+              <br>
+              <hr class="hr">
+              <h4>DETAILS</h4>
+              <table class="table" border="1" class="table" style="width:100% ;font-size: 12px;">
+                <thead>
+                  <tr>
+                    <th class="text-left font-size-14">N°</th>
+                    <th class="text-left font-size-14">Date</th>
+                    <th class="text-left font-size-14">Libellé</th>
+                    <th class="text-left font-size-14">Désignation</th>
+                    <th class="text-left font-size-14">Dépôt</th>
+                    <th class="text-left font-size-14">Type Op.</th>
+                    <th class="text-right font-size-14">Stock initial</th>
+                    <th class="text-right font-size-14">Quantité</th>
+                    <th class="text-right font-size-14">Prix Unit</th>
+                    <th class="text-right font-size-14">Total</th>
+                    <th class="text-left font-size-14">Fait par</th>
+                    <th class="text-left font-size-14">Observation</th>
+                  </tr>
+                </thead>
+                <tbody class="body">
+                  <tr *ngFor="let mouv of stockmouvementsdetails; let i =index;">
+                      <td>{{i+1}}</td>
+                      <td class="text-left">{{mouv.done_at | date}}</td>
+                      <td class="text-left">{{mouv.motif | titlecase}}</td>
+                      <td class="text-left">{{mouv.service_name | titlecase}}</td>
+                      <td class="text-left">{{mouv.deposit_name | titlecase}}</td>
+                      <td class="text-left">{{(mouv.type==='entry'?'Entrée':'Sortie') | titlecase}}</td>
+                      <td class="text-right">{{mouv.quantity_before | number}} {{mouv.uom_symbol}}</td>
+                      <td class="text-right">{{mouv.quantity | number}} {{mouv.uom_symbol}}</td>
+                      <td class="text-right">{{(mouv.price?mouv.price:0) | number}} {{defaultMoney.abreviation}}</td>
+                      <td class="text-right">{{(mouv.total?mouv.total:0) | number}} {{defaultMoney.abreviation}}</td>
+                      <td class="text-left">{{mouv.done_by_name | titlecase}}</td>
+                      <td class="text-left">{{mouv.note | titlecase}}</td>
+                    </tr>
+                </tbody>
+              </table>  
+            </ng-container>
+
+            <ng-container *ngIf="showreportstockgroupedbydates">
+              <h4>CUMUL GENERAL</h4>
+              <div class="ion-padding bd-square bd-radius-10">
+                <table class="table" border="1" style="width:100% ;font-size: 12px;">
+                  <thead>
+                    <tr>
+                      <th class="text-left font-size-14">N°</th>
+                      <th class="text-left font-size-14">Désignation</th>
+                      <th class="text-left font-size-14">Catégorie</th>
+                      <th class="text-right font-size-14">Stock Initial</th>
+                      <th class="text-right font-size-14">Tot. Entrées</th>
+                      <th class="text-right font-size-14">Tot. Sorties</th>
+                      <th class="text-right font-size-14">solde</th>
+                    </tr>
+                  </thead>
+                  <tbody class="body">
+                    <tr *ngFor="let mouv of stockgroupedbydates?.cumul; let i =index;">
+                        <td>{{i+1}}</td>
+                        <td class="text-left">{{mouv.service.name | titlecase}}</td>
+                        <td class="text-left">{{mouv.service.category_name | titlecase}}</td>
+                        <td class="text-right">{{(mouv.totalBefore?mouv.totalBefore:0) | number}} {{mouv.service.uom_symbol}}</td>
+                        <td class="text-right">{{(mouv.totalEntries?mouv.totalEntries:0) | number}} {{mouv.service.uom_symbol}}</td>
+                        <td class="text-right">{{mouv.totalWithdraw | number}} {{mouv.service.uom_symbol}}</td>
+                        <td class="text-right">{{mouv.soldinventory | number}} {{mouv.service.uom_symbol}}</td>
+                    </tr>
+                  </tbody>
+      
+                </table>
+              </div>
+              <br>
+              <h4>DETAILS</h4>
+              <div class="ion-padding bd-radius-10 bd-square">
+                <div *ngFor="let detail of stockgroupedbydates.details" class="ion-padding-start">
+                  <h6 class="bg-medium-clean font-bold-500 bd-radius-10 ion-padding-start">{{detail.from | date}}</h6>
+                  <table class="table" border="1" style="width:100% ;font-size: 12px;">
+                    <thead>
+                      <tr>
+                        <th class="text-left font-size-14">N°</th>
+                        <th class="text-left font-size-14">Date</th>
+                        <th class="text-left font-size-14">Libellé</th>
+                        <th class="text-left font-size-14">Désignation</th>
+                        <th class="text-left font-size-14">Dépôt</th>
+                        <th class="text-left font-size-14">Type Op.</th>
+                        <th class="text-right font-size-14">Stock initial</th>
+                        <th class="text-right font-size-14">Quantité</th>
+                        <th class="text-right font-size-14">Prix Unit</th>
+                        <th class="text-right font-size-14">Total</th>
+                        <th class="text-left font-size-14">Fait par</th>
+                        <th class="text-left font-size-14">Observation</th>
+                      </tr>
+                    </thead>
+                    <tbody class="body">
+                      <tr *ngFor="let mouv of detail.data; let i =index;">
+                          <td>{{i+1}}</td>
+                          <td class="text-left">{{mouv.done_at | date}}</td>
+                          <td class="text-left">{{mouv.motif | titlecase}}</td>
+                          <td class="text-left">{{mouv.service_name | titlecase}}</td>
+                          <td class="text-left">{{mouv.deposit_name | titlecase}}</td>
+                          <td class="text-left">{{(mouv.type==='entry'?'Entrée':'Sortie') | titlecase}}</td>
+                          <td class="text-right">{{mouv.quantity_before | number}} {{mouv.uom_symbol}}</td>
+                          <td class="text-right">{{mouv.quantity | number}} {{mouv.uom_symbol}}</td>
+                          <td class="text-right">{{(mouv.price?mouv.price:0) | number}} {{defaultMoney.abreviation}}</td>
+                          <td class="text-right">{{(mouv.total?mouv.total:0) | number}} {{defaultMoney.abreviation}}</td>
+                          <td class="text-left">{{mouv.done_by_name | titlecase}}</td>
+                          <td class="text-left">{{mouv.note | titlecase}}</td>
+                        </tr>
+                    </tbody>
+                  </table>  
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+    </mat-tab>
+    <mat-tab *ngIf="appserv.permissionFilter('rapports','credits')">
+      <ng-template mat-tab-label>
+        <ion-icon name="people-outline"></ion-icon> &nbsp;
+        Crédits
+      </ng-template>
+        <br>
+        <div class="content ion-padding">
+          
+          <div class="filterbloc bd-radius-10 bd-rounded">
+            <ion-grid>
+              <ion-row>
+                <ion-col size="12" size-lg="6" class="border-right-2px">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label>
+                      <p class="item-label-title" (click)="creditscustomersfilter()">
+                        <ion-text>Par Client</ion-text>
+                      </p>
+                      <p class="secondpara">
+                        <ion-text *ngIf="actualcustomers.length<=0">Sélectionner les clients</ion-text>
+                        <ion-text class="articles-list" (click)="selldynamiviewer('customers',actualcustomers)">
+                          <span *ngFor="let customer of actualcustomers" class="font-size-10">{{customer.customerName| titlecase}},</span>
+                          <br>
+                        </ion-text>
+                        <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetcreditscustomerslist()" *ngIf="actualcustomers.length>0"></ion-icon>
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" color="primary" [disabled]="actualcustomers.length<=0" (click)="reportcreditsbycustomers()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+               
+                <ion-col size="12" size-lg="6">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label (click)="creditsdatefilter()">
+                      <p class="item-label-title">
+                        <ion-text>Par Date</ion-text>
+                      </p>
+                      <p class="secondpara" *ngIf="credits_from || credits_to">
+                        {{credits_from}} - {{credits_to}}
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" color="primary" (click)="creditsreport()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+          <div #creditsBloc id="credits-bloc" class="content ion-padding">
+            <h2 *ngIf="credits_from!==credits_to">Rapport des crédits pour la période du {{credits_from}} au {{credits_to}}</h2>
+            <h2 *ngIf="credits_from===credits_to">Rapport des crédits du {{credits_from}}</h2>
+            
+            <hr class="hr">
+            <h4>CUMUL</h4>
+            <table class="table" border="1" style="width:100% ;font-size: 12px;">
+              <thead>
+                <tr>
+                  <th class="text-left font-size-15">N°</th>
+                  <th class="text-left font-size-15">Client</th>
+                  <th class="text-left font-size-15">Contacts</th>
+                  <th class="text-right font-size-15">Total Crédit</th>
+                  <th class="text-right font-size-15">Total payé</th>
+                  <th class="text-right font-size-15">Solde brute</th>
+                  <th class="text-right font-size-15">Solde net</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let credit of credits; let i=index;">
+                  <td>{{i+1}}</td>
+                  <td class="text-wrapped text-left">{{(credit.customer.customerName?credit.customer.customerName:"Anonyme") | uppercase}}</td>
+                  <td class="text-left text-wrapped">
+                   <span>{{credit.customer.phone?credit.customer.phone:"Aucun numero"}}</span> <br> 
+                   <span>{{credit.customer.mail?credit.customer.mail:"Aucune adresse mail"}}</span>
+                  </td>
+                  <td class="text-right font-size-14">{{(credit.total?credit.total:0) | number}} {{defaultMoney.abreviation}}</td>
+                  <td class="text-right font-size-14">{{(credit.totalpayed?credit.totalpayed:0) | number}} {{defaultMoney.abreviation}}</td>
+                  <td class="text-right font-size-14">{{(credit.sold?credit.sold:0) | number}} {{defaultMoney.abreviation}}</td>
+                  <td class="text-right font-size-14">{{(credit.soldnet?credit.soldnet:0) | number}} {{defaultMoney.abreviation}}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="3" class="font-size-20 text-right">Sous totaux</th>
+                  <th class="text-right font-size-20 text-right">{{totalcredits | number}} {{defaultMoney.abreviation}}</th>
+                  <th class="text-right font-size-20 text-right">{{totalcreditspayed | number}} {{defaultMoney.abreviation}}</th>
+                  <th class="text-right font-size-20 text-right">{{totalcreditsSold | number}} {{defaultMoney.abreviation}}</th>
+                  <th class="text-right font-size-20 text-right">{{totalcreditsSoldnet | number}} {{defaultMoney.abreviation}}</th>
+                </tr> 
+              </tfoot>
+            </table>
+            <h4>DETAILS <span *ngIf="credits.length>1">PAR CLIENT</span></h4>
+            <div class="sells-body" *ngFor="let credit of credits">
+                <h6 class="bg-medium-clean font-bold-500 font-size-15">{{credit.customer.customerName | uppercase}} ({{credit.total | number}} &nbsp;&nbsp; {{defaultMoney.abreviation}})</h6>
+                <table class="table" border="1" style="width:100% ;font-size: 12px;">
+                  <thead>
+                    <tr>
+                      <th class="text-left">N°</th>
+                      <th class="text-left">Date</th>
+                      <th class="text-left">Réf. Facture</th>
+                      <th class="text-right">Dette</th>
+                      <th class="text-right">Payé</th>
+                      <th class="text-right">Solde</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let debt of credit.debts; let c=index;">
+                      <td class="text-left">{{c+1}}</td>
+                      <td class="text-left">{{debt.created_at | date}}</td>
+                      <td class="text-left text-wrapped">
+                        {{debt.uuid}} ({{debt.total_invoice | number}} {{defaultMoney.abreviation}})
+                          <br *ngIf="debt.details.length>0">
+                          <!-- <br *ngIf="debt.details.length>0"> -->
+                          <div class="details-invoice ion-padding-top">
+                              <ion-text *ngFor="let detail of debt.details" class="details-invoice-tr full-width">
+                                <span class="font-size-10 text-left text-wrapped">{{detail.name | titlecase}}</span>
+                                <span class="font-size-10 text-right">&nbsp; &nbsp;({{detail.quantity}} {{detail.symbol}})</span>
+                                <span class="font-size-10 text-right"> &nbsp; &nbsp;{{detail.total}} {{defaultMoney.abreviation}}</span>
+                              </ion-text>
+                          </div>
+                      </td>
+                      <td class="text-right">{{debt.amount | number}}</td>
+                      <td class="text-right">{{debt.already_payed | number}}</td>
+                      <td class="text-right">{{debt.sold | number}} {{defaultMoney.abreviation}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+  
+          </div>
+        </div>
+       
+    </mat-tab>   
+    <mat-tab *ngIf="appserv.permissionFilter('rapports','providers')">
+      <ng-template mat-tab-label>
+        <ion-icon name="people-outline"></ion-icon> &nbsp;
+        Fournisseurs
+      </ng-template>
+        <br>
+        <div class="content ion-padding">
+          
+          <div class="filterbloc bd-radius-10 bd-rounded">
+            <ion-grid>
+              <ion-row>
+                <ion-col size="12" size-lg="6" class="border-right-2px">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label>
+                      <p class="item-label-title" (click)="creditscustomersfilter()">
+                        <ion-text>Par fournisseurs</ion-text>
+                      </p>
+                      <p class="secondpara">
+                        <ion-text *ngIf="actualcustomers.length<=0">Sélectionner les clients</ion-text>
+                        <ion-text class="articles-list" (click)="selldynamiviewer('customers',actualcustomers)">
+                          <span *ngFor="let customer of actualcustomers" class="font-size-10">{{customer.customerName| titlecase}},</span>
+                          <br>
+                        </ion-text>
+                        <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetcreditscustomerslist()" *ngIf="actualcustomers.length>0"></ion-icon>
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" color="primary" [disabled]="actualcustomers.length<=0" (click)="reportcreditsbycustomers()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+               
+                <ion-col size="12" size-lg="6">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label (click)="creditsdatefilter()">
+                      <p class="item-label-title">
+                        <ion-text>Par Date</ion-text>
+                      </p>
+                      <p class="secondpara" *ngIf="credits_from || credits_to">
+                        {{credits_from}} - {{credits_to}}
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" color="primary" (click)="creditsreport()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+          <div #creditsBloc id="credits-bloc" class="content ion-padding">
+            <h2 *ngIf="credits_from!==credits_to">Rapport des crédits pour la période du {{credits_from}} au {{credits_to}}</h2>
+            <h2 *ngIf="credits_from===credits_to">Rapport des crédits du {{credits_from}}</h2>
+            
+            <hr class="hr">
+            <h4>CUMUL</h4>
+            <table class="table" border="1" style="width:100% ;font-size: 12px;">
+              <thead>
+                <tr>
+                  <th class="text-left font-size-15">N°</th>
+                  <th class="text-left font-size-15">Client</th>
+                  <th class="text-left font-size-15">Contacts</th>
+                  <th class="text-right font-size-15">Total Crédit</th>
+                  <th class="text-right font-size-15">Total payé</th>
+                  <th class="text-right font-size-15">Solde brute</th>
+                  <th class="text-right font-size-15">Solde net</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let credit of credits; let i=index;">
+                  <td>{{i+1}}</td>
+                  <td class="text-wrapped text-left">{{(credit.customer.customerName?credit.customer.customerName:"Anonyme") | uppercase}}</td>
+                  <td class="text-left text-wrapped">
+                   <span>{{credit.customer.phone?credit.customer.phone:"Aucun numero"}}</span> <br> 
+                   <span>{{credit.customer.mail?credit.customer.mail:"Aucune adresse mail"}}</span>
+                  </td>
+                  <td class="text-right font-size-14">{{(credit.total?credit.total:0) | number}} {{defaultMoney.abreviation}}</td>
+                  <td class="text-right font-size-14">{{(credit.totalpayed?credit.totalpayed:0) | number}} {{defaultMoney.abreviation}}</td>
+                  <td class="text-right font-size-14">{{(credit.sold?credit.sold:0) | number}} {{defaultMoney.abreviation}}</td>
+                  <td class="text-right font-size-14">{{(credit.soldnet?credit.soldnet:0) | number}} {{defaultMoney.abreviation}}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="3" class="font-size-20 text-right">Sous totaux</th>
+                  <th class="text-right font-size-20 text-right">{{totalcredits | number}} {{defaultMoney.abreviation}}</th>
+                  <th class="text-right font-size-20 text-right">{{totalcreditspayed | number}} {{defaultMoney.abreviation}}</th>
+                  <th class="text-right font-size-20 text-right">{{totalcreditsSold | number}} {{defaultMoney.abreviation}}</th>
+                  <th class="text-right font-size-20 text-right">{{totalcreditsSoldnet | number}} {{defaultMoney.abreviation}}</th>
+                </tr> 
+              </tfoot>
+            </table>
+            <h4>DETAILS <span *ngIf="credits.length>1">PAR CLIENT</span></h4>
+            <div class="sells-body" *ngFor="let credit of credits">
+                <h6 class="bg-medium-clean font-bold-500 font-size-15">{{credit.customer.customerName | uppercase}} ({{credit.total | number}} &nbsp;&nbsp; {{defaultMoney.abreviation}})</h6>
+                <table class="table" border="1" style="width:100% ;font-size: 12px;">
+                  <thead>
+                    <tr>
+                      <th class="text-left">N°</th>
+                      <th class="text-left">Date</th>
+                      <th class="text-left">Réf. Facture</th>
+                      <th class="text-right">Dette</th>
+                      <th class="text-right">Payé</th>
+                      <th class="text-right">Solde</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let debt of credit.debts; let c=index;">
+                      <td class="text-left">{{c+1}}</td>
+                      <td class="text-left">{{debt.created_at | date}}</td>
+                      <td class="text-left text-wrapped">
+                        {{debt.uuid}} ({{debt.total_invoice | number}} {{defaultMoney.abreviation}})
+                          <br *ngIf="debt.details.length>0">
+                          <!-- <br *ngIf="debt.details.length>0"> -->
+                          <div class="details-invoice ion-padding-top">
+                              <ion-text *ngFor="let detail of debt.details" class="details-invoice-tr full-width">
+                                <span class="font-size-10 text-left text-wrapped">{{detail.name | titlecase}}</span>
+                                <span class="font-size-10 text-right">&nbsp; &nbsp;({{detail.quantity}} {{detail.symbol}})</span>
+                                <span class="font-size-10 text-right"> &nbsp; &nbsp;{{detail.total}} {{defaultMoney.abreviation}}</span>
+                              </ion-text>
+                          </div>
+                      </td>
+                      <td class="text-right">{{debt.amount | number}}</td>
+                      <td class="text-right">{{debt.already_payed | number}}</td>
+                      <td class="text-right">{{debt.sold | number}} {{defaultMoney.abreviation}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+  
+          </div>
+        </div>
+       
+    </mat-tab>
+    <mat-tab *ngIf="appserv.permissionFilter('rapports','payments')">
+      <ng-template mat-tab-label>
+        <ion-icon name="cash-outline"></ion-icon> &nbsp;
+        Paiements
+      </ng-template>
+        <br>
+        <div class="content ion-padding">      
+          <div class="filterbloc bd-radius-10 bd-rounded">
+            <ion-grid>
+              <ion-row>
+                <ion-col size="12" size-lg="6" class="border-right-2px">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label>
+                      <p class="item-label-title" (click)="paymentcustomersfilter()">
+                        <ion-text>Par Client</ion-text>
+                      </p>
+                      <p class="secondpara">
+                        <ion-text *ngIf="paymentcustomers.length<=0">Sélectionner les clients</ion-text>
+                        <ion-text class="articles-list" (click)="selldynamiviewer('customers',paymentcustomers)">
+                          <span *ngFor="let customer of paymentcustomers" class="font-size-10">{{customer.customerName| titlecase}},</span>
+                          <br>
+                        </ion-text>
+                        <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetpaymentscustomerslist()" *ngIf="paymentcustomers.length>0"></ion-icon>
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" color="primary" [disabled]="paymentcustomers.length<=0" (click)="reportpaymentbycustomers()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+               
+                <ion-col size="6"size="12" size-lg="6">
+                  <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                    <ion-label (click)="paymentsdatefilter()">
+                      <p class="item-label-title">
+                        <ion-text>Par Date</ion-text>
+                      </p>
+                      <p class="secondpara" *ngIf="payment_from || payment_to">
+                        {{payment_from}} - {{payment_to}}
+                      </p> 
+                    </ion-label>
+                    <ion-chip  slot="end" class="font-size-10" color="primary" (click)="paymentsreport()">
+                      <span>Afficher</span>
+                    </ion-chip>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+          <div #creditsBloc id="payments-bloc" class="content ion-padding">
+            <h2 *ngIf="payment_from!==payment_to">Rapport paiements crédits pour la période du {{payment_from}} au {{payment_to}}</h2>
+            <h2 *ngIf="payment_from===payment_to">Rapport paiements crédits du {{payment_from}}</h2>
+            
+            <hr class="hr">
+            <h4>CUMUL</h4>
+            <table class="table" border="1" style="width:100% ;font-size: 12px;">
+              <thead>
+                <tr>
+                  <th class="text-left font-size-15">N°</th>
+                  <th class="text-left font-size-15">Client</th>
+                  <th class="text-left font-size-15">Contacts</th>
+                  <th class="text-left font-size-15">Adresse</th>
+                  <th class="text-right font-size-15">Total Crédit</th>
+                  <th class="text-right font-size-15">Total payés</th>
+                  <th class="text-right font-size-15">Solde</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let payment of payments; let i=index;">
+                  <td>{{i+1}}</td>
+                  <td class="text-wrapped">{{payment.customerName | uppercase}}</td>
+                  <td class="text-left text-wrapped">
+                   <span>{{payment.phone}}</span> <br>
+                   <span>{{payment.mail}}</span>
+                  </td>
+                  <td class="text-left font-size-14">{{payment.adress}}</td>
+                  <td class="text-right font-size-14">{{payment.total_debts}} {{defaultMoney.abreviation}}</td>
+                  <td class="text-right font-size-14">{{payment.total_payed}} {{defaultMoney.abreviation}}</td>
+                  <td class="text-right font-size-14">{{payment.total_sold}} {{defaultMoney.abreviation}}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="4" class="font-size-20 text-right">Sous totaux</th>
+                  <th class="text-right font-size-20 text-right">{{subtotaldebts}} {{defaultMoney.abreviation}}</th>
+                  <th class="text-right font-size-20 text-right">{{subtotalpayments}} {{defaultMoney.abreviation}}</th>
+                  <th class="text-right font-size-20 text-right">{{subtotalsolds}} {{defaultMoney.abreviation}}</th>
+                </tr> 
+              </tfoot>
+            </table>
+            <h4 *ngIf="payments.length>1">DETAILS <span >PAR CLIENT</span></h4>
+            <div class="sells-body" *ngFor="let payment of payments">
+                <h6 class="bg-medium-clean font-bold-500 font-size-15">{{payment.customerName | uppercase}} &nbsp;&nbsp; ({{payment.total_debts | number}} {{defaultMoney.abreviation}})</h6>
+                <table class="table" border="1" style="width:100% ;font-size: 12px;">
+                  <thead>
+                    <tr>
+                      <th class="text-left">N°</th>
+                      <th class="text-left">Date</th>
+                      <th class="text-left">Référence</th>
+                      <th class="text-left">Fait par</th>
+                      <th class="text-right">Montant payé</th>
+                      
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let history of payment.payments; let c=index;">
+                      <td class="text-left">{{c+1}}</td>
+                      <td class="text-left">{{history.done_at | date}}</td>
+                      <td class="text-left text-wrapped">
+                        {{history.uuid}}
+                      </td>
+                      <td class="text-left">{{history.done_by_name | titlecase}}</td>
+                      <td class="text-right">{{history.amount_payed | number}} {{defaultMoney.abreviation}}</td>
+                      
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th colspan="4" class="font-size-15 text-right">Sous total</th>
+                      <th class="font-size-15 text-right">{{payment.total_payed}} {{defaultMoney.abreviation}}</th>
+                    </tr>
+                  </tfoot>
+                </table>
+            </div>
+          </div>
+        </div>
+       
+    </mat-tab>
+    <mat-tab *ngIf="appserv.permissionFilter('rapports','expenditures')">
+      <ng-template mat-tab-label>
+        <ion-icon name="shapes-outline"></ion-icon> &nbsp;
+        Dépenses & Entrées
+      </ng-template>
+      <br>
+      <div class="filterbloc bd-radius-10 bd-rounded">
+        <ion-tab-button class="ion-text-center" (click)="cashboodatefilter()">
+             <ion-label>
+              <ion-avatar class="border-rounded-avatar display-flex-center" slot="start">
+                <ion-icon name="calendar-outline" color="warning" size="small"></ion-icon>
+              </ion-avatar>
+               <br>
+              <ion-note class="font-bold-600 font-size-12">Par date</ion-note>
+             </ion-label>
+        </ion-tab-button>
+      </div>
+      <div #cashbookbloc id="cash-book-bloc" class="content ion-padding">
+        <h2 *ngIf="cash_book_from!==cash_book_to"> Bons de caisse pour la période du {{cash_book_from}} au {{cash_book_to}} </h2>
+        <h2 *ngIf="cash_book_from===cash_book_to">Bons de caisse du {{cash_book_from}}</h2>
+        <hr class="hr">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-lg="6" class="ion-padding">
+              <h6>ENTREES</h6>
+              <table class="table" border="1" style="width: 100%; font-size: 12px;">
+                <thead>
+                  <tr>
+                    <th class="text-left font-size-14">N°</th>
+                    <!-- <th class="text-left font-size-14">OP.ID</th> -->
+                    <th class="text-left font-size-14">Date</th>
+                    <th class="text-left font-size-14">Libellé</th>
+                    <th class="text-left font-size-14">Imputation</th>
+                    <th class="text-right font-size-14">Montant</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let book of cashbooklist?.entries; let i=index;">
+                    <td class="text-left">{{i+1}}</td>
+                    <!-- <td class="text-left">{{book.uuid}}</td> -->
+                    <td class="text-left">{{book?.created_at | date}}</td>
+                    <td class="text-left">{{book?.motif | titlecase}}</td>
+                    <td class="text-left">{{book?.name | titlecase}}</td>
+                    <td class="text-right">{{book?.amount | number}} {{defaultMoney?.abreviation}}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="4" class="text-right font-size-16">Sous Total des entrées</th>
+                    <th colspan="2" class="text-right font-size-16">{{(cashbooklist.sum_entries?cashbooklist.sum_entries:0) | number}} {{defaultMoney.abreviation}}</th>
+                  </tr>
+                </tfoot>
+              </table>
+            </ion-col>
+            <ion-col size="12" class="ion-padding" size-lg="6">
+              <h6>SORTIES</h6>
+              <table class="table" border="1" style="width: 100%; font-size: 12px;">
+                <thead>
+                  <tr>
+                    <th class="text-left">N°</th>
+                    <!-- <th class="text-left">OP.ID</th> -->
+                    <th class="text-left font-size-14">Date</th>
+                    <th class="text-left font-size-14">Libellé</th>
+                    <th class="text-left font-size-14">Imputation</th>
+                    <th class="text-right font-size-14">Montant</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let book of cashbooklist.withdraw; let i=index;">
+                    <td class="text-left">{{i+1}}</td>
+                    <!-- <td class="text-left">{{book.uuid}}</td> -->
+                    <td class="text-left">{{book.created_at | date}}</td>
+                    <td class="text-left">{{book.motif | titlecase}}</td>
+                    <td class="text-left">{{book.name | titlecase}}</td>
+                    <td class="text-right">{{book.amount | number}} {{defaultMoney.abreviation}}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="4" class="text-right font-size-16">Sous Total des sorties</th>
+                    <th colspan="2" class="text-right font-size-16">{{cashbooklist.sum_withdraw | number}} {{defaultMoney.abreviation}}</th>
+                  </tr>
+                </tfoot>
+              </table>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="12" class="ion-padding">
+              <table class="table">
+                <tr class="bd-square" style="width: 100%;">
+                  <th class="font-size-17">Total entrées:</th>
+                  <th>{{cashbooklist.sum_entries | number}} {{defaultMoney.abreviation}}</th>
+                </tr> 
+                <tr>
+                  <th class="font-size-17">Total sorties:</th>
+                  <th>{{cashbooklist.sum_withdraw | number}} {{defaultMoney.abreviation}}</th>
+                </tr>  
+                <tr class="font-size-17">
+                  <th>Total général:</th>
+                  <th>{{cashbooklist.total | number}} {{defaultMoney.abreviation}}</th>
+                </tr> 
+                <tr class="font-size-17">
+                  <th>Solde :</th>
+                  <th>{{(cashbooklist.sum_entries-cashbooklist.sum_withdraw) | number}} {{defaultMoney.abreviation}}</th>
+                </tr>
+              </table>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+    </mat-tab>
+    <mat-tab *ngIf="appserv.permissionFilter('rapports', 'cashbook')">
+      <ng-template mat-tab-label>
+        <ion-icon name="book-outline"></ion-icon> &nbsp;
+        Livres des caisses
+      </ng-template>
+      <br>
+      <div class="filterbloc bd-radius-10 bd-rounded">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-lg="3" class="border-right-2px">
+             
+                <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                  <ion-label (click)="casbooktruedatefilter()">
+                    <p class="item-label-title">
+                      <ion-text>Par Date</ion-text>
+                    </p>
+                    <p class="secondpara" *ngIf=" cashbooktrue_from ||  cashbooktrue_to">
+                      {{ cashbooktrue_from}} - {{ cashbooktrue_to}}
+                    </p> 
+                  </ion-label>
+                  <ion-chip  slot="end" class="font-size-10" color="primary" (click)="getdailyoperations()">
+                    <span>Afficher</span>
+                  </ion-chip>
+                </ion-item>
+             
+            </ion-col> 
+
+            <ion-col size="12" size-lg="3">
+              <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                <ion-label>
+                  <p class="item-label-title" (click)="gotocashbooksfundspicker()">
+                    <ion-text>Par Caisses</ion-text>
+                  </p>
+                  <p class="secondpara">
+                    <ion-text *ngIf="actualfundscashbooks.length<=0">Sélectionner les caisses</ion-text>
+                    <ion-text class="articles-list" (click)="selldynamiviewer('funds',actualfundscashbooks)">
+                      <span *ngFor="let tub of actualfundscashbooks" class="font-size-10">{{tub.description | titlecase}},</span>
+                      <br>
+                    </ion-text>
+                    <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetTubslist()" *ngIf="actualfundscashbooks.length>0"></ion-icon>
+                  </p> 
+                </ion-label>
+                <ion-chip  slot="end" [disabled]="actualfundscashbooks.length<=0" class="font-size-10" color="primary" (click)="cashbookbytubs()">
+                  <span>Afficher</span>
+                </ion-chip>
+              </ion-item>
+            </ion-col>
+            <ion-col size="12" size-lg="3" class="border-right-2px" *ngIf="appserv.actualUser.user_type==='super_admin'"> 
+              <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+                <ion-label>
+                  <p class="item-label-title" (click)="cashbookspickaccounts()">
+                    <ion-text>Par comptes</ion-text>
+                  </p>
+                  <p class="secondpara">
+                    <ion-text *ngIf="listcashbookaccounts.length<=0">Sélectionner les comptes</ion-text>
+                    <ion-text class="articles-list" (click)="selldynamiviewer('accounts',listcashbookaccounts)">
+                      <span *ngFor="let account of listcashbookaccounts" class="font-size-10">{{account.name | titlecase}},</span>
+                      <br>
+                    </ion-text>
+                    <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetlistcashbookaccounts()" *ngIf="listcashbookaccounts.length>0"></ion-icon>
+                  </p> 
+                </ion-label>
+                <ion-chip  slot="end" class="font-size-10" [disabled]="listcashbookaccounts.length<=0" color="primary" (click)="reportcashbooksaccounts()">
+                  <span>Afficher</span>
+                </ion-chip>
+              </ion-item>
+            </ion-col>
+            <ion-col size="12" size-lg="3" *ngIf="appserv.actualUser.user_type==='super_admin'">
+              <ion-item class="contentbody default-list-item"  lines="none" detail="true" >
+                <ion-label>
+                  <p class="item-label-title" (click)="cashbooksagentsfilter()">
+                    <ion-text>Par Agent</ion-text>
+                  </p>
+                  <p class="secondpara">
+                    <ion-text *ngIf="listagentsCasbooks.length<=0">Sélectionner les agents</ion-text>
+                    <ion-text class="articles-list" (click)="selldynamiviewer('agents_cashbooks',listagentsCasbooks)">
+                      <span *ngFor="let agent of listagentsCasbooks" class="font-size-10">{{agent.user_name| titlecase}},</span>
+                      <br>
+                    </ion-text>
+                    <ion-icon name="close-circle-outline" color="danger" size="small" (click)="resetcashbooksagentslist()" *ngIf="listagentsCasbooks.length>0"></ion-icon>
+                  </p> 
+                </ion-label>
+                <ion-chip  slot="end" class="font-size-10" color="primary" (click)="cashbooksReportbyAgents()">
+                  <span>Afficher</span>
+                </ion-chip>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>  
+      <br>
+      <div id="cash-book-bloc2" class="content ion-padding">
+        <h2 *ngIf="cashbooktrue_from!==cashbooktrue_to"> Livre de caisse pour la période du {{appserv.frdate(cashbooktrue_from)}} au {{appserv.frdate(cashbooktrue_to)}} </h2>
+        <h2 *ngIf="cashbooktrue_from===cashbooktrue_to">Livre de caisse du {{appserv.frdate(cashbooktrue_from)}}</h2>
+        <div>
+          <ng-container *ngIf="cashbookfilter==='default'">
+            <h2>Toutes les caisses</h2>
+          </ng-container> 
+          <ng-container *ngIf="cashbookfilter==='funds'">
+            <h2 class="font-size-15">Filtré par caisses: <span *ngFor="let tub of actualfundscashbooks" class="font-size-12">{{tub.description | titlecase}},</span></h2>
+          </ng-container>
+          <ng-container *ngIf="cashbookfilter==='accounts'">
+            <h2 class="font-size-15">Filtré par comptes: <span *ngFor="let account of listcashbookaccounts" class="font-size-12">{{account.name | titlecase}},</span></h2>
+          </ng-container>
+          <ng-container *ngIf="cashbookfilter==='agents'">
+            <h2 class="font-size-15">Filtré par agents: <span *ngFor="let agent of listagentsCasbooks" class="font-size-12">{{agent.user_name | titlecase}},</span></h2>
+          </ng-container>
+          
+        </div>
+        <table class="table" border="1" style="width:100% ;font-size: 12px;">
+          <thead>
+            <th class="text-left">DATE</th>
+            <th class="text-left">N°</th>
+            <th class="text-left">PAR</th>
+            <th class="text-left">CAISSE</th>
+            <th class="text-left">LIBELLE</th>
+            <th class="text-right">DEBIT</th>
+            <th class="text-right">CREDIT</th>
+            <th class="text-left">IMPUTATION</th>
+            <th class="text-right">SOLDES</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let mouv of listoperations; let i=index">
+              <td class="text-left font-size-11">{{appserv.frdate(mouv.done_at)}}</td>
+              <td class="text-left font-size-11">{{i+1}}</td>
+              <td class="text-left font-size-11">{{mouv.user_name | titlecase}}</td>
+              <td class="text-left font-size-11">{{mouv.fund_name | titlecase}}</td>
+              <td class="text-left font-size-11">{{mouv.motif}}</td>
+              <td class="text-right font-size-11">{{(mouv.type==='entry'?mouv.amount:'') | number}} {{mouv.type==='entry'?mouv.abreviation:''}}</td>
+              <td class="text-right font-size-11">{{(mouv.type==='withdraw'?mouv.amount:'') | number}} {{mouv.type==='withdraw'?mouv.abreviation:''}}</td>
+              <td class="text-left font-size-11">{{mouv.account_name | titlecase}}</td>
+              <td class="text-right font-size-11">{{mouv.sold | number}} {{mouv.abreviation}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</ion-content>

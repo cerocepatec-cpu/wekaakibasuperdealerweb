@@ -1,0 +1,37 @@
+<ion-header class="ion-no-border ion-padding">
+  <ion-toolbar>
+    <ion-item lines="none" class="contentbody font-bold-500">
+      <ion-icon name="chevron-back-outline" color="primary" size="large" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <ion-segment mode="ios" [(ngModel)]="filtercriteria" slot="end">
+        <ion-segment-button value="all">Tous</ion-segment-button>
+        <ion-segment-button value="cash">Cash</ion-segment-button>
+        <ion-segment-button value="debt">Dettes</ion-segment-button>
+      </ion-segment>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-searchbar placeholder="Recherche" mode="ios"></ion-searchbar>
+  <ion-card class="bd-radius-10 ion-padding" mode="ios">
+    <ion-item class="bd-radius-10" *ngIf="mouvements.length===0" color="warning">
+     <ion-text class="font-size-13">Aucune opération déjà faite</ion-text>
+    </ion-item>
+    <ion-item mode="ios" class="default-list-item3"  lines="inset" *ngFor="let mouv of mouvements | slice:0:5" >
+      <ion-avatar slot="start"><ion-icon [name]="mouv.type==='withdraw'?'arrow-up':'arrow-down'"></ion-icon></ion-avatar>
+      <ion-label>
+        <h2 class="item-label-title">{{mouv.created_at | date}}</h2>
+        <h4 class="secondpara font-size-11"><ion-note>{{mouv.motif}}</ion-note></h4>
+      </ion-label>
+      <ion-chip slot="end" class="font-size-11 chipset" [color]="mouv.type==='withdraw'?'danger':''">{{mouv.type_approvement | titlecase}}</ion-chip>
+      <ion-text slot="end" class="font-size-11" [color]="mouv.type==='withdraw'?'danger':''">
+        {{mouv.quantity | number}} 
+      </ion-text>
+    </ion-item>
+    <ion-item mode="ios" lines="none" *ngIf="mouvements.length>5" >
+      <ion-note slot="start" class="font-size-12">
+        Tout voir
+      </ion-note>
+      <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+    </ion-item>
+  </ion-card>
+</ion-content>

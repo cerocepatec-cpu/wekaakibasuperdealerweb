@@ -1,0 +1,177 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="full">
+      <ion-icon name="chevron-back" slot="start" (click)="closemodal()" size="large" color="secondary"></ion-icon>
+      <ion-text  class="font-bold-600">Configuration du POS</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <mat-tab class="workspace-item">
+      <ng-template mat-tab-label>
+        <ion-text>Impréssion</ion-text>
+      </ng-template>
+        <div class="content ion-padding-top">
+          <ion-list >
+            <ion-list-header class="font-size-14">Entêtes</ion-list-header>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.logo" (ionChange)="headerchanging($event)">Logos</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.name" (ionChange)="headerchanging($event)">Nom</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.adresse" (ionChange)="headerchanging($event)">Adresse</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.description" (ionChange)="headerchanging($event)">Description</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.num_impot" (ionChange)="headerchanging($event)">Numéro Impôt</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.national_identification" (ionChange)="headerchanging($event)">ID. NAT</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.rccm" (ionChange)="headerchanging($event)">Rccm</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.phone" (ionChange)="headerchanging($event)">Contact</ion-toggle>
+            </ion-item>
+          </ion-list>
+          <ion-list >
+            <ion-list-header class="font-size-14">Pied de page</ion-list-header>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.invoicefooter" (ionChange)="headerchanging($event)">Afficher le pied de page</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.totalht" (ionChange)="headerchanging($event)">Total HT</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.tva" (ionChange)="headerchanging($event)">TVA</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.reduction" (ionChange)="headerchanging($event)">Reduction</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.netToPay" (ionChange)="headerchanging($event)">Net à payer</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.back" (ionChange)="headerchanging($event)">Retour</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.totalReceived" (ionChange)="headerchanging($event)">Total réçu</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.customerName" (ionChange)="headerchanging($event)">Nom client</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.phoneNumber" (ionChange)="headerchanging($event)">Contact client</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.totalPoints" (ionChange)="headerchanging($event)">Total points</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.totalBonus" (ionChange)="headerchanging($event)">Total Bonus</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.totalCautions" (ionChange)="headerchanging($event)">Total Cautions</ion-toggle>
+            </ion-item> 
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.cashMode" (ionChange)="headerchanging($event)">Paiement en espèce</ion-toggle>
+            </ion-item>
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.bankMode" (ionChange)="headerchanging($event)">Paiement en banque</ion-toggle>
+            </ion-item> 
+            <ion-item>
+              <ion-toggle class="font-size-11" [(ngModel)]="posprintoptions.mobileMode" (ionChange)="headerchanging($event)">Paiement via Mobile Money</ion-toggle>
+            </ion-item>
+            <ion-item *ngIf="appserv.permissionFilter('Facturation','Invoice message footer')" detail="true" (click)="setfootermsg()">
+              <ion-text class="font-size-11">Configurer le message de pied de page</ion-text>
+              <ion-icon [name]="appserv.getactualEse().invoicefooter?'checkmark-circle-outline':'close-circle-outline'" [color]="appserv.getactualEse().invoicefooter?'success':'warning'" slot="end" size="small"></ion-icon>
+            </ion-item>
+          </ion-list>
+        </div>
+    </mat-tab> 
+    <mat-tab class="workspace-item">
+      <ng-template mat-tab-label>
+        <ion-text>Imprimantes</ion-text>
+      </ng-template>
+        <div class="content ion-padding">
+            <ion-list>
+              <ion-list-header class="font-size-14">Format papier par défaut</ion-list-header>
+              <ion-item>
+                <ion-toggle class="font-size-11" [checked]="posprinterformat==='pos'" value="pos" (ionChange)="changepaperformat($event)">POS (58mm & 80mm)</ion-toggle>
+              </ion-item>
+              <ion-item>
+                <ion-toggle class="font-size-11" [checked]="posprinterformat==='a4'" value="a4" (ionChange)="changepaperformat($event)">A4</ion-toggle>
+              </ion-item>
+            </ion-list>
+        </div>
+    </mat-tab> 
+    <mat-tab class="workspace-item">
+      <ng-template mat-tab-label>
+        <ion-text>Modèles</ion-text>
+      </ng-template>
+        <div class="content ion-padding">
+          
+        </div>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>Connectivité</ng-template>
+      <div class="content ion-padding">
+        <ion-item lines="none" class="user-bloc bd-radius-10" [color]="appserv.isMyDeviceConnected()===true?'success':'warning'">
+          <ion-icon [name]="appserv.isMyDeviceConnected()===true?'cloud-done':'cloud-upload'" size="small" slot="start"></ion-icon>
+          <ion-text class="font-size-11">{{appserv.isMyDeviceConnected()===true?'Mode connecté':'Mode déconnecté'}}</ion-text>
+          <ion-icon name="chevron-down" size="small" [mat-menu-trigger-for]="menuoffandonline" slot="end"></ion-icon>
+          <mat-menu #menuoffandonline="matMenu" xPosition="before" yPosition="below">
+              <button mat-menu-item (click)="appserv.isMyDeviceConnected()===true?appserv.ChangeConnectivity(false):appserv.ChangeConnectivity(true)">
+                <ion-text class="font-size-11">Mode connecté</ion-text>
+              </button>
+              <button mat-menu-item (click)="appserv.isMyDeviceConnected()===true?appserv.ChangeConnectivity(false):appserv.ChangeConnectivity(true)">
+                <ion-text class="font-size-11">Mode déconnecté</ion-text>
+              </button>
+          </mat-menu>
+        </ion-item> 
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- <h4 class="bg-medium-clean font-size-16">MONNAIES</h4>
+  <ion-list *ngIf="appserv.permissionFilter('moneys', 'view')">
+    <ion-list-header>
+      <ion-text class="font-size-14">Monnaie par défaut</ion-text>
+    </ion-list-header>
+    <ion-item *ngFor="let money of listmoney">
+      <ion-toggle class="font-size-11" [checked]="money.principal===1?true:false" [value]="money" *ngIf="!appserv.permissionFilter('moneys', 'change_default_money')">{{money.money_name | titlecase}}</ion-toggle>
+      <ion-toggle class="font-size-11" [checked]="money.principal===1?true:false" [value]="money" (ionChange)="changeprincipalmoney($event)" *ngIf="appserv.permissionFilter('moneys', 'change_default_money')">{{money.money_name | titlecase}}</ion-toggle>
+    </ion-item>
+  </ion-list> -->
+
+  <!-- <ion-list *ngIf="appserv.permissionFilter('conversions', 'view')">
+    <ion-list-header>
+      <ion-text *ngIf="appserv.permissionFilter('conversions', 'add')" class="font-size-14" (click)="addConversion()">Conversion Monnaies</ion-text>
+      <ion-text *ngIf="!appserv.permissionFilter('conversions', 'add')" class="font-size-14">Conversion Monnaies</ion-text>
+    </ion-list-header>
+    <div *ngIf="appserv.permissionFilter('conversions', 'view')" >
+      <ion-item lines="full"  detail="true" class="default-list-item" *ngFor="let conversion of listconversions"(click)="menuconversion(conversion)">
+        <ion-avatar slot="start"><ion-icon name="sync"></ion-icon></ion-avatar>
+          <ion-label>
+            <p class="item-label-title">
+              <ion-text class="font-size-11">{{conversion.name1}} ({{conversion.abreviation1}})</ion-text>
+            </p>
+            <p class="secondpara"><ion-icon name="arrow-down-outline" size="small"></ion-icon></p>
+            <p class="secondpara font-bold-500">
+              <ion-text class="font-size-11">{{conversion.name2}} ({{conversion.abreviation2}})</ion-text>
+            </p>
+          </ion-label>
+          <ion-note class="reqtotalprinted font-bold-600" slot="end">Taux: <span class="font-bold-500 font-size-15">{{conversion.rate}}</span></ion-note>
+      </ion-item>
+    </div>
+
+  </ion-list> -->
+</ion-content>
+<ion-footer>
+
+</ion-footer>

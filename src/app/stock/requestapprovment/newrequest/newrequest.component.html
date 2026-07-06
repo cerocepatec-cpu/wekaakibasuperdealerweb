@@ -1,0 +1,43 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+        <ion-icon name="chevron-back-outline" color="primary" (click)="appserv.closemodal()"></ion-icon>
+        <ion-text color="primary">Nouvelle demande</ion-text>
+        <ion-chip (click)="validatetransfert()"  class="box-big"  color="secondary" mode="ios" slot="end">Envoyer demande ({{articles.length}})</ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar *ngIf="showprogress" mode="ios" type="indeterminate"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+    
+      <ion-item class="contentbody bd-square bd-radius-10 ion-margin-bottom font-size-13" lines="none" (click)="depositsenderpicker()">
+        <ion-text slot="start">Dépôt demandeur</ion-text>
+        <ion-note slot="end">{{(depositsender?depositsender.name:'') | titlecase}}</ion-note>
+      </ion-item>
+
+      <ion-item class="contentbody bd-square bd-radius-10 ion-margin-bottom font-size-13" lines="none" (click)="depositreceiverpicker()" *ngIf="depositsender">
+        <ion-text slot="start">Dépôt fournisseur</ion-text>
+        <ion-note slot="end">{{(depositreceiver?depositreceiver.name:'') | titlecase}}</ion-note> 
+      </ion-item>
+      <hr class="hr">
+      <div *ngIf="depositsender" class="bd-radius-10">
+        <ion-item lines="none" class="contentbody ion-padding-bottom list-title">
+          <ion-text slot="start" class="font-size-16">Produits à demander ({{articles.length}})</ion-text>
+          <ion-avatar slot="end" class="bg-medium" (click)="servicepicker()"><ion-icon color="light" name="add-outline" size="large"></ion-icon></ion-avatar>  
+        </ion-item>
+  
+        <ion-item class="default-list-item font-size-13 contentbody" lines="full" *ngFor="let article of articles" >
+         <ion-label>
+          <ion-note class="font-bold-600 text-ellipsis" slot="start" [color]="article.service.available_qte>1?'':'danger'">{{article.service.name | titlecase}}</ion-note>
+          <ion-input type="number" placeholder="entrer la quantité" [value]="article.service.available_qte?article.service.available_qte:0" [label]="article.service.uom_symbol" labelPlacement="floating"></ion-input>
+         </ion-label>
+          <ion-icon name="trash-outline" size="small" slot="end" (click)="deletefromlist(article)" *ngIf="!article.selected" ></ion-icon>
+          <ion-icon name="checkmark-outline" slot="end" color="success" size="small" *ngIf="article.status==='sent'"></ion-icon> 
+          <ion-icon name="close-outline" slot="end" color="danger" size="small" *ngIf="article.status==='unsent'"></ion-icon> 
+        </ion-item>
+      </div>
+     <br>
+      <ion-item class="contentbody bd-square bd-radius-10 ion-margin-bottom font-size-13" lines="none" *ngIf="articles.length>0" >
+        <ion-textarea [(ngModel)]="note" label="Entrer une note ou référence" labelPlacement="floating"  placeholder="Entrer une note"></ion-textarea>
+      </ion-item>
+</ion-content>

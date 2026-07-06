@@ -1,0 +1,31 @@
+export interface TransfertStock{
+    id?: number;
+    deposit_sender_id?:number;
+    deposit_receiver_id?:number;
+    quantity_sent?:number;
+    quantity_received?:number;
+    note?:string;
+    comment?:string;
+    reference?:string;
+    sender_id?:number;
+    user_id?:number;
+    receiver_id?:number;
+    receiver_name?:string;
+    service_id?:number;
+    service_name?:string;
+    service_description?:string;
+    sender_name?:string;
+    deposit_sender_name?:string;
+    deposit_receiver_name?:string;
+    uom_symbol?:string;
+    created_at?:string;
+    updated_at?:string;
+    selected?:boolean;
+    type?: string;
+    status?: string;
+    enterprise_id?:number;
+    validate_by?: number;
+    validate?: string;
+    validate_at?: string;
+    received_at?: string;
+}

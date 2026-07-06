@@ -1,0 +1,105 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Octroyer un crédit</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="p-4 bg-gray-50 dark:bg-gray-900">
+  <form
+    (ngSubmit)="submit()"
+    class="bg-white dark:bg-gray-800 rounded-xl p-4 space-y-4 max-w-xl mx-auto">
+
+    <!-- ERROR -->
+    <div *ngIf="error"
+      class="text-red-600 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded">
+      {{ error }}
+    </div>
+
+    <!-- MEMBER AUTOCOMPLETE -->
+    <app-members-autocomplete
+      placeholder="Rechercher un membre (nom ou téléphone)"
+      [results]="members"
+      labelKey="name"
+      subLabelKey="phone"
+      (search)="onSearchMember($event)"
+      (selectItem)="selectMember($event)">
+    </app-members-autocomplete>
+
+    <!-- AMOUNT REQUESTED -->
+    <ion-input
+      label="Montant demandé"
+      type="number"
+      placeholder="Ex: 100000"
+      [(ngModel)]="form.principal_amount_requested"
+      name="principal_amount_requested"
+      required>
+    </ion-input>
+
+    <!-- MONEY -->
+<ion-select
+  label="Monnaie"
+  placeholder="Choisir la monnaie"
+  [(ngModel)]="form.money_id"
+  name="money_id"
+  required>
+  <ion-select-option
+    *ngFor="let money of moneys"
+    [value]="money.id">
+    {{ money.abreviation }} — {{ money.money_name }}
+  </ion-select-option>
+</ion-select>
+
+    <!-- INTEREST -->
+    <ion-input
+      label="Taux d’intérêt (%)"
+      type="number"
+      placeholder="Ex: 5"
+      [(ngModel)]="form.interest_rate"
+      name="interest_rate"
+      required>
+    </ion-input>
+
+    <!-- DURATION -->
+    <ion-input
+      label="Durée (jours)"
+      type="number"
+      [(ngModel)]="form.duration_days"
+      name="duration_days"
+      required>
+    </ion-input>
+
+    <!-- INSTALLMENT TYPE -->
+    <ion-select
+      label="Type d’échéance"
+      [(ngModel)]="form.installment_type"
+      name="installment_type">
+      <ion-select-option value="daily">Journalier</ion-select-option>
+      <ion-select-option value="weekly">Hebdomadaire</ion-select-option>
+      <ion-select-option value="monthly">Mensuel</ion-select-option>
+    </ion-select>
+
+    <!-- GRACE PERIOD -->
+    <ion-input
+      label="Période de grâce (jours)"
+      type="number"
+      [(ngModel)]="form.grace_period_days"
+      name="grace_period_days">
+    </ion-input>
+
+    <!-- NOTE -->
+    <ion-textarea
+      label="Note"
+      [(ngModel)]="form.note"
+      name="note">
+    </ion-textarea>
+
+    <!-- SUBMIT -->
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="loading || !form.user_id">
+      {{ loading ? 'Création...' : 'Créer le crédit' }}
+    </ion-button>
+
+  </form>
+</ion-content>

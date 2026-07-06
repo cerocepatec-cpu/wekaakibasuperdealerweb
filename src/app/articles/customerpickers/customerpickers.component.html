@@ -1,0 +1,22 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none" class="contentbody">
+      <ion-icon name="chevron-back" size="large" color="secondary" (click)="closemodal()"></ion-icon>
+      <ion-text>{{multiple?"Sélectionner les membres":"Sélectionner un membre"}}</ion-text>
+      <ion-icon *ngIf="appserv.permissionFilter('clients', 'add')" name="add-circle-outline" slot="end" size="large" color="primary" (click)="addnewcustomer()"></ion-icon>
+      <ion-chip *ngIf="multiple" [disabled]="listcustomerstosend.length<=0" slot="end" (click)="sendata()">Valider</ion-chip>
+    </ion-item>
+    <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-14" [(ngModel)]="search" (ionInput)="lookup()" #inputSearch></ion-searchbar>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-list class="contentbody">
+    <ion-item lines="full" *ngFor="let customer of listcustomers" (click)="selected(customer)" class="font-size-14 contentbody">
+      <ion-text slot="start">{{customer.customerName | titlecase}}</ion-text>
+      <ion-icon slot="end" *ngIf="customer.selected"  name="checkmark-circle-outline" color="success" size="small"></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+

@@ -1,0 +1,126 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" (click)="closemodal()" slot="start"></ion-icon>
+      <ion-icon name="add-outline" slot="start" color="primary" (click)="selectotherarticles()"></ion-icon>
+      <ion-icon name="checkbox-outline" slot="start" color="primary" (click)="showcheckbox=!showcheckbox" *ngIf="selectedarticles.length===0"></ion-icon>
+      <ion-icon name="remove-circle-outline" slot="start" color="primary" (click)="showcheckbox=!showcheckbox;selectedarticles=[];" *ngIf="selectedarticles.length>0"></ion-icon>
+      <ion-text slot="start">Mouvements de stock</ion-text> 
+      <ion-icon name="checkmark-outline" slot="end" size="large" (click)="sendhistorystock()" color="success"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-card color="warning" class="ion-padding" mode="ios">
+    <ion-text class="font-size-11">
+      Vous n'êtes pas obligé de tout remplir. Les informations obligatoires sont juste la quantité à approvionner ou à déstocker et le type d'opération. A noter que le type par défaut est "Approvisionner".
+    </ion-text>
+  </ion-card>
+  <ion-searchbar mode="ios" placeholder="Rechercher..." class="font-size-12"></ion-searchbar>
+  <div class="listdeleting" *ngIf="showcheckbox">
+    <ion-item class="contentbody default-list-item" *ngFor="let article of liststockstories " lines="inset" (click)="selectitem(article)">
+      <ion-checkbox slot="start" mode="ios" size="small"></ion-checkbox>
+      <ion-label>
+        <p class="item-label-title">
+          <ion-text>{{article.service_name | titlecase}}</ion-text> 
+        </p>
+      </ion-label>
+      <ion-icon name="chevron-down-outline" slot="end" size="small"></ion-icon>
+    </ion-item>
+  </div>
+  
+  <ion-accordion-group [multiple]="true" *ngIf="!showcheckbox">
+    <ion-accordion [value]="article.service_id" *ngFor="let article of liststockstories" mode="ios">
+      <ion-item slot="header" color="light">
+        <ion-label class="font-size-12">{{article.service_name | titlecase}}</ion-label>
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        <ion-item lines="full" class="font-size-11 ion-no-padding">
+          <ion-tab-button>
+            <ion-toggle color="danger" (ionChange)="changemouvementmode(article)" [enableOnOffLabels]="true" class="customized" [checked]="article.showWithdraw"></ion-toggle>
+            <ion-label class="font-size-11">Déstocker</ion-label>
+          </ion-tab-button> 
+          <ion-tab-button (click)="depositpickerforall(article)">
+            <ion-icon name="storefront" size="small"></ion-icon>
+            <ion-label class="font-size-11">Dépôt</ion-label>
+          </ion-tab-button>
+          <ion-tab-button *ngIf="iscashmode===true">
+            <ion-icon name="scan" size="small"></ion-icon>
+            <ion-label class="font-size-11">Code-barres</ion-label>
+          </ion-tab-button>
+          <ion-tab-button [matMenuTriggerFor]="othersactions">
+            <ion-icon name="ellipsis-vertical" size="small"></ion-icon>
+            <ion-label class="font-size-11">Autres</ion-label>
+          </ion-tab-button>
+        </ion-item>
+        <mat-menu #othersactions="matMenu" xPosition="before">
+          <button mat-menu-item>
+            <ion-icon name="attach"></ion-icon>
+            <span class="font-size-12"> Pièce jointe</span>
+          </button>
+          <button mat-menu-item (click)="providerpickerforall(article)">
+            <ion-icon name="person"></ion-icon>
+            <span class="font-size-12"> Fournisseur</span>
+          </button>
+        </mat-menu>
+          <ion-list>
+            <ion-item lines="full" class="font-size-12">
+              <ion-input type="number" placeholder="Quantité" [(ngModel)]="article.quantity" (keyup)="totalcalculate(article)" ></ion-input>
+            </ion-item>
+            <ion-item lines="full" class="font-size-12" *ngIf="iscashmode===true && article.showpu">
+              <ion-input type="number" placeholder="Prix d'achat" [(ngModel)]="article.price" (keyup)="totalcalculate(article)" ></ion-input>
+            </ion-item>
+            <ion-item lines="full" class="font-size-12" *ngIf="iscashmode===true && article.showtotal">
+              <ion-input type="number" placeholder="Total" [(ngModel)]="article.total" [disabled]="true"></ion-input>
+            </ion-item> 
+            <ion-item lines="full" class="font-size-12" (click)="calendarpicker(article)" *ngIf="iscashmode===true && article.showcalendar">
+              <ion-input placeholder="Date d'expiration" [(ngModel)]="article.expiration_date"></ion-input>
+             <ion-icon name="calendar" slot="end"></ion-icon>
+            </ion-item> 
+            <ion-item lines="full" class="font-size-12">
+              <ion-input type="text" placeholder="Motif" [(ngModel)]="article.motif"></ion-input>
+            </ion-item> 
+            <ion-item lines="full" class="font-size-12">
+              <ion-textarea placeholder="Entrer une note" [(ngModel)]="article.note"></ion-textarea>
+            </ion-item>
+            <ion-item lines="none" class="font-size-12" *ngIf="iscashmode===true && article.showbarcode">
+              <ion-input placeholder="Code-barres" [(ngModel)]="article.code_bar"></ion-input>
+              <ion-icon name="scan-outline" color="primary" size="small"></ion-icon>
+            </ion-item>
+          </ion-list>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+</ion-content>
+<ion-footer class="ion-no-border" [translucent]="true">
+  <ion-toolbar>
+    <ion-item lines="full">
+      <ion-tab-button (click)="providerpickerforall()" slot="start" *ngIf="iscashmode" >
+        <ion-text color="secondary">Fournisseur</ion-text>
+        <ion-label class="font-size-11" color="medium">{{(actualcustomer?actualcustomer.customerName:'Sélectionner')| titlecase}}</ion-label>
+      </ion-tab-button> 
+      <ion-tab-button (click)="attachmentspickerforall()" slot="start">
+        <ion-label color="secondary">Pièce jointe</ion-label>
+        <ion-text class="font-size-11" color="medium">Ajouter</ion-text>
+      </ion-tab-button>
+      <ion-tab-button (click)="depositpickerforall()" slot="start">
+        <ion-text color="secondary">Dépôt</ion-text>
+        <ion-label class="font-size-11" color="medium">{{actualdeposit?actualdeposit.name:'Sélectionner'| titlecase}}</ion-label>
+      </ion-tab-button>
+      <ion-tab-button slot="start">
+        <ion-text color="secondary">Document</ion-text>
+        <ion-label class="font-size-11" color="medium" (click)="alltypedocumentpicker()">{{actualdocumenttype?actualdocumenttype.name:'Sélectionner'| titlecase}}</ion-label>
+        <ion-label class="font-size-11" color="medium" (click)="alldocumentref()">{{actualdocumenttype?'Ref:' + documentnumber:''}}</ion-label>
+      </ion-tab-button>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-toggle color="danger" (ionChange)="changeallmouvementmode()" [enableOnOffLabels]="true" [(ngModel)]="mouvementmode"></ion-toggle>
+      <ion-label class="font-size-12">Déstocker</ion-label>
+
+      <ion-toggle color="primary" *ngIf="actualcustomer && iscashmode" (ionChange)="changealltypeapprovement()" [enableOnOffLabels]="true" [(ngModel)]="typemouvement"> </ion-toggle>
+      <ion-label class="font-size-12" *ngIf="actualcustomer && iscashmode">Achat à crédit?</ion-label>
+
+      <ion-text color="danger" slot="end" class="font-size-12" (click)="multipledelete()" *ngIf="selectedarticles.length>0" >Supprimer</ion-text>
+    </ion-item> 
+  </ion-toolbar>
+</ion-footer>

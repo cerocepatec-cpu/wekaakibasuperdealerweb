@@ -1,0 +1,168 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" class="contentbody font-bold-500">
+      <ion-back-button *ngIf="!modal_used"></ion-back-button>
+      <ion-icon name="chevron-back" *ngIf="modal_used" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-segment mode="ios" slot="start" [(ngModel)]="activitytype">
+        <ion-segment-button *ngIf="appserv.permissionFilter('stock', 'entry') && criteria==='entry'" value="entry">Nouvelle entrée</ion-segment-button>
+        <ion-segment-button *ngIf="appserv.permissionFilter('stock', 'withdraw') && criteria==='withdraw'" value="withdraw">Sortie en stock</ion-segment-button>
+      </ion-segment>
+      <ion-icon name="eye-outline" slot="end" color="primary" size="small" (click)="modesearch=!modesearch"></ion-icon>
+      <ion-icon name="checkbox-outline" slot="end" color="primary" (click)="showcheckbox=!showcheckbox" *ngIf="selectedarticles.length===0"></ion-icon>
+      <ion-icon name="remove-circle-outline" slot="end" color="primary" size="small" (click)="showcheckbox=!showcheckbox;selectedarticles=[];" *ngIf="selectedarticles.length>0"></ion-icon>
+      <ion-chip *ngIf="appserv.permissionFilter('stock','add')" slot="end" color="success" (click)="sendhistorystock()" [disabled]="liststockstories.length<1"><ion-icon  name="checkmark" size="large"></ion-icon></ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-toolbar class="contentbody">
+    <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-12" #inputsearch (keyup)="lookuparticles()"></ion-searchbar>
+    <!-- <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-12" #inputsearch (keyup)="lookuparticles()" (ionChange)="lookuparticlebybarcode()"></ion-searchbar> -->
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" type="indeterminate" *ngIf="showcreatingprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  
+  <ng-container *ngIf="!modesearch">
+    <div class="ion-padding">
+      <h2>Liste des mouvements à envoyer</h2>
+      <div class="listdeleting" *ngIf="showcheckbox">
+        <ion-item class="contentbody default-list-item" *ngFor="let article of liststockstories " lines="inset">
+          <ion-icon slot="start" name="trash-outline" color="danger"size="small" (click)="removefromlist(article)"></ion-icon>
+          <ion-label>
+            <p class="item-label-title">
+              <ion-text>{{article.service_name | titlecase}}</ion-text> 
+            </p>
+          </ion-label>
+          <ion-icon name="chevron-down-outline" slot="end" size="small"></ion-icon>
+        </ion-item>
+      </div>
+      
+      <ion-accordion-group [multiple]="true" *ngIf="!showcheckbox">
+        <ion-accordion [value]="article.service_id" *ngFor="let article of liststockstories" mode="ios">
+          <ion-item slot="header" color="light">
+            <ion-label class="font-size-12">{{article.service_name | titlecase}}</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <mat-menu #othersactions="matMenu" xPosition="before">
+              <button mat-menu-item>
+                <ion-icon name="attach"></ion-icon>
+                <span class="font-size-12"> Pièce jointe</span>
+              </button>
+              <button mat-menu-item (click)="providerpickerforall(article)">
+                <ion-icon name="person"></ion-icon>
+                <span class="font-size-12"> Fournisseur</span>
+              </button>
+            </mat-menu>
+              <ion-list>
+                <ion-item lines="full" class="font-size-12">
+                  <ion-input type="number" label="Quantité" [(ngModel)]="article.quantity" (keyup)="totalcalculate(article)" labelPlacement="stacked"></ion-input>
+                </ion-item>
+                <ion-item lines="full" class="font-size-12" *ngIf="iscashmode===true && article.showpu">
+                  <ion-input type="number" label="Prix d'achat" [(ngModel)]="article.price" (keyup)="totalcalculate(article)" labelPlacement="stacked"></ion-input>
+                </ion-item>
+                <ion-item lines="full" class="font-size-12" *ngIf="iscashmode===true && article.showtotal" class="ion-hide">
+                  <ion-input type="number" label="Total" [(ngModel)]="article.total" [disabled]="true" labelPlacement="stacked"></ion-input>
+                </ion-item> 
+                <ion-item lines="full" class="font-size-12" *ngIf="iscashmode===true && article.showcalendar">
+                  <ion-input label="Date d'expiration" [(ngModel)]="article.expiration_date" type="date"></ion-input>
+                </ion-item> 
+                <ion-item lines="full" class="font-size-12">
+                  <ion-input type="text" label="Libellé" [(ngModel)]="article.motif" labelPlacement="stacked"></ion-input>
+                </ion-item> 
+                <ion-item lines="full" class="font-size-12">
+                  <ion-textarea label="Entrer une note" [(ngModel)]="article.note" labelPlacement="stacked"></ion-textarea>
+                </ion-item>
+                <ion-item lines="none" class="font-size-12" *ngIf="iscashmode===true && article.showbarcode">
+                  <ion-input label="Code-barres" [(ngModel)]="article.code_bar"></ion-input>
+                </ion-item>
+              </ion-list>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="modesearch">
+    <hr class="hr">
+    <div class="ion-padding" *ngFor="let article of articlesfromapi">
+      <ion-item class="contentbody default-list-item"  lines="none" detail="true">
+        <ion-checkbox slot="start" *ngIf="showcheckbox" mode="ios" size="small" aria-label="product" [checked]="article.selected"></ion-checkbox>
+        <ion-avatar slot="start" [class]="article.selected?'bg-success':''">
+          <ion-text class="ion-text-uppercase">{{article.service.name | slice:0:2}}</ion-text>
+        </ion-avatar>
+        <ion-label>
+          <p class="item-label-title">
+            <ion-text>{{article.service.name | titlecase}}</ion-text>
+          </p>
+          <p class="secondpara">
+            {{article.service.description | titlecase}}
+          </p>
+          <p class="secondpara">
+            <span class="reqtotalprinted font-size-11"><span class="font-bold-600"></span> {{article.service.category_name | titlecase}}</span> | <span class="reqtotalprinted font-size-11"><span class="font-bold-600"></span>{{article.total | number}} {{article.service.uom_symbol | titlecase}}</span>
+          </p> 
+        </ion-label>
+        <ion-chip  slot="end" class="font-size-10" [color]="article.selected?'success':'primary'" [disabled]="!article.quantity" (click)="addtolist(article)">
+          <ion-icon name="checkmark-circle-outline" *ngIf="article.selected"></ion-icon>
+          <span *ngIf="!article.selected">Ajouter</span>
+        </ion-chip>
+      </ion-item>
+      <p class="form bd-square ion-padding">
+        <ion-input type="number" label="Quantité" [(ngModel)]="article.quantity" (keyup)="totalcalculate2(article)" labelPlacement="stacked" class="bd-square bd-radius-10 margin-btm-5 font-size-12 margin-btm-5 font-size-12"></ion-input>
+        <ion-input type="number" [label]='labelprice' [(ngModel)]="article.price" (keyup)="totalcalculate2(article)" labelPlacement="stacked" class="bd-square bd-radius-10 margin-btm-5 font-size-12"></ion-input>
+        <ion-input type="text" label="Palette" [(ngModel)]="article.palette" labelPlacement="stacked" class="bd-square bd-radius-10 margin-btm-5 font-size-12"></ion-input>
+        <ion-input label="Date d'expiration" [(ngModel)]="article.expiration_date" type="date" class="bd-square bd-radius-10 margin-btm-5 font-size-12" *ngIf="criteria!=='withdraw'"></ion-input>
+        <ion-input type="text" label="Libellé" [(ngModel)]="article.motif" labelPlacement="stacked" class="bd-square bd-radius-10 margin-btm-5 font-size-12"></ion-input>
+        <ion-textarea label="Entrer une note" [(ngModel)]="article.note" labelPlacement="stacked" class="bd-square bd-radius-10 margin-btm-5 font-size-12"></ion-textarea>
+      </p>
+    </div>
+  </ng-container>
+ 
+</ion-content>
+<ion-footer class="ion-no-border" [translucent]="true">
+    <ion-grid>
+      <ion-row *ngIf="selectedarticles.length===0">
+        <ion-col size="4" *ngIf="showprovider">
+          <ion-tab-button (click)="providerpickerforall()" *ngIf="iscashmode" >
+            <ion-text color="secondary">Fournisseur</ion-text>
+            <ion-icon name="person-add-outline" size="small"></ion-icon>
+            <ion-label class="font-size-11" color="medium">{{(actualcustomer?actualcustomer.providerName:'')| titlecase}}</ion-label>
+          </ion-tab-button>
+        </ion-col>
+        <!-- <ion-col size="3">
+          <ion-tab-button (click)="attachmentspickerforall()">
+            <ion-label color="secondary">Attaches</ion-label>
+            <ion-icon name="document-attach-outline" size="small"></ion-icon>
+            <ion-text class="font-size-11" color="medium">Ajouter</ion-text>
+          </ion-tab-button>
+        </ion-col> -->
+        <ion-col size="4">
+          <ion-tab-button (click)="depositpickerforall()">
+            <ion-text color="secondary">Dépôt</ion-text>
+            <ion-icon name="storefront" size="small"></ion-icon>
+            <ion-label class="font-size-11" color="medium">{{(actualdeposit?actualdeposit.name:'')| titlecase}}</ion-label>
+          </ion-tab-button>
+        </ion-col>
+        <ion-col col="4">
+          <ion-tab-button >
+            <ion-text color="secondary">Document</ion-text>
+            <ion-icon name="document-text-outline" size="small" (click)="alltypedocumentpicker()"></ion-icon>
+            <ion-label class="font-size-11" color="medium" >{{actualdocumenttype?actualdocumenttype.name:''| titlecase}}</ion-label>
+            <ion-label class="font-size-11" color="medium" (click)="alldocumentref()">{{actualdocumenttype?'Ref:' + documentnumber:''}}</ion-label>
+          </ion-tab-button>
+        </ion-col>
+        <ion-col size="4" *ngIf="showcreditmode">
+          <ion-tab-button >
+            <ion-toggle color="primary" (ionChange)="changealltypeapprovement()" [(ngModel)]="typemouvement"> </ion-toggle>
+            <ion-label class="font-size-12">Achat à crédit?</ion-label>
+          </ion-tab-button>
+        </ion-col> 
+      </ion-row>
+      <ion-row *ngIf="selectedarticles.length>0" (click)="multipledelete()">
+        <ion-col>
+          <ion-tab-button color="danger" class="font-size-12">
+            <ion-icon name="trash-outline" size="small"></ion-icon>
+            <ion-label class="font-size-11" color="medium">Supprimer</ion-label>
+          </ion-tab-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid> 
+</ion-footer>
+

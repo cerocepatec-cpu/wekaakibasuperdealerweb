@@ -1,0 +1,69 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="full">
+      <ion-text class="font-bold-600 font-size-20" slot="start">Entrée argent</ion-text>
+      <ion-button size="small" mode="ios" shape="round" color="warning"*ngIf="!showcheckbox && appserv.permissionFilter('Entrée argent', 'add')" (click)="newentry()" slot="end" >
+        <span class="font-size-16">Nouvelle entrée</span> &nbsp;
+        <ion-icon name="add-circle-outline" size="small"></ion-icon>
+      </ion-button>
+      <ion-text slot="start" color="primary" (click)="showcheckbox=!showcheckbox; listselectedexpenditures=[];" *ngIf="showcheckbox">Terminer</ion-text>
+    
+      <!-- <ion-icon name="print-outline" color="secondary" slot="end" *ngIf="!showcheckbox" size="large"></ion-icon>
+      <ion-icon name="download-outline" color="success" slot="end" [matMenuTriggerFor]="menuexport" *ngIf="!showcheckbox" size="large"></ion-icon>
+      <ion-icon name="share-outline" color="primary" slot="end" *ngIf="!showcheckbox" size="large"></ion-icon> -->
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item ><ion-text class="font-size-12">Exporter en Excel</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-12">Exporter en PDF</ion-text></button>
+    </mat-menu>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody cartpreview-80">
+
+  <ion-item lines="none" class="contentbody margin-left-moins-15">
+    <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche" [(ngModel)]="keyword" #defaultinput></ion-searchbar>
+    <ion-icon name="filter-outline" slot="end" [matMenuTriggerFor]="filter_menu" color="primary"></ion-icon>
+    <mat-menu #filter_menu="matMenu">
+      <button mat-menu-item (click)="deletefilter()"> <ion-text class="font-size-11" color="danger">Annuler le filtre</ion-text></button>
+      <button mat-menu-item (click)="userpicker()"> <ion-text class="font-size-11">Faites par</ion-text></button>
+      <button mat-menu-item (click)="accountpicker()"> <ion-text class="font-size-11">Compte</ion-text></button>
+      <button mat-menu-item (click)="anonyaccount()"> <ion-text class="font-size-11">Sans compte</ion-text></button>
+      <button mat-menu-item (click)="periodfilter()"> <ion-text class="font-size-11">Période</ion-text></button>
+    </mat-menu>
+  </ion-item>
+ 
+
+  <ion-card class="bd-radius-10 ion-padding"  color="warning" *ngIf="listexpenditures.length===0">
+    <ion-text class="font-size-13">Aucune éntrée d'argent disponible</ion-text>
+  </ion-card>
+  
+  <ion-card class="bd-radius-10 ion-padding"  mode="ios" *ngIf="listexpenditures.length>0">
+    <ion-text class="font-size-13">Total des entrées : {{totalgeneral | number}} {{appserv.getDefaultmoney().abreviation}}</ion-text>
+  </ion-card>
+
+  <ion-item class="default-list-item contentbody"  lines="inset" *ngFor="let expenditure of listexpenditures | filter:keyword" (click)="menuexpenditure(expenditure)" detail="true">
+    <ion-checkbox slot="start" *ngIf="showcheckbox" mode="ios" size="small"></ion-checkbox>
+    <ion-avatar slot="start">
+      <ion-icon name="book-outline" size="small"></ion-icon>
+    </ion-avatar>
+    <ion-label>
+      <p class="item-label-title"><ion-text>{{(expenditure.user_name?expenditure.user_name:expenditure.created_at)|titlecase }}</ion-text></p>
+      <p class="secondpara" *ngIf="expenditure.account_name"><ion-text><span class="font-bold-600">Compte:</span> {{expenditure.account_name | titlecase}}</ion-text></p>
+      <p class="secondpara"><ion-note class="font-size-11"> <span class="font-bold-600">OP.ID:</span> {{expenditure.uuid}}</ion-note></p>
+      <p class="secondpara"><ion-note class="font-size-11" *ngIf="expenditure.motif"><span class="font-bold-600">Libellé:</span> {{expenditure.motif}}</ion-note></p>
+      <p class="secondpara"> <ion-chip class="secondpara">{{expenditure.amount | number}} {{expenditure.abreviation}}</ion-chip> &nbsp; <ion-note class="font-size-10 font-bold-600" *ngIf="expenditure.beneficiary_name">Bénef.{{expenditure.beneficiary_name}}</ion-note></p>
+    </ion-label>
+  </ion-item>
+</ion-content>
+<ion-footer class="ion-no-border" [translucent]="true" *ngIf="showcheckbox && listselectedexpenditures.length>0 && appserv.permissionFilter('Entrée argent', 'delete')">
+  <ion-toolbar>
+    <ion-item lines="none" class="font-size-14">
+      <ion-text slot="start" color="danger" (click)="multipledelete()"><ion-icon name="trash-outline"></ion-icon></ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>
+
+
+
+

@@ -1,0 +1,103 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+        <ion-icon name="chevron-back-outline" color="primary" (click)="appserv.closemodal()"></ion-icon>
+        <ion-text color="primary">Nouveau transfert</ion-text>
+        <ion-chip (click)="validatetransfert()" *ngIf="articles.length>0" slot="end">
+          <ion-icon  name="send-outline" color="secondary" mode="ios"></ion-icon>
+        </ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar *ngIf="showprogress" mode="ios" type="indeterminate"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+    
+      <ion-item class="contentbody bd-square bd-radius-10 ion-margin-bottom" lines="none" (click)="depositsenderpicker()">
+        <ion-text slot="start">Dépôt expéditeur</ion-text>
+        <ion-chip slot="end" class="font-size-12" *ngIf="depositsender">{{(depositsender?depositsender.name:'') | titlecase}}</ion-chip>
+      </ion-item>
+
+      <ion-item class="contentbody bd-square bd-radius-10 ion-margin-bottom" lines="none" (click)="depositreceiverpicker()" *ngIf="depositsender">
+        <ion-text slot="start">Dépôt destinataire</ion-text>
+        <ion-chip slot="end" class="font-size-12" *ngIf="depositreceiver">{{(depositreceiver?depositreceiver.name:'') | titlecase}}</ion-chip> 
+      </ion-item>
+      <hr class="hr">
+      <div *ngIf="depositsender" class="bd-radius-10">
+        <ion-item lines="none" class="contentbody ion-padding-bottom list-title">
+          <ion-text slot="start" class="font-size-16">Produits à transferer ({{articles.length}})</ion-text>
+          <ion-avatar slot="end" class="bg-medium" (click)="setModalarticlesOpened(true)"><ion-icon color="light" name="add-outline" size="large"></ion-icon></ion-avatar>  
+        </ion-item>
+
+          <ion-grid>
+            <ion-row *ngFor="let article of articles" class="bd-square bd-rounded ion-margin-bottom">
+              <ion-col size="12">
+                <ion-item class="contentbody default-list-item"  lines="full">
+                  <ion-avatar slot="start" [class]="article.selected?'bg-success':''">
+                    <ion-text class="ion-text-uppercase">{{article.service.name | slice:0:2}}</ion-text>
+                  </ion-avatar>
+                  <ion-label>
+                    <p class="item-label-title">
+                      <ion-text>{{article.service.name | titlecase}}</ion-text>
+                    </p>
+                    <p class="secondpara">
+                      {{article.service.description | titlecase}}
+                    </p>
+                    <p class="secondpara">
+                      <ion-chip>
+                        <ion-input type="date" [(ngModel)]="article.done_at" class="font-size-12" label="Date"></ion-input>
+                      </ion-chip>
+                    </p> 
+                  </ion-label>
+                  <ion-icon name="trash-outline" size="small" slot="end" color="warning" (click)="removewithdrawarticle(article)"></ion-icon>
+                </ion-item>
+              </ion-col>
+              <ion-col size="12">
+                <ion-input class="bd-square bd-rounded ion-padding-start" type="number" placeholder="entrer la quantité" [(ngModel)]="article.service.available_qte" [label]="article.service.uom_symbol" labelPlacement="floating"></ion-input>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+       
+
+        <!-- <ion-item class="default-list-item font-size-13 contentbody" lines="full" *ngFor="let article of articles" >
+         <ion-label>
+          <ion-note class="font-bold-600 text-ellipsis" slot="start" [color]="article.service.available_qte>1?'':'danger'">{{article.service.name | titlecase}}</ion-note>
+          <ion-input type="number" placeholder="entrer la quantité" [(ngModel)]="article.service.available_qte" [label]="article.service.uom_symbol" labelPlacement="floating"></ion-input>
+         </ion-label>
+          <ion-icon name="trash-outline" size="small" slot="end" (click)="deletefromlist(article)" *ngIf="!article.selected" ></ion-icon>
+          <ion-icon name="checkmark-outline" slot="end" color="success" size="small" *ngIf="article.status==='sent'"></ion-icon> 
+          <ion-icon name="close-outline" slot="end" color="danger" size="small" *ngIf="article.status==='unsent'"></ion-icon> 
+        </ion-item> -->
+      </div>
+     <br>
+      <ion-item class="contentbody bd-square bd-radius-10 ion-margin-bottom font-size-13" lines="none" *ngIf="articles.length>0" >
+        <ion-textarea [(ngModel)]="note" label="Entrer une note ou référence" labelPlacement="floating"  placeholder="Entrer une note"></ion-textarea>
+      </ion-item>
+      <ion-modal  (willDismiss)="BeforeClosingSearchModal($event)" (didPresent)="aftermodalpresented($event)" [isOpen]="isModalOpen" class="modal-border-radius-20">
+        <ng-template>
+          <ion-header class="ion-no-border">
+            <ion-toolbar class="contentbody ion-padding-top">
+              <ion-searchbar  
+                mode="ios" placeholder="Recherche"  #mobileinputSearch (keyup)="mobilelookupmethod($event)" 
+                (ionClear)="appserv.closemodal()" cancel-button-text="Fermer"
+                show-cancel-button="always"
+                cancel-button-icon="trash"
+                ></ion-searchbar>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="contentbody">
+            <ion-item *ngFor="let article of transfertslistarticles; let i =index;" class="default-list-item contentbody" (click)="addtocart(article,i)">
+              <ion-avatar>
+                <ion-img  *ngIf="article.service.photo" [src]="article.service.photo" ></ion-img>
+                <ion-icon name="image-outline" *ngIf="!article.service.photo"></ion-icon>
+              </ion-avatar>
+              <ion-label>
+                <p class="item-label-title">{{article.service.name | titlecase}}</p>
+                <p class="secondpara">{{article.service.description | titlecase}}</p>
+              </ion-label>
+              <ion-chip class="font-size-11 font-bold-600" *ngIf="!article.selected">{{article.quantity | number}} {{article.service.uom_symbol}}</ion-chip>
+              <ion-icon name="checkmark-outline" color="success" *ngIf="article.selected"></ion-icon>
+            </ion-item>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+</ion-content>

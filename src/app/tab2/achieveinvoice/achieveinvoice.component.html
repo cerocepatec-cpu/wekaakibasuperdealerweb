@@ -1,0 +1,41 @@
+
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="arrow-back-outline" size="small" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text slot="start">Validation Facture</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  
+  <ion-list class="contentbody">
+    <ion-list-header>
+      <ion-text class="font-size-20 font-bold-500">Que voulez-vous faire de cette facture?</ion-text>
+    </ion-list-header>
+    <ion-item class="contentbody margin-btm-10" (click)="selected(type)" *ngFor="let type of types" >
+      <ion-avatar slot="start">
+        <ion-img [src]="type.img" *ngIf="type.img"></ion-img>
+        <ion-icon [name]="type.icone" size="large" color="primary" *ngIf="!type.img" ></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <h2 class="font-size-13">{{type.title}}</h2>
+        <p class="font-size-12">{{type.description}}</p>
+      </ion-label>
+      <ion-icon name="checkmark-circle-outline" size="large" color="primary" *ngIf="type.selected" ></ion-icon>
+    </ion-item>  
+  </ion-list> 
+ 
+</ion-content>
+<ion-footer class="ion-no-border ion-padding">
+  <ion-button mode="ios" color="primary" expand="block" shape="round" fill="outline" (click)="sendData()">
+    Valider mon choix
+    <ion-icon slot="end" name="checkmark-outline" size="small"></ion-icon>
+  </ion-button>
+  <ion-item lines="none">
+    <ion-label>Montant reçu</ion-label>
+    &nbsp;
+    <ion-input class="font-size-20 bd-square bd-radius-10 ion-padding-start" color="primary" type="number" [(ngModel)]="amount_paid"></ion-input>
+  </ion-item>
+  <ion-textarea placeholder="Ajouter une note" class="font-size-12 bd-square bd-radius-10 ion-padding-start" color="primary" autoGrow="true" [(ngModel)]="invoicesent.note"></ion-textarea>
+</ion-footer>

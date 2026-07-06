@@ -1,0 +1,102 @@
+<ion-header class="ion-no-border contentbody">
+  <ion-toolbar class="contentbody">
+    <ion-title class="font-size-40">
+      <ion-text>Paramètres</ion-text>
+    </ion-title>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" fullscreen="true"> 
+    <!-- <ion-searchbar mode="ios" placeholder="Recherche" id="open-modal"></ion-searchbar> -->
+    <ion-card class="bd-radius-10 margin-btm-15 ion-padding cursor-pointer" mode="ios" (click)="gotoinfosagent()">
+      <ion-item lines="none" detail="true" class="font-size-14 default-avatar-item">
+        <ion-avatar slot="start">
+          <ion-img [src]="actualuser.avatar?imgUrl+actualuser.avatar:''" *ngIf="actualuser.avatar"></ion-img>
+          <ion-icon name="person" size="large" *ngIf="!actualuser.avatar"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2>{{actualuser.user_name | titlecase}}</h2>
+          <ion-note class="font-size-12">{{actualuser.note | titlecase}}</ion-note>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+
+    <ion-card class=" bd-radius-10 margin-btm-15" mode="ios" *ngIf="appserv.permissionFilter('syncing', 'send')" (click)="appserv.closemodal()">
+      <ion-item lines="none" class="default-list-item2" mode="ios" lines="none" detail="true" routerLink="/uzisha/sycingdata">
+        <ion-avatar slot="start" class="square-avatar-primary"> <ion-icon name="cloud-outline"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Synchronisation</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Synchronisez toutes vos données avec le serveur en ligne </ion-note></h4>
+        </ion-label>
+        <ion-chip slot="end" color="warning">{{SyncingDataLength()}}</ion-chip> 
+       </ion-item>
+    </ion-card>
+        
+    <ion-card class="cursor-pointer bd-radius-10 margin-btm-15" mode="ios" *ngIf="appserv.permissionFilter('Entreprise', 'view')" (click)="appserv.closemodal()">
+      <ion-item lines="none" class="default-list-item2" mode="ios" detail="true" routerLink="/uzisha/enterprises">
+        <ion-avatar slot="start" class="square-avatar-success"><ion-icon name="logo-web-component"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Entreprise</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Mettre à jour les informations de votre entreprise</ion-note></h4>
+        </ion-label> 
+       </ion-item> 
+    </ion-card>  
+    
+    <ion-card class="cursor-pointer bd-radius-10 margin-btm-15" mode="ios" *ngIf="appserv.permissionFilter('Facturation', 'change pos settings')" (click)="gotoposSettings()">
+      <ion-item lines="none" class="default-list-item2" mode="ios" detail="true">
+        <ion-avatar slot="start" class="square-avatar-medium"><ion-icon name="cog-outline"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Configuration POS</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Configuration impréssion, formats papiers, Taux TVA, Entêtes et pied de page, etc. </ion-note></h4>
+        </ion-label> 
+       </ion-item> 
+    </ion-card>  
+    
+    <ion-card class="cursor-pointer bd-radius-10 margin-btm-15" mode="ios" *ngIf="appserv.permissionFilter('Marges dépenses', 'view')">
+      <ion-item lines="none" class="default-list-item2" mode="ios" detail="true" (click)="appserv.modalCtrl.dismiss()" routerLink="/uzisha/settingmargins">
+        <ion-avatar slot="start" class="square-avatar-primary"><ion-icon name="book-outline"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Limites dépenses</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Configurer les montants minima et maxima pour vos dépenses. </ion-note></h4>
+        </ion-label> 
+       </ion-item> 
+    </ion-card> 
+    
+    <ion-card class="cursor-pointer bd-radius-10 margin-btm-15" mode="ios" *ngIf="appserv.permissionFilter('produits', 'delete')">
+      <ion-item lines="none" class="default-list-item2" mode="ios" [mat-menu-trigger-for]="menuproducts">
+        <ion-avatar slot="start" class="square-avatar-danger"><ion-icon name="sync-outline"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Produits</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Supprimer et configuration TVA.</ion-note></h4>
+        </ion-label>
+        <ion-icon name="chevron-down-outline" size="small" color="medium">
+        </ion-icon>
+       </ion-item> 
+       <mat-menu #menuproducts="matMenu">
+        <button mat-menu-item (click)="resetproducts()"><ion-text class="font-size-12">Supprimer tous les produits</ion-text></button>
+        <button mat-menu-item [mat-menu-trigger-for]="submenuproductstva"><ion-text class="font-size-12">Configuration TVA</ion-text></button>
+      </mat-menu> 
+      <mat-menu #submenuproductstva="matMenu">
+        <button mat-menu-item (click)="updatealltvalines(true)"><ion-text class="font-size-12">Activer la TVA pour tous</ion-text></button>
+        <button mat-menu-item (click)="updatealltvalines(false)"><ion-text class="font-size-12">Désactiver la TVA pour tous</ion-text></button>
+      </mat-menu>
+    </ion-card> 
+
+    <!-- <ion-card class="cursor-pointer bd-radius-10 margin-btm-15" mode="ios" (click)="gotocustomersloyalty()" *ngIf="appserv.actualUser.user_type==='super_admin'">
+      <ion-item lines="none" class="default-list-item2" mode="ios" detail="true">
+        <ion-avatar slot="start" class="square-avatar-success"><ion-icon name="people-outline"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Fidélisation</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Configurer les techniques de fidélisation. </ion-note></h4>
+        </ion-label> 
+       </ion-item> 
+    </ion-card>  -->
+    
+    <ion-card mode="ios" color="medium" (click)="disconect()">
+      <ion-item lines="none" class="ion-text-center">
+        <ion-avatar slot="start" class="square-avatar-danger"><ion-icon name="log-out"></ion-icon></ion-avatar>
+        <ion-text class="font-size-14">Déconnexion</ion-text>
+      </ion-item>
+    </ion-card>
+
+</ion-content>

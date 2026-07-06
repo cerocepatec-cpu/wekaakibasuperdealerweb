@@ -1,0 +1,57 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" color="primary" size="large" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-text slot="start">Nouveau poste</ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" *ngIf="showcreatingprogress" mode="ios"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <br>
+  <div class="mobileform">
+    <form [formGroup]="newpositionform">
+      <ion-card mode="ios" class="ion-padding-top ion-padding-bottom">
+        <ion-grid>
+          <ion-row>
+            <ion-col size-lg="6" size="12">
+              <ion-text class="font-size-12 ion-padding-start" color="primary">Methode de calcule par défaut</ion-text> 
+              <br>
+                <ion-segment formControlName="method_of_calculation" mode="ios">
+                  <ion-segment-button value="percentage">Pourcentage</ion-segment-button>
+                  <ion-segment-button value="amount">Fixe</ion-segment-button>
+                </ion-segment>
+            </ion-col>
+          </ion-row>
+        </ion-grid> 
+      </ion-card>
+      
+      <ion-card mode="ios" class="ion-padding-top">
+        <ion-text class="font-size-12" color="primary ion-padding-start">Informations de base</ion-text>
+        <ion-item lines="full" class="font-size-12">
+          <ion-input formControlName="name" label="Nom (*):" #defaultinput></ion-input>
+        </ion-item> 
+        
+        <ion-item lines="full" class="font-size-12">
+          <ion-textarea class="font-size-12" autoGrow="true" spellcheck="true" formControlName="description" label="Déscription:"></ion-textarea>
+        </ion-item>
+  
+        <ion-item lines="full" class="font-size-12">
+          <ion-input formControlName="salary_percentage" label="Pourcentage:"></ion-input>
+        </ion-item> 
+        
+        <ion-item lines="full" class="font-size-12">
+          <ion-input formControlName="participation_rate" label="Taux de participation:"></ion-input>
+        </ion-item>  
+        <ion-item lines="none" class="font-size-12">
+          <ion-input formControlName="salary_amount" label="Montant:"></ion-input>
+        </ion-item>
+      </ion-card>
+    </form>
+  </div>
+</ion-content>
+<ion-footer class="ion-no-border contentbody ion-padding">
+  <ion-button expand="block" slot="start" size="small" class="box-big" color="secondary" mode="ios" [disabled]="!newpositionform.valid" (click)="addnewposition()">
+    <span class="font-size-11">Enregistrer</span>
+  </ion-button> 
+</ion-footer>

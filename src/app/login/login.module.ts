@@ -1,0 +1,21 @@
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
+import { LoginPageRoutingModule } from './login-routing.module';
+import { LoginPage } from './login.page';
+import { ServersetupComponent } from '../serversetup/serversetup.component';
+import { RefreshtokenComponent } from '../refreshtoken/refreshtoken.component';
+import { ForgetpasswordComponent } from '../forgetpassword/forgetpassword.component';
+@NgModule({
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    LoginPageRoutingModule,
+    ReactiveFormsModule
+  ],
+  schemas:[CUSTOM_ELEMENTS_SCHEMA],
+  declarations: [LoginPage,ServersetupComponent,RefreshtokenComponent,ForgetpasswordComponent]
+})
+export class LoginPageModule {}

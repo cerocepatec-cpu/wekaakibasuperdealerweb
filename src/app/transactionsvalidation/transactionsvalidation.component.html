@@ -1,0 +1,139 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+      <ion-icon name="chevron-back" size="large" color="primary" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text>Détail transaction</ion-text>
+      <ion-icon name="print-outline" color="secondary" slot="end" size="small" (click)="export('print')" *ngIf="!iseditionactivated"></ion-icon>
+      <ion-icon name="pencil-outline" color="primary" slot="end" size="small" class="cursor-pointer" (click)="modeEdition()" *ngIf="transactionsent.transaction_status==='pending'"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item (click)="export('excel')"><ion-text class="font-size-12">Exporter en Excel</ion-text></button>
+      <button mat-menu-item (click)="export('pdf')"><ion-text class="font-size-12">Exporter en PDF</ion-text></button>
+    </mat-menu>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <br>
+  <div class="userprofiltoedit ion-text-center">
+    <!-- <ion-avatar style="margin:auto;">
+      <ion-icon [name]="transactionsent.type==='withdraw'?'arrow-up-outline':'arrow-down-outline'" [color]="transactionsent.type==='withdraw'?'danger':''"></ion-icon>
+    </ion-avatar> -->
+    <ion-note class="font-size-14" color="secondary">{{transactionsent.member_fullname}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">Op.ID. {{transactionsent.uuid}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">{{transactionsent.type==='deposit'?'Dépôt':'Retrait'}} sur compte </ion-note>
+    <br>
+    <ion-note class="font-size-12">{{transactionsent.done_at | date}}</ion-note>
+  </div>
+
+   <ng-container *ngIf="!iseditionactivated">
+       <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+          <ion-item class="font-size-12 default-list-item2" mode="ios" lines="full">
+            <ion-text slot="start">Compte</ion-text>
+              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{transactionsent.memberaccount_name}}</ion-text></h2>
+          </ion-item> 
+          <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+            <ion-text slot="start">Montant</ion-text> 
+              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{transactionsent.amount | number}} {{transactionsent.abreviation}}</ion-text></h2>
+          </ion-item> 
+          <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="none" >
+            <ion-text slot="start">Frais</ion-text>
+              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{transactionsent.fees}} {{transactionsent.abreviation}}</ion-text></h2>
+          </ion-item>
+        </ion-card>
+
+        <ion-card mode="ios">
+          <ion-item class="font-size-12 default-list-item2" mode="ios" lines="full" >
+            <ion-text slot="start">Statut</ion-text>
+              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{transactionsent.transaction_status==='pending'?'En attente':transactionsent.transaction_status==='validated'?'Validée':transactionsent.transaction_status==='cancelled'?'Annulée':''}}</ion-text></h2>
+          </ion-item>
+
+          <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+            <ion-text slot="start">Opération faite par</ion-text> 
+              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{transactionsent.operation_done_by | titlecase}}</ion-text></h2>
+          </ion-item>
+
+          <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full">
+            <ion-text slot="start">Contact</ion-text>
+              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{transactionsent.phone}}</ion-text></h2>
+          </ion-item>   
+          <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full">
+            <ion-text slot="start">Adresse</ion-text>
+              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{transactionsent.adresse}}</ion-text></h2>
+          </ion-item>   
+          <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="none">
+            <ion-text slot="start">Note</ion-text>
+              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{transactionsent.motif}}</ion-text></h2>
+          </ion-item>
+        </ion-card>
+   </ng-container>
+   <ng-container *ngIf="iseditionactivated">
+      <div class="ion-padding">
+        <form class="form bd-radius-10 bd-square" [formGroup]="transactionform">
+              <ion-card mode="ios" class="ion-no-padding">
+                 <ion-item lines="none" class="default-list-item" mode="ios">
+                    <ion-label>
+                      <h2 class="font-size-14 item-label-title"><ion-text>Compte</ion-text></h2>
+                    </ion-label>
+                    <select formControlName="member_account_id" class="bd-square bd-radius-5 font-size-12" (change)="handleAccountChange($event)">
+                      <option [value]="account.id" *ngFor="let account of accounts">
+                        {{account.description?account.description:account.account_number}}
+                      </option>
+                    </select>
+                 </ion-item>
+              </ion-card>
+              
+              <ion-card mode="ios">
+                <ion-item lines="full" mode="ios">
+                  <ion-icon name="calendar-outline" slot="start" size="small"></ion-icon>
+                  <ion-chip class="font-size-11" slot="end">
+                    <ion-input type="date" formControlName="done_at"></ion-input>
+                  </ion-chip> 
+                </ion-item>
+                <ion-item lines="full" class="font-size-12">
+                  <ion-label>Montant:</ion-label>
+                  <ion-input type="number" formControlName="amount" #defaultinput></ion-input>
+                  <ion-badge slot="end">{{transactionsent.abreviation}}</ion-badge>
+                </ion-item>
+                
+                <ion-item lines="full" class="font-size-12">
+                  <ion-label>Motif:</ion-label>
+                  <ion-textarea class="font-size-12" autoGrow="true" spellcheck="true" formControlName="motif"></ion-textarea>
+                </ion-item> 
+
+                <ion-item lines="full" class="font-size-12">
+                  <ion-label>Qui fait l'opération:</ion-label>
+                  <ion-input class="font-size-12" formControlName="operation_done_by"></ion-input>
+                </ion-item> 
+
+                <ion-item lines="full" class="font-size-12">
+                  <ion-label>Contact:</ion-label>
+                  <ion-input class="font-size-12" formControlName="phone"></ion-input>
+                </ion-item>
+
+                <ion-item lines="full" class="font-size-12">
+                  <ion-label>Adresse:</ion-label>
+                  <ion-input class="font-size-12" formControlName="adresse"></ion-input>
+                </ion-item>
+              </ion-card>
+          </form>
+      </div>
+   </ng-container>
+ 
+</ion-content>
+<ion-footer class="ion-no-border ion-no-margin" style="padding: 2px!important;">
+  <ion-grid class="ion-no-border ion-no-padding ion-no-margin" *ngIf="iseditionactivated">
+    <ion-row class="ion-no-border ion-no-padding ion-no-margin">
+      <ion-col size="1" class="ion-no-border ion-no-padding ion-no-margin"></ion-col>
+      <ion-col size="10" class="ion-no-border ion-no-padding ion-no-margin">
+        <ion-button color="warning" mode="ios" expand="block" (click)="validateupdate()" size="small">Valider</ion-button>
+      </ion-col>
+      <ion-col size="1" class="ion-no-border ion-no-padding ion-no-margin"></ion-col>
+    </ion-row>
+  </ion-grid>
+   <ion-item mode="ios" class="contentbody footeritem" lines="none" *ngIf="!iseditionactivated">
+      <h4 class="font-size-12"><ion-note>Effectuée le {{transactionsent.done_at | date}} </ion-note></h4> <br> <br>
+      <h4 class="font-size-12"><ion-note> &nbsp; par {{transactionsent.done_by_fullname?transactionsent.done_by_fullname:transactionsent.done_by_name | titlecase}} </ion-note></h4>
+  </ion-item>
+</ion-footer>

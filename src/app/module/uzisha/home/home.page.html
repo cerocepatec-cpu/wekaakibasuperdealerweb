@@ -1,0 +1,1443 @@
+<ion-header class="ion-no-border colorleftside">
+  <ion-toolbar>
+    <ion-item lines="full" class="warning_gradient">
+      <ion-button
+        fill="clear"
+        (click)="appserv.smartBack()"
+        slot="start"
+        color="light"
+      >
+        <ion-icon name="chevron-back-outline" size="large"></ion-icon>
+      </ion-button>
+      <ion-text
+        slot="start"
+        class="font-size-30 font-bold-600 smalldevicehidden"
+        color="light"
+        >Vente carnets
+      </ion-text>
+      <ion-text
+        slot="start"
+        class="font-size-16 font-bold-600 largedevicehidden"
+        (click)="filterbydeposit()"
+        color="light"
+        >Vente carnets</ion-text
+      >
+      <ion-text
+        slot="end"
+        class="font-size-12 font-bold-600 largedevicehidden"
+        (click)="filterbydeposit()"
+        >({{actualdeposit?.name | titlecase}})</ion-text
+      >
+      <ion-chip
+        slot="start"
+        class="font-size-13 light-shadow font-bold-600 smalldevicehidden light"
+        (click)="filterbydeposit()"
+        [outline]="true"
+        matTooltip="Cliquez pour changer le dépôt"
+        >Dépôt: {{actualdeposit?.name | titlecase}}</ion-chip
+      >
+      <ion-chip
+        slot="start"
+        class="font-size-13 light-shadow font-bold-600 smalldevicehidden light"
+        (click)="newproduct()"
+        [outline]="true"
+        *ngIf="appserv.permissionFilter('produits', 'add')"
+        matTooltip="Cliquez pour créer un nouveau produit"
+        >Produit <ion-icon name="add-circle-outline" size="small"></ion-icon
+      ></ion-chip>
+      <ion-chip
+        slot="start"
+        class="font-size-13 light-shadow font-bold-600 smalldevicehidden light"
+        (click)="presenteFencePage()"
+        [outline]="true"
+        *ngIf="appserv.permissionFilter('clôtures', 'add')"
+        matTooltip="Clôturer la journée"
+        >Clôturer <ion-icon name="power" color="warning" size="small"></ion-icon
+      ></ion-chip>
+      <ion-chip
+        slot="end"
+        (click)="newmoneyentry()"
+        class="font-size-13 light-shadow font-bold-600 smalldevicehidden light"
+        [outline]="true"
+        *ngIf="appserv.permissionFilter('Entrée argent', 'add')"
+        matTooltip="Cliquez pour entrer de l'argent"
+        >Entrée argent</ion-chip
+      >
+      <ion-chip
+        slot="end"
+        (click)="newexpenditure()"
+        class="font-size-13 light-shadow font-bold-600 smalldevicehidden light"
+        [outline]="true"
+        *ngIf="appserv.permissionFilter('depenses', 'add')"
+        matTooltip="Cliquez pour effectuer une dépense"
+        >Dépenses</ion-chip
+      >
+      <ion-chip
+        slot="end"
+        (click)="debtsviewer()"
+        class="font-size-13 light-shadow font-bold-600 smalldevicehidden light"
+        [outline]="true"
+        *ngIf="appserv.permissionFilter('Facturation', 'can sell')"
+        matTooltip="Cliquez pour visualiser les dettes et faire les paiements"
+        >Dettes</ion-chip
+      >
+      <ion-chip
+        slot="end"
+        (click)="gotoinvoicesviewer()"
+        *ngIf="appserv.permissionFilter('factures', 'view')"
+        [outline]="true"
+        class="font-size-13 light light-shadow font-bold-600 smalldevicehidden"
+        matTooltip="Cliquez pour visualiser vos factures"
+        >Mes ventes</ion-chip
+      >
+      <ion-icon
+        name="ellipsis-vertical-outline"
+        slot="end"
+        size="small"
+        class="largedevicehidden light"
+        [outline]="true"
+        color="light"
+        matTooltip="Cliquez pour d'autres options"
+        (click)="openactionsheet()"
+      ></ion-icon>
+      <ion-icon
+        name="settings-outline"
+        slot="end"
+        size="small"
+        (click)="possettings()"
+        *ngIf="appserv.permissionFilter('Facturation', 'change pos settings')"
+        class="light"
+        matTooltip="Cliquez pour charger la page de configuration POS"
+      ></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-toolbar class="colorleftside">
+    <ion-searchbar
+      animated="true"
+      placeholder="Recherche"
+      (click)="setModalarticlesOpened(true)"
+      mode="ios"
+      search-icon="search-circle"
+      class="largedevicehidden"
+    ></ion-searchbar>
+    <ion-grid class="smalldevicehidden">
+      <ion-row>
+        <ion-col size="12" size-lg="8">
+          <ion-item lines="none" mode="ios" class="contentbody">
+            <ion-searchbar
+              mode="ios"
+              placeholder="Recherche"
+              #inputSearch
+              (keyup)="largedevicelookupmethod($event)"
+              [(ngModel)]="search"
+            ></ion-searchbar>
+            <ion-icon name="hourglass-outline"></ion-icon>
+            <ion-badge
+              color="warning"
+              class="font-size-15"
+              (click)="gotosavedinvoices()"
+              >{{savedInvoices.length}}</ion-badge
+            >
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-lg="4">
+          <ion-item
+            lines="none"
+            class="default-list-item2 colorleftside"
+            mode="ios"
+            lines="inset"
+          >
+            <ion-label>
+              <h2 class="font-size-14 item-label-title">
+                <ion-text>Date Facture</ion-text>
+              </h2>
+            </ion-label>
+            <ion-chip class="font-size-11 secondpara">
+              <ion-input
+                type="date"
+                [(ngModel)]="invoice.date_operation"
+                class="font-size-12"
+                label="Date"
+              ></ion-input>
+            </ion-chip>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+  <ion-progress-bar
+    *ngIf="showdefaultprogress"
+    type="indeterminate"
+    mode="ios"
+  ></ion-progress-bar>
+</ion-header>
+<ion-content class="ion-padding-bottom colorleftside">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données..."
+    >
+    </ion-refresher-content>
+  </ion-refresher>
+  <!-- SMALL DEVICE DESIGN -->
+  <div class="menu-header-bg"></div>
+  <div class="menu-header-bg2"></div>
+  <ion-grid class="largedevicehidden">
+    <ion-modal
+      (willDismiss)="BeforeClosingSearchModal($event)"
+      (didPresent)="aftermodalpresented($event)"
+      [isOpen]="isModalOpen"
+    >
+      <ng-template>
+        <ion-header class="ion-no-border">
+          <ion-toolbar class="colorleftside">
+            <ion-searchbar
+              mode="ios"
+              placeholder="Recherche"
+              #mobileinputSearch
+              (keyup)="mobilelookupmethod($event)"
+              (ionClear)="appserv.closemodal()"
+              cancel-button-text="Fermer"
+              show-cancel-button="always"
+              cancel-button-icon="trash"
+            ></ion-searchbar>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="colorleftside">
+          <ion-item
+            *ngFor="let article of listarticles; let i =index;"
+            class="default-list-item colorleftside"
+            (click)="addtocart(article,i)"
+          >
+            <ion-avatar>
+              <ion-img
+                *ngIf="article.service.photo"
+                [src]="article.service.photo"
+              ></ion-img>
+              <ion-icon
+                name="image-outline"
+                *ngIf="!article.service.photo"
+              ></ion-icon>
+            </ion-avatar>
+            <ion-label text-wrap>
+              <p class="text-wrapped">
+                <ion-text class="text-wrapped font-bold-600"
+                  >{{article.service.name | titlecase}}</ion-text
+                >
+              </p>
+              <p class="secondpara">
+                {{article.service.description | titlecase}}
+              </p>
+              <p class="secondpara font-bold-600 flex-scroll">
+                <span *ngFor="let price of article.prices">
+                  {{price.price | number}} {{defaultmoney.abreviation}} |
+                </span>
+              </p>
+            </ion-label>
+            <ion-chip
+              class="font-size-11 font-bold-600"
+              *ngIf="!article.selected"
+              >{{article.quantity | number}}
+              {{article.service.uom_symbol}}</ion-chip
+            >
+            <ion-icon
+              name="checkmark-outline"
+              color="success"
+              *ngIf="article.selected"
+            ></ion-icon>
+          </ion-item>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+    <ion-row>
+      <ion-col size="12">
+        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+          <mat-tab class="workspace-item" (click)="mode('new-invoice')">
+            <ng-template mat-tab-label>
+              <ion-icon
+                name="add-circle-outline"
+                size="large"
+                color="warning"
+                class="medium-icon close-icon"
+              ></ion-icon>
+              &nbsp; &nbsp;
+              <ion-text>Facture</ion-text>
+            </ng-template>
+            <div class="content ion-padding-top">
+              <ng-container>
+                <ion-item
+                  lines="none"
+                  class="colorleftside bd-radius-10 bd-rounded box-big ion-text-center"
+                >
+                  <ion-text
+                    class="cursor-pointer focused-primary font-bold-600 font-size-15"
+                    >Récapitulatif de la commande
+                    ({{this.listselectedarticles.length}})</ion-text
+                  >
+                  <ion-icon
+                    name="refresh-circle-outline"
+                    (click)="resetchart()"
+                    slot="end"
+                    size="small"
+                    color="warning"
+                    class="cursor-pointer"
+                    matTooltip="Réinitialiser le panier"
+                    matTooltipPosition="left"
+                  ></ion-icon>
+                </ion-item>
+                <div>
+                  <ion-grid>
+                    <ion-row
+                      class="bd-radius-10 box-big padding-5 margin-btm-15 cart-item"
+                    >
+                      <ion-col size="12">
+                        <tr
+                          (click)="vatenter()"
+                          matTooltip="Entrer le taux de la TVA"
+                          matTooltipPosition="left"
+                        >
+                          <td>
+                            <ion-text
+                              class="font-bold-600 font-size-15"
+                              color="primary"
+                              >Tva ({{tva_rate}} %)</ion-text
+                            >
+                          </td>
+                          <td>&nbsp; :&nbsp;</td>
+                          <td>
+                            {{vat_amount|number}} {{defaultmoney.abreviation}}
+                          </td>
+                        </tr>
+                        <tr
+                          (click)="reductionenter()"
+                          matTooltip="Accorder une réduction"
+                          matTooltipPosition="left"
+                        >
+                          <td>
+                            <ion-text
+                              class="font-bold-600 font-size-15"
+                              color="primary"
+                              >Réduction</ion-text
+                            >
+                          </td>
+                          <td>&nbsp; : &nbsp;</td>
+                          <td>
+                            {{reduction | number}} {{defaultmoney.abreviation}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <ion-text
+                              class="font-bold-600 font-size-15"
+                              color="primary"
+                              matTooltip="Total Hors Taxe"
+                              matTooltipPosition="left"
+                              >Total TTC</ion-text
+                            >
+                          </td>
+                          <td>&nbsp; : &nbsp;</td>
+                          <td>
+                            {{(totalgeneral) | number}}
+                            {{defaultmoney.abreviation}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <ion-text
+                              class="font-bold-600 font-size-15"
+                              color="primary"
+                              matTooltip="Montant total à payer"
+                              matTooltipPosition="left"
+                              >Total HT</ion-text
+                            >
+                          </td>
+                          <td>&nbsp; : &nbsp;</td>
+                          <td>
+                            {{netToPay | number}} {{defaultmoney.abreviation}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <ion-text
+                              class="font-bold-600 font-size-15"
+                              color="primary"
+                              matTooltip="Montant à retourner au membre"
+                              matTooltipPosition="left"
+                              >Retour</ion-text
+                            >
+                          </td>
+                          <td>&nbsp; : &nbsp;</td>
+                          <td>
+                            {{invoice.back | number}}
+                            {{defaultmoney.abreviation}}
+                          </td>
+                        </tr>
+                      </ion-col>
+                    </ion-row>
+                    <hr class="hr" />
+                    <ion-row
+                      *ngFor="let article of listselectedarticles"
+                      class="bd-radius-10 box-big padding-5 margin-btm-15 cart-item"
+                    >
+                      <ion-grid>
+                        <ion-row>
+                          <ion-col
+                            size="9"
+                            (click)="selectsubservices(article)"
+                          >
+                            <ion-label
+                              class="font-bold-600 font-size-15"
+                              color="primary"
+                              >{{article.service.name | titlecase}}</ion-label
+                            >
+                          </ion-col>
+                          <ion-col size="3">
+                            <ion-label>
+                              <ion-icon
+                                name="trash"
+                                size="small"
+                                color="danger"
+                                (click)="removefromlist(article)"
+                              ></ion-icon>
+                            </ion-label>
+                          </ion-col>
+                        </ion-row>
+                        <ion-row>
+                          <ion-col size="4">
+                            <ion-label
+                              class="font-size-12 cursor-pointer"
+                              (click)="servicepricespicker(article)"
+                            >
+                              {{article.service.price | number}}
+                              {{article.service.abreviation | titlecase}} /
+                              {{article.service.uom_symbol | titlecase}}
+                            </ion-label>
+                          </ion-col>
+                          <ion-col
+                            size="1"
+                            (click)="quantitychange(article,'remove')"
+                          >
+                            <ion-chip class="el-box bd-radius-10"
+                              ><ion-icon
+                                class="margin-auto"
+                                name="remove-outline"
+                                size="small"
+                              ></ion-icon
+                            ></ion-chip>
+                          </ion-col>
+                          <ion-col
+                            size="2"
+                            class="ion-padding-start ion-padding-top ion-text-center"
+                            (click)="tipquantity(article)"
+                          >
+                            <ion-label class="font-size-15"
+                              >{{article.service.selling_qte}}</ion-label
+                            >
+                          </ion-col>
+                          <ion-col
+                            size="1"
+                            (click)="quantitychange(article,'add')"
+                          >
+                            <ion-chip class="el-box bd-radius-10"
+                              ><ion-icon
+                                class="margin-auto"
+                                name="add-outline"
+                                size="small"
+                              ></ion-icon
+                            ></ion-chip>
+                          </ion-col>
+                          <ion-col size="4" class="ion-text-right">
+                            <ion-text
+                              class="font-size-13 text-ellipsis"
+                              color="primary"
+                              >{{(article.service.price *
+                              article.service.selling_qte) | number}}
+                              {{article.service.abreviation}}</ion-text
+                            >
+                          </ion-col>
+                        </ion-row>
+                        <ion-row
+                          (click)="subservicesviewer(article)"
+                          class="cursor-pointer"
+                        >
+                          <ion-text
+                            *ngFor="let accomp of article.subservices"
+                            class="font-size-10"
+                            color="medium"
+                            >{{accomp.service.name | titlecase}}
+                            ({{accomp.quantity}}
+                            {{accomp.service.uom_symbol}}),&nbsp;</ion-text
+                          >
+                          &nbsp;
+                          <ion-icon
+                            *ngIf="article.subservices.length>0"
+                            name="close-circle"
+                            color="warning"
+                            size="small"
+                            class="ion-float-end"
+                            (click)="article.subservices=[]"
+                          ></ion-icon>
+                        </ion-row>
+                      </ion-grid>
+                    </ion-row>
+                  </ion-grid>
+                </div>
+              </ng-container>
+              <div
+                class="lg-new-action-bloc bg-warning"
+                *ngIf="listselectedarticles.length<=0 && listarticles.length<=0"
+                (click)="isModalOpen=true"
+              >
+                <ion-icon name="add-circle-outline" size="large"></ion-icon>
+                <br />
+                <ion-text class="font-size-13"
+                  >Cliquez ici pour commencer une nouvelle facture</ion-text
+                >
+              </div>
+            </div>
+          </mat-tab>
+          <mat-tab class="workspace-item">
+            <ng-template mat-tab-label>
+              <ion-text>Membre et autres</ion-text>
+            </ng-template>
+            <div class="content ion-padding">
+              <ion-card class="bd-radius-10 margin-btm-15" mode="ios">
+                <ion-item
+                  lines="none"
+                  class="default-list-item2 colorleftside"
+                  mode="ios"
+                  lines="inset"
+                >
+                  <ion-avatar slot="start" class="square-avatar-medium"
+                    ><ion-icon name="calendar-outline"></ion-icon
+                  ></ion-avatar>
+                  <ion-label>
+                    <h2 class="font-size-14 item-label-title">
+                      <ion-text>Date facture</ion-text>
+                    </h2>
+                    <ion-chip class="font-size-11 secondpara">
+                      <ion-input
+                        type="date"
+                        [(ngModel)]="invoice.date_operation"
+                        class="font-size-12"
+                        label="Date"
+                      ></ion-input>
+                    </ion-chip>
+                  </ion-label>
+                </ion-item>
+                <ion-item
+                  lines="inset"
+                  class="default-list-item colorleftside"
+                  mode="ios"
+                  detail="true"
+                >
+                  <ion-icon
+                    name="add-outline"
+                    size="small"
+                    (click)="pickmember()"
+                    class="strock-icon"
+                  ></ion-icon>
+                  <ion-label>
+                    <h2 class="font-size-14 item-label-title">
+                      &nbsp; <ion-text>Membre</ion-text>
+                    </h2>
+                    <h4 class="font-size-11 secondpara">
+                      <ion-note>
+                        &nbsp;&nbsp;Sélectionner un membre pour la vente
+                        actuelle</ion-note
+                      >
+                    </h4>
+                  </ion-label>
+                  <ion-chip
+                    slot="end"
+                    *ngIf="actualcustomer.name?actualcustomer.name:actualcustomer.user_name"
+                    color="secondary"
+                    class="font-size-12"
+                    (click)="detailsCustomer(actualcustomer)"
+                    >{{actualcustomer.name?actualcustomer.name:actualcustomer.user_name| titlecase}}</ion-chip
+                  >
+                </ion-item>
+              </ion-card>
+
+              <ion-card class="bd-radius-10 margin-btm-15" mode="ios">
+                <ion-item
+                  lines="none"
+                  class="colorleftside bd-square bd-radius-10 note-card-width"
+                  matTooltip="Entrer une note concernant la facture"
+                  matTooltipPosition="left"
+                >
+                  <ion-textarea
+                    [(ngModel)]="invoice.note"
+                    autoGrow="true"
+                    label="Entrer une note"
+                    labelPlacement="floating"
+                    class="font-size-12"
+                  ></ion-textarea>
+                </ion-item>
+                <ejs-barcodegenerator
+                  id="barcode"
+                  width="200px"
+                  height="150px"
+                  mode="SVG"
+                  type="Codabar"
+                  value="123456789"
+                ></ejs-barcodegenerator>
+              </ion-card>
+
+              <ion-card class="bd-radius-10 margin-btm-15" mode="ios">
+                <ion-item
+                  lines="none"
+                  class="default-list-item2"
+                  mode="ios"
+                  lines="inset"
+                >
+                  <ion-avatar slot="start" class="square-avatar-medium"
+                    ><ion-icon name="cash-outline"></ion-icon
+                  ></ion-avatar>
+                  <ion-label>
+                    <h2 class="font-size-14 item-label-title">
+                      <ion-text>En espèces</ion-text>
+                    </h2>
+                    <h4 class="font-size-11 secondpara">Paiement cash reçu</h4>
+                    <ion-chip class="font-size-11 secondpara">
+                      <ion-input
+                        type="number"
+                        [(ngModel)]="invoice.totalespeces"
+                        (ionInput)="changingothersamounts($event,'espece')"
+                        class="ion-text-center"
+                      ></ion-input>
+                    </ion-chip>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item lines="inset" class="default-list-item2" mode="ios">
+                  <ion-avatar slot="start" class="square-avatar-medium"
+                    ><ion-icon name="card-outline"></ion-icon
+                  ></ion-avatar>
+                  <ion-label>
+                    <h2 class="font-size-14 item-label-title">
+                      <ion-text>Banque</ion-text>
+                    </h2>
+                    <h4 class="font-size-11 secondpara">
+                      Paiement fait par banque
+                    </h4>
+                    <ion-chip class="font-size-11 secondpara">
+                      <ion-input
+                        type="number"
+                        [(ngModel)]="invoice.totalcreditcard"
+                        class="ion-text-center"
+                        (ionInput)="changingothersamounts($event,'card')"
+                      ></ion-input>
+                    </ion-chip>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item lines="none" class="default-list-item2" mode="ios">
+                  <ion-avatar slot="start" class="square-avatar-medium"
+                    ><ion-icon name="phone-portrait-outline"></ion-icon
+                  ></ion-avatar>
+                  <ion-label>
+                    <h2 class="font-size-14 item-label-title">
+                      <ion-text>Mobile Money</ion-text>
+                    </h2>
+                    <h4 class="font-size-11 secondpara">
+                      Paiement fait par téléphone
+                    </h4>
+                    <ion-chip class="font-size-11 secondpara">
+                      <ion-input
+                        type="number"
+                        [(ngModel)]="invoice.totalmobilemoney"
+                        class="ion-text-center"
+                        (ionInput)="changingothersamounts($event,'mobile')"
+                      ></ion-input>
+                    </ion-chip>
+                  </ion-label>
+                </ion-item>
+              </ion-card>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- LARGE AND MEDIUM DEVICE DESIGN -->
+  <ion-grid class="smalldevicehidden">
+    <ion-row>
+      <ion-col size="4">
+        <ion-item
+          lines="none"
+          class="colorleftside bd-radius-10 bd-rounded box-big horizontal-scrol padding-top-5"
+        >
+          <ion-text
+            class="cursor-pointer focused-primary text-ellipsis font-size-12 bg-dark ion-margin-end bd-rounded padding-5"
+            color="light"
+            *ngFor="let categ of listcategories"
+            (click)="filterbycategorie(categ)"
+            matTooltipPosition="below"
+            >{{categ.name | titlecase}}</ion-text
+          >
+          <ion-icon
+            name="list"
+            slot="end"
+            (click)="cardshown=!cardshown"
+            color="warning"
+            size="small"
+            [matTooltip]="cardshown?'Afficher en mode liste':'Afficher en mode cartes'"
+          ></ion-icon>
+        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="10">
+              <ng-template #itemslist>
+                <div class="cartpreview">
+                  <!-- <ion-grid>
+
+                      </ion-grid> -->
+                  <ion-item
+                    class="colorleftside default-list-item"
+                    *ngFor="let article of listarticles; let i=index "
+                    lines="inset"
+                    (click)="addtocart(article,i)"
+                  >
+                    <ion-avatar slot="start">
+                      <ion-text class="ion-text-uppercase"
+                        >{{article.service.name | slice:0:2}}</ion-text
+                      >
+                    </ion-avatar>
+                    <ion-label text-wrap>
+                      <p class="text-wrapped">
+                        <ion-text class="text-wrapped font-bold-600"
+                          >{{article.service.name | titlecase}}</ion-text
+                        >
+                      </p>
+                      <p class="secondpara">
+                        <span class="reqtotalprinted font-size-11"
+                          >{{article.prices.length>0?article.prices[0].price:0}}
+                          {{article.prices.length>0?article.prices[0].abreviation:''}}
+                          |
+                          {{article.service.category_name?article.service.category_name:'aucune'
+                          | titlecase}}</span
+                        >
+                      </p>
+                      <p class="secondpara">
+                        {{article.service.description | titlecase}}
+                      </p>
+                    </ion-label>
+                    <ion-text
+                      class="font-size-14"
+                      *ngIf="article.service.type==='1'"
+                      >Qté.
+                      {{(article.service.available_qte!==null?article.service.available_qte:'0')|
+                      number}} {{article.service.uom_symbol}}</ion-text
+                    >
+                    <ion-icon
+                      name="checkmark-outline"
+                      color="success"
+                      size="large"
+                      *ngIf="article.selected"
+                    ></ion-icon>
+                  </ion-item>
+                </div>
+              </ng-template>
+
+              <ng-template #card_list>
+                <ion-row class="cartpreview">
+                  <ion-col
+                    size="6"
+                    *ngFor="let article of listarticles; let i=index"
+                    (click)="addtocart(article,i)"
+                  >
+                    <ion-card class="ion-padding-top">
+                      <ion-img
+                        *ngIf="article.service.photo"
+                        [src]="article.service.photo"
+                      ></ion-img>
+                      <div
+                        class="thumbnail-full-width"
+                        *ngIf="!article.service.photo"
+                      >
+                        <ion-icon name="image-outline"></ion-icon>
+                      </div>
+
+                      <ion-card-header class="ion-text-center">
+                        <ion-card-title
+                          color="secondary"
+                          class="font-bold-500 font-size-12 text-wrapped"
+                          >{{article.service.name | titlecase}}</ion-card-title
+                        >
+                      </ion-card-header>
+                      <ion-card-content>
+                        <div class="circle-pricing ion-text-center">
+                          <ion-avatar style="margin: auto">
+                            <ion-text class="font-size-10">
+                              <span
+                                >{{article.prices.length>0?article.prices[0].abreviation:''}}</span
+                              >
+                              <br />
+                              <span
+                                >{{article.prices.length>0?article.prices[0].price:0
+                                | number}}</span
+                              >
+                            </ion-text>
+                          </ion-avatar>
+                          <ion-button
+                            mode="ios"
+                            size="small"
+                            expand="outline"
+                            *ngIf="article.service.type==='1'"
+                            class="font-size-11"
+                            >{{article.service.available_qte | number}}
+                            {{article.service.uom_symbol |
+                            titlecase}}</ion-button
+                          >
+                          <ion-button
+                            mode="ios"
+                            size="small"
+                            expand="outline"
+                            *ngIf="article.service.type==='2'"
+                            >servir</ion-button
+                          >
+                          <ion-icon
+                            name="checkmark-outline"
+                            color="success"
+                            size="large"
+                            *ngIf="article.selected"
+                          ></ion-icon>
+                        </div>
+                      </ion-card-content>
+                    </ion-card>
+                  </ion-col>
+                </ion-row>
+              </ng-template>
+              <ng-content
+                select="card_list"
+                *ngIf="!cardshown; else card_list  "
+              >
+              </ng-content>
+              <ng-content *ngIf="cardshown; else itemslist "> </ng-content>
+            </ion-col>
+            <ion-col size="2">
+              <ion-chip
+                (click)="changenumberarticle('0')"
+                class="bd-square bd-radius-10 chip-square font-bold-600 font-size-20 ion-text-center"
+                matTooltip="Ajouter 0"
+                matTooltipPosition="right"
+                ><ion-text class="margin-auto">0</ion-text></ion-chip
+              >
+              <ion-chip
+                (click)="changenumberarticle('1')"
+                class="bd-square bd-radius-10 chip-square font-bold-600 font-size-20 ion-text-center"
+                matTooltip="Ajouter 1"
+                matTooltipPosition="right"
+                ><ion-text class="margin-auto">1</ion-text></ion-chip
+              >
+              <ion-chip
+                (click)="changenumberarticle('2')"
+                class="bd-square bd-radius-10 chip-square font-bold-600 font-size-20 ion-text-center"
+                matTooltip="Ajouter 2"
+                matTooltipPosition="right"
+                ><ion-text class="margin-auto">2</ion-text></ion-chip
+              >
+              <ion-chip
+                (click)="changenumberarticle('3')"
+                class="bd-square bd-radius-10 chip-square font-bold-600 font-size-20 ion-text-center"
+                matTooltip="Ajouter 3"
+                matTooltipPosition="right"
+                ><ion-text class="margin-auto">3</ion-text></ion-chip
+              >
+              <ion-chip
+                (click)="changenumberarticle('4')"
+                class="bd-square bd-radius-10 chip-square font-bold-600 font-size-20 ion-text-center"
+                matTooltip="Ajouter 4"
+                matTooltipPosition="right"
+                ><ion-text class="margin-auto">4</ion-text></ion-chip
+              >
+              <ion-chip
+                (click)="changenumberarticle('5')"
+                class="bd-square bd-radius-10 chip-square font-bold-600 font-size-20 ion-text-center"
+                matTooltip="Ajouter 5"
+                matTooltipPosition="right"
+                ><ion-text class="margin-auto">5</ion-text></ion-chip
+              >
+              <ion-chip
+                (click)="changenumberarticle('6')"
+                class="bd-square bd-radius-10 chip-square font-bold-600 font-size-20 ion-text-center"
+                matTooltip="Ajouter 6"
+                matTooltipPosition="right"
+                ><ion-text class="margin-auto">6</ion-text></ion-chip
+              >
+              <ion-chip
+                (click)="changenumberarticle('7')"
+                class="bd-square bd-radius-10 chip-square font-bold-600 font-size-20 ion-text-center"
+                matTooltip="Ajouter 7"
+                matTooltipPosition="right"
+                ><ion-text class="margin-auto">7</ion-text></ion-chip
+              >
+              <ion-chip
+                (click)="changenumberarticle('8')"
+                class="bd-square bd-radius-10 chip-square font-bold-600 font-size-20 ion-text-center"
+                matTooltip="Ajouter 8"
+                matTooltipPosition="right"
+                ><ion-text class="margin-auto">8</ion-text></ion-chip
+              >
+              <ion-chip
+                (click)="changenumberarticle('9')"
+                class="bd-square bd-radius-10 chip-square font-bold-600 font-size-20 ion-text-center"
+                matTooltip="Ajouter 9"
+                matTooltipPosition="right"
+                ><ion-text class="margin-auto">9</ion-text></ion-chip
+              >
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item
+          lines="none"
+          class="colorleftside bd-radius-10 bd-rounded box-big ion-text-center"
+        >
+          <ion-text
+            class="cursor-pointer focused-primary font-bold-600 font-size-15"
+            >Récapitulatif de la commande
+            ({{this.listselectedarticles.length}})</ion-text
+          >
+          <ion-icon
+            name="refresh-circle-outline"
+            (click)="resetchart()"
+            slot="end"
+            size="small"
+            color="warning"
+            class="cursor-pointer"
+            matTooltip="Réinitialiser le panier"
+            matTooltipPosition="left"
+          ></ion-icon>
+        </ion-item>
+        <div class="cartpreview">
+          <ion-grid>
+            <ion-row
+              class="bd-radius-10 box-big padding-5 margin-btm-15 cart-item"
+            >
+              <ion-col size="12">
+                <tr
+                  (click)="vatenter()"
+                  matTooltip="Entrer le taux de la TVA"
+                  matTooltipPosition="left"
+                >
+                  <td>
+                    <ion-text class="font-bold-600 font-size-15" color="primary"
+                      >Tva ({{tva_rate}} %)</ion-text
+                    >
+                  </td>
+                  <td>&nbsp; :&nbsp;</td>
+                  <td>{{vat_amount|number}} {{defaultmoney.abreviation}}</td>
+                </tr>
+                <tr
+                  (click)="reductionenter()"
+                  matTooltip="Accorder une réduction"
+                  matTooltipPosition="left"
+                >
+                  <td>
+                    <ion-text class="font-bold-600 font-size-15" color="primary"
+                      >Réduction</ion-text
+                    >
+                  </td>
+                  <td>&nbsp; : &nbsp;</td>
+                  <td>{{reduction | number}} {{defaultmoney.abreviation}}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <ion-text
+                      class="font-bold-600 font-size-15"
+                      color="primary"
+                      matTooltip="Total Hors Taxe"
+                      matTooltipPosition="left"
+                      >Total HT</ion-text
+                    >
+                  </td>
+                  <td>&nbsp; : &nbsp;</td>
+                  <td>
+                    {{(totalgeneral) | number}} {{defaultmoney.abreviation}}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <ion-text
+                      class="font-bold-600 font-size-15"
+                      color="primary"
+                      matTooltip="Montant total à payer"
+                      matTooltipPosition="left"
+                      >Net à payer</ion-text
+                    >
+                  </td>
+                  <td>&nbsp; : &nbsp;</td>
+                  <td>{{netToPay | number}} {{defaultmoney.abreviation}}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <ion-text
+                      class="font-bold-600 font-size-15"
+                      color="primary"
+                      matTooltip="Montant à retourner au membre"
+                      matTooltipPosition="left"
+                      >Retour</ion-text
+                    >
+                  </td>
+                  <td>&nbsp; : &nbsp;</td>
+                  <td>
+                    {{invoice.back | number}} {{defaultmoney.abreviation}}
+                  </td>
+                </tr>
+              </ion-col>
+            </ion-row>
+            <hr class="hr" />
+            <ion-row
+              *ngFor="let article of listselectedarticles"
+              class="bd-radius-10 box-big padding-5 margin-btm-15 cart-item"
+            >
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="9" (click)="selectsubservices(article)">
+                    <ion-label
+                      class="font-bold-600 font-size-15"
+                      color="primary"
+                      >{{article.service.name | titlecase}}</ion-label
+                    >
+                  </ion-col>
+                  <ion-col size="3">
+                    <ion-label>
+                      <ion-icon
+                        name="trash"
+                        size="small"
+                        color="danger"
+                        (click)="removefromlist(article)"
+                      ></ion-icon>
+                    </ion-label>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col size="4">
+                    <ion-label
+                      class="font-size-12 cursor-pointer"
+                      (click)="servicepricespicker(article)"
+                    >
+                      {{article.service.price | number}}
+                      {{article.service.abreviation | titlecase}} /
+                      {{article.service.uom_symbol | titlecase}}
+                    </ion-label>
+                  </ion-col>
+                  <ion-col size="1" (click)="quantitychange(article,'remove')">
+                    <ion-chip class="el-box bd-radius-10"
+                      ><ion-icon
+                        class="margin-auto"
+                        name="remove-outline"
+                        size="small"
+                      ></ion-icon
+                    ></ion-chip>
+                  </ion-col>
+                  <ion-col
+                    size="2"
+                    class="ion-padding-start ion-padding-top ion-text-center"
+                    (click)="tipquantity(article)"
+                  >
+                    <ion-label class="font-size-15"
+                      >{{article.service.selling_qte}}</ion-label
+                    >
+                  </ion-col>
+                  <ion-col size="1" (click)="quantitychange(article,'add')">
+                    <ion-chip class="el-box bd-radius-10"
+                      ><ion-icon
+                        class="margin-auto"
+                        name="add-outline"
+                        size="small"
+                      ></ion-icon
+                    ></ion-chip>
+                  </ion-col>
+                  <ion-col size="4" class="ion-text-right">
+                    <ion-text class="font-size-13 text-ellipsis" color="primary"
+                      >{{(article.service.price * article.service.selling_qte) |
+                      number}} {{article.service.abreviation}}</ion-text
+                    >
+                  </ion-col>
+                </ion-row>
+                <ion-row
+                  (click)="subservicesviewer(article)"
+                  class="cursor-pointer"
+                >
+                  <ion-text
+                    *ngFor="let accomp of article.subservices"
+                    class="font-size-10"
+                    color="medium"
+                    >{{accomp.service.name | titlecase}} ({{accomp.quantity}}
+                    {{accomp.service.uom_symbol}}),&nbsp;</ion-text
+                  >
+                  &nbsp;
+                  <ion-icon
+                    *ngIf="article.subservices.length>0"
+                    name="close-circle"
+                    color="warning"
+                    size="small"
+                    class="ion-float-end"
+                    (click)="article.subservices=[]"
+                  ></ion-icon>
+                </ion-row>
+              </ion-grid>
+            </ion-row>
+          </ion-grid>
+        </div>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item
+          lines="none"
+          class="colorleftside bd-radius-10 bd-rounded box-big ion-text-center"
+          (click)="pickmember()"
+        >
+          <ion-text
+            class="cursor-pointer focused-primary font-bold-600 font-size-15"
+            >Opérations de paiement</ion-text
+          >
+        </ion-item>
+        <ion-card
+    class="bd-radius-10 primary-border-radius ion-padding shadow-sm">
+
+    <!-- ================= TOTAL ================= -->
+    <div class="text-center mb-4">
+
+      <h2 class="font-bold-600 text-lg">
+        Total à payer
+      </h2>
+
+      <p class="text-2xl font-bold text-primary">
+        {{ netToPay | number }}
+        {{ defaultmoney.abreviation }}
+      </p>
+
+    </div>
+
+    <!-- ================= MEMBRE ================= -->
+    <div class="border-t pt-3">
+
+      <div class="flex justify-between items-center cursor-pointer" (click)="pickmember()">
+
+        <span class="text-sm font-semibold text-slate-600">
+          Membre
+        </span>
+
+        <ion-icon
+          name="person-add-outline"
+          color="primary"
+          class="cursor-pointer"
+          >
+        </ion-icon>
+
+      </div>
+
+      <div *ngIf="actualcustomer?.id; else noMember"
+           class="mt-2 bg-slate-50 p-2 rounded-lg">
+
+        <div class="flex justify-between items-center">
+
+          <span class="font-semibold text-primary cursor-pointer"
+                (click)="detailsCustomer(actualcustomer)">
+            {{ actualcustomer.name || (actualcustomer.user_name | titlecase) }}
+          </span>
+
+          <ion-icon
+            name="close-circle-outline"
+            color="danger"
+            class="cursor-pointer"
+            (click)="actualcustomer={}; selectedAccount=null">
+          </ion-icon>
+
+        </div>
+
+      </div>
+
+      <ng-template #noMember>
+        <div class="mt-2 text-xs text-slate-400">
+          Aucun membre sélectionné
+        </div>
+      </ng-template>
+
+    </div>
+
+    <!-- ================= COMPTES ================= -->
+    <div *ngIf="actualcustomer?.id" class="border-t mt-4 pt-3">
+
+      <p class="text-sm font-semibold mb-2 text-slate-600">
+        Comptes du membre
+      </p>
+
+      <div class="space-y-2 max-h-64 overflow-auto">
+
+        <div
+          *ngFor="let account of memberAccounts"
+          (click)="selectedAccount = selectedAccount?.id === account.id ? null : account"
+          class="cursor-pointer p-2 rounded-lg border transition-all duration-150"
+          [ngClass]="
+            selectedAccount?.id === account.id
+              ? 'border-primary bg-primary/10'
+              : 'border-slate-200 bg-white hover:border-primary'
+          ">
+
+          <div class="flex justify-between items-center">
+
+            <div>
+              <p class="text-sm font-semibold">
+                {{ account.description }}
+              </p>
+
+              <p class="text-xs text-slate-500">
+                {{ account.account_number }}
+              </p>
+            </div>
+
+            <div class="text-right">
+
+              <p class="text-sm font-semibold">
+                {{ account.sold | number }}
+                {{ account.money_abreviation }}
+              </p>
+
+              <ion-icon
+                *ngIf="selectedAccount?.id === account.id"
+                name="checkmark-circle"
+                color="primary">
+              </ion-icon>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div *ngIf="!memberAccounts?.length"
+             class="text-xs text-slate-400 text-center py-3">
+          Aucun compte disponible
+        </div>
+
+      </div>
+
+    </div>
+
+  </ion-card>
+        <ion-item
+          lines="none"
+          class="colorleftside bd-square bd-radius-10"
+          matTooltip="Entrer une note concernant la facture"
+          matTooltipPosition="left"
+        >
+          <ion-textarea
+            [(ngModel)]="invoice.note"
+            autoGrow="true"
+            label="Entrer une note"
+            labelPlacement="floating"
+            class="font-size-12"
+          ></ion-textarea>
+        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-item
+                lines="none"
+                class="colorleftside shadow-back font-size-15"
+              >
+                <ion-text
+                  class="font-size-15 font-bold-600"
+                  slot="start"
+                  matTooltip="Cliquez pour voir les modes de paiement"
+                  matTooltipPosition="left"
+                  >Mode de paiement</ion-text
+                >
+                <ion-icon
+                  name="chevron-down"
+                  size="small"
+                  *ngIf="!showpaymentmode"
+                  (click)="showpaymentmode=!showpaymentmode"
+                ></ion-icon>
+                <ion-icon
+                  name="chevron-up"
+                  size="small"
+                  *ngIf="showpaymentmode"
+                  (click)="showpaymentmode=!showpaymentmode"
+                ></ion-icon>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <ion-row class="ion-padding-bottom" *ngIf="showpaymentmode">
+            <ion-col
+              size="3"
+              class="ion-margin-end secondary-border-radius bd-radius-10"
+              matTooltip="Le montant réçu en espèces"
+              matTooltipPosition="left"
+            >
+              <ion-tab-button>
+                <ion-icon name="cash-outline"></ion-icon>
+                <ion-label>En espèces</ion-label>
+                <ion-input
+                  type="number"
+                  [(ngModel)]="invoice.totalespeces"
+                  (ionInput)="changingothersamounts($event,'espece')"
+                  class="ion-text-center"
+                ></ion-input>
+              </ion-tab-button>
+            </ion-col>
+            <ion-col
+              size="3"
+              class="ion-margin-end secondary-border-radius bd-radius-10"
+              matTooltip="Montant payé par chèque bancaire ou versé à la banque"
+              matTooltipPosition="left"
+            >
+              <ion-tab-button>
+                <ion-icon name="card-outline"></ion-icon>
+                <ion-label>Banque</ion-label>
+                <ion-input
+                  type="number"
+                  [(ngModel)]="invoice.totalcreditcard"
+                  class="ion-text-center"
+                  (ionInput)="changingothersamounts($event,'card')"
+                ></ion-input>
+              </ion-tab-button>
+            </ion-col>
+            <ion-col
+              size="3"
+              class="secondary-border-radius bd-radius-10"
+              matTooltip="Le montant payé par mobile money"
+              matTooltipPosition="left"
+            >
+              <ion-tab-button>
+                <ion-icon name="phone-portrait-outline"></ion-icon>
+                <ion-label>Mobile money</ion-label>
+                <ion-input
+                  type="number"
+                  [(ngModel)]="invoice.totalmobilemoney"
+                  class="ion-text-center"
+                  (ionInput)="changingothersamounts($event,'mobile')"
+                ></ion-input>
+              </ion-tab-button>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <ion-button
+                [disabled]="!appserv.permissionFilter('Facturation', 'cash') || canPrintProforma"
+                expand="block"
+                type="submit"
+                color="success"
+                class="full-width font-size-16"
+                mode="ios"
+                (click)="cashmode()"
+                matTooltip="Faire une facture cash"
+                matTooltipPosition="left"
+              >
+                <ion-text class="font-size-30">Valider</ion-text>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-fab
+    slot="fixed"
+    vertical="bottom"
+    horizontal="end"
+    (click)="isActionsModalOpen=true"
+    class="largedevicehidden"
+  >
+    <ion-fab-button color="warning" size="small">
+      <ion-icon
+        name="arrow-forward-outline"
+        color="light"
+        size="large"
+      ></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-modal
+    (willDismiss)="BeforeClosingActionsModal($event)"
+    (didPresent)="aftermodalActionspresented($event)"
+    [isOpen]="isActionsModalOpen"
+    [breakpoints]="[0.25,0.50]"
+    [initialBreakpoint]="0.25"
+    class="modal-border-radius-20"
+  >
+    <ng-template>
+      <ion-content class="colorleftside" color="dark-tynt">
+        <br />
+        <ion-buttons>
+          <ion-tab-button
+            [disabled]="!appserv.permissionFilter('Facturation', 'cash') || canPrintProforma"
+            (click)="cashmode()"
+          >
+            <ion-icon
+              name="cash"
+              color="success"
+              aria-hidden="true"
+              class="strock-icon"
+            ></ion-icon>
+            <ion-label class="font-bold-600">Cash</ion-label>
+          </ion-tab-button>
+
+          <ion-tab-button
+            [disabled]="!appserv.permissionFilter('Facturation', 'proforma')"
+            *ngIf="canPrintProforma"
+            (click)="cancelProformat()"
+          >
+            <ion-icon
+              name="close"
+              color="dark"
+              aria-hidden="true"
+              class="strock-icon"
+            ></ion-icon>
+            <ion-label class="font-bold-600">Annuler </ion-label>
+          </ion-tab-button>
+
+          <ion-tab-button
+            [disabled]="!appserv.permissionFilter('Facturation', 'proforma')"
+            *ngIf="canPrintProforma"
+            (click)="proformat()"
+          >
+            <ion-icon
+              name="print"
+              color="dark"
+              aria-hidden="true"
+              class="strock-icon"
+            ></ion-icon>
+            <ion-label class="font-bold-600">Imprimer</ion-label>
+          </ion-tab-button>
+        </ion-buttons>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- others payment modes -->
+  <ion-modal
+    (willDismiss)="BeforeClosingOthersPaymentsModal($event)"
+    (didPresent)="afterOthersPaymentspresented($event)"
+    [isOpen]="isOthersPaymentsModalOpen"
+    class="modal-border-radius-20"
+  >
+    <ng-template>
+      <ion-header class="ion-no-border ion-padding contentbody">
+        <ion-toolbar class="contentbody">
+          <ion-item lines="none" class="contentbody">
+            <ion-icon
+              name="chevron-back-outline"
+              size="large"
+              (click)="appserv.closemodal()"
+            ></ion-icon>
+            <ion-text class="font-size-20"
+              >Choisissez un autre mode paiement</ion-text
+            >
+          </ion-item>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="colorleftside" color="dark-tynt">
+        <ion-text>Here you've to print the</ion-text>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

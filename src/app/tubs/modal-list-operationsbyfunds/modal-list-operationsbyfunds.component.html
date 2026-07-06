@@ -1,0 +1,32 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>
+      <ion-item lines="none">
+        <ion-icon name="chevron-back-outline" (click)="closemodal()" slot="start"></ion-icon>
+        <ion-text color="primary" slot="start" class="smalldevicehidden font-size-12">Recherche Opérations</ion-text>
+        <ion-segment mode="ios" slot="end" [(ngModel)]="operationsfilter">
+          <ion-segment-button value="all" (click)="filteroperations('all')">Toutes</ion-segment-button>
+          <ion-segment-button value="entry" (click)="filteroperations('entry')">Entrées</ion-segment-button>
+          <ion-segment-button value="wayout" (click)="filteroperations('withdraw')">Sorties</ion-segment-button>
+        </ion-segment>
+        <ion-chip slot="end">{{listmouvements.length>=100?'+99':listmouvements.length}}</ion-chip>
+      </ion-item>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+    <ion-searchbar [(ngModel)]="search" mode="ios" placeholder="Recherche..." #defaultinput></ion-searchbar>
+      <ion-item mode="ios" class="default-list-item" *ngFor="let mouvement of listmouvements | filter:search" lines="inset">
+        <ion-avatar slot="start" [class]="mouvement.type==='entry'?'':'color-customer-warn'"><ion-icon [color]="mouvement.type==='withdraw'?'danger':''" [name]="mouvement.type==='entry'?'arrow-down-outline':'arrow-up-outline'" size="small"></ion-icon></ion-avatar>
+        <ion-label>
+          <h2 class="item-label-title ion-padding-bottom font-bold-600"><ion-note [class]="mouvement.type==='entry'?'':'color-customer-warn'">{{mouvement.uuid}}</ion-note></h2>
+          <h4 class="secondpara font-size-11"><ion-note>{{mouvement.motif | titlecase}}</ion-note></h4>
+          <h4 class="secondpara font-size-11"><ion-note>{{mouvement.created_at | date}}</ion-note></h4>
+        </ion-label>
+         <ion-text slot="end" class="font-size-11">
+          {{mouvement.amount|number}} {{tubsent.money_abreviation}}
+        </ion-text>
+        <ion-chip slot="end" class="font-size-11 chipset">{{mouvement.user_name | titlecase}}</ion-chip>
+      </ion-item>
+</ion-content>
+

@@ -1,0 +1,230 @@
+<ion-header class="ion-no-border contentbody">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none" class="default-list-item">
+      <ion-icon
+        name="chevron-back-outline"
+        (click)="appserv.closemodal()"
+        color="warning"
+        size="large"
+      ></ion-icon>
+      <ion-avatar (click)="openeditprofil()">
+        <ion-img
+          [src]="actualuser.avatar ? appserv.imgUrl + actualuser.avatar : ''"
+          *ngIf="actualuser.avatar"
+        ></ion-img>
+        <ion-icon
+          name="person-outline"
+          size="small"
+          *ngIf="!actualuser.avatar"
+        ></ion-icon>
+      </ion-avatar>
+      <ion-label (click)="openeditprofil()">
+        <p class="item-label-title">
+          {{
+            (actualuser.name ? actualuser.name : actualuser.user_name)
+              | titlecase
+          }}
+        </p>
+        <p class="secondpara">
+          <ion-note class="font-size-11">{{ actualuser.note }}</ion-note>
+        </p>
+      </ion-label>
+      <ion-chip slot="end"
+        >I.D : {{ actualuser.uuid ? actualuser.uuid : "aucun" }}</ion-chip
+      >
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <div class="ion-text-center detailrequestheader ion-padding">
+    <ion-card class="bd-radius-10 accept-use" mode="ios">
+      <ion-item mode="ios" lines="full" detail="false">
+        <h2 class="font-size-12">Nom d'utilisateur</h2>
+        <ion-note slot="end" class="font-size-11">{{
+          actualuser.user_name | titlecase
+        }}</ion-note>
+      </ion-item>
+      <ion-item mode="ios" lines="full" detail="false">
+        <h2 class="font-size-12">Nom complet</h2>
+        <ion-note slot="end" class="font-size-11">{{
+          actualuser.name | titlecase
+        }}</ion-note>
+      </ion-item>
+      <ion-item mode="ios" lines="full" detail="false">
+        <h2 class="font-size-12">Email</h2>
+        <ion-note slot="end" class="font-size-11">{{
+          actualuser.email | titlecase
+        }}</ion-note>
+      </ion-item>
+      <ion-item mode="ios" lines="full" detail="false">
+        <h2 class="font-size-12">Téléphone</h2>
+        <ion-note slot="end" class="font-size-11">{{
+          actualuser.user_phone
+        }}</ion-note>
+      </ion-item>
+      <ion-item mode="ios" lines="none" detail="false">
+        <h2 class="font-size-12">Note</h2>
+        <ion-note slot="end" class="font-size-11">{{
+          actualuser.note | titlecase
+        }}</ion-note>
+      </ion-item>
+    </ion-card>
+
+    <ion-card
+      class="bd-radius-10 margin-btm-15"
+      mode="ios"
+      *ngIf="appserv.permissionFilter('agents', 'edit') && appserv.getactualuser().id !== actualuser.id"
+    >
+      <ion-item
+        lines="full"
+        class="font-size-12"
+        mode="ios"
+        detail="true"
+        (click)="gotochangesecurity()"
+      >
+        <ion-text slot="start">Mot de passe et sécurité</ion-text>
+        <ion-spinner
+          name="lines-small"
+          slot="end"
+          *ngIf="showsecurityprogress"
+        ></ion-spinner>
+      </ion-item>
+      <ion-item
+        lines="full"
+        class="font-size-12"
+        mode="ios"
+        detail="true"
+        (click)="gotochangepermission()"
+      >
+        <ion-text slot="start">Rôle et Permissions </ion-text>
+        <ion-spinner
+          name="lines-small"
+          slot="end"
+          *ngIf="showpermissionprogress"
+        ></ion-spinner>
+      </ion-item>
+      <ion-item
+        lines="none"
+        class="font-size-12"
+        mode="ios"
+        detail="true"
+        (click)="gotomembersaccounts()"
+        *ngIf="appserv.permissionFilter('agents', 'see_account')"
+      >
+        <ion-text slot="start">Comptes </ion-text>
+        <ion-spinner
+          name="lines-small"
+          slot="end"
+          *ngIf="showpermissionprogress"
+        ></ion-spinner>
+      </ion-item>
+    </ion-card>
+
+    <ion-card
+      class="bd-radius-10 margin-btm-15"
+      mode="ios"
+      *ngIf="appserv.permissionFilter('agents', 'edit') && appserv.getactualuser().id !== actualuser.id"
+    >
+      <ion-item
+        lines="full"
+        class="font-size-12"
+        mode="ios"
+        detail="true"
+        (click)="changeaccess('mobile_access')"
+      >
+        <ion-text slot="start">Accès mobile</ion-text>
+        <ion-note slot="end">{{
+          actualuser.mobile_access ? "Oui" : "Non"
+        }}</ion-note>
+      </ion-item>
+      <ion-item
+        lines="full"
+        class="font-size-12"
+        mode="ios"
+        detail="true"
+        (click)="changeaccess('can_withdraw_on_mobile')"
+      >
+        <ion-text slot="start">Retrait avec mobile money </ion-text>
+        <ion-note slot="end">{{
+          actualuser.can_withdraw_on_mobile ? "Oui" : "Non"
+        }}</ion-note>
+      </ion-item>
+      <ion-item
+        lines="none"
+        class="font-size-12"
+        mode="ios"
+        detail="true"
+        (click)="changeaccess('can_withdraw_by_agent')"
+      >
+        <ion-text slot="start">Peut rétirer chez un agent </ion-text>
+        <ion-note slot="end">{{
+          actualuser.can_withdraw_by_agent ? "Oui" : "Non"
+        }}</ion-note>
+      </ion-item>
+    </ion-card>
+
+    <ion-card
+      class="bd-radius-10 margin-btm-15"
+      mode="ios"
+      *ngIf="appserv.getactualuser().id === actualuser.id"
+    >
+      <ion-item
+        lines="full"
+        class="font-size-12"
+        mode="ios"
+        detail="true"
+        (click)="changepin()"
+      >
+        <ion-text slot="start">Pin</ion-text>
+      </ion-item>
+    </ion-card>
+    <ion-item lines="none" class="contentbody">
+      <ion-note
+        >Créée le
+        {{
+          actualuser.created_at | date : " dd MMM, yyyy 'à' hh:mm a"
+        }}</ion-note
+      >
+    </ion-item>
+  </div>
+</ion-content>
+<ion-footer
+  class="ion-no-border contentbody"
+  *ngIf="appserv.permissionFilter('agents', 'edit') && appserv.getactualuser().id !== actualuser.id"
+>
+  <ion-item mode="ios" lines="none">
+    <ion-text
+      color="danger"
+      *ngIf="
+        actualuser.status === 'enabled' &&
+        appserv.permissionFilter('agents', 'disable')
+      "
+      (click)="disactiveuser()"
+      slot="start"
+      class="cursor-pointer"
+      >Désactiver</ion-text
+    >
+    <ion-text
+      color="success"
+      *ngIf="
+        actualuser.status === 'disabled' &&
+        appserv.permissionFilter('agents', 'disable')
+      "
+      (click)="activeuser()"
+      slot="start"
+      class="cursor-pointer"
+    >
+      Activer</ion-text
+    >
+    <ion-spinner *ngIf="actualuser.loading"></ion-spinner>
+    <ion-icon
+      name="document-outline"
+      slot="end"
+      size="small"
+      class="ion-padding-end cursor-pointer"
+      color="warning"
+      (click)="edituser(actualuser)"
+      *ngIf="appserv.permissionFilter('agents', 'edit')"
+    ></ion-icon>
+  </ion-item>
+</ion-footer>

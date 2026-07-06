@@ -1,0 +1,18 @@
+.details-invoice{
+    display: table;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.details-invoice > * {
+    display: table-row;
+    // border: 1px solid black;
+    padding: 5px;
+    .details-invoice-tr{
+        span{
+            display: table-cell;
+            margin-right: 10px;
+            border: 0.5px solid black;
+        }
+    }
+  }

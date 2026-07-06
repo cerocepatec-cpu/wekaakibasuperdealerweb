@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Gestion avancée des Clôtures</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" fullscreen>
+
+  <!-- 🔹 Filtres -->
+  <div class="filters grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+    <ion-button (click)="pickusers()" mode="ios" color="medium" size="small">
+      <ion-text>Agents</ion-text>
+    </ion-button>
+    <ion-select placeholder="Caisse" interface="popover" mode="ios" [(ngModel)]="filters.fund_id" (ionChange)="loadClosures()">
+      <ion-select-option *ngFor="let f of funds" [value]="f.id">{{ f.description }}</ion-select-option>
+    </ion-select>
+    <ion-select placeholder="Devise" interface="popover" mode="ios" [(ngModel)]="filters.currency_id" (ionChange)="loadClosures()">
+      <ion-select-option *ngFor="let c of currencies" [value]="c.id">{{ c.abreviation }}</ion-select-option>
+    </ion-select>
+    <ion-select  placeholder="Statut" interface="popover" mode="ios" [(ngModel)]="filters.status" (ionChange)="loadClosures()">
+      <ion-select-option value="pending">Pending</ion-select-option>
+      <ion-select-option value="validated">Validated</ion-select-option>
+      <ion-select-option value="rejected">Rejected</ion-select-option>
+    </ion-select>
+    <ion-datetime display-format="DD/MM/YYYY" placeholder="Début" [(ngModel)]="filters.start_date" (ionChange)="loadClosures()" *ngIf="showfilterdates"></ion-datetime>
+    <ion-datetime display-format="DD/MM/YYYY" placeholder="Fin" [(ngModel)]="filters.end_date" (ionChange)="loadClosures()" *ngIf="showfilterdates"></ion-datetime>
+  </div>
+  <ion-searchbar mode="ios"placeholder="Recherche..." [(ngModel)]="search" #defaultinput></ion-searchbar>
+  <!-- 🔹 Clôtures groupées -->
+  <div *ngFor="let group of groupedClosures | keyvalue | filter:search">
+    <ion-card class="mb-4">
+      <ion-card-header class="bg-gray-100 px-4 py-2">
+        <strong>{{ group.value[0].closed_at | date:'dd/MM/yyyy' }}</strong> - {{ group.value[0].user?.name }}
+      </ion-card-header>
+      <ion-card-content class="px-4 py-2">
+        <br>
+        <div *ngFor="let closure of group.value" class="mb-2 p-2 border rounded flex justify-between items-center">
+          <div>
+            <strong [ngClass]="{
+                  'bg-green-100 text-green-700': closure.status === 'validated',
+                  'bg-yellow-100 text-yellow-700': closure.status === 'pending',
+                  'bg-red-100 text-red-700': closure.status === 'rejected'
+                }" class="cursor-pointer" (click)="detailfence(closure)">{{ closure.fund?.description | uppercase}}</strong> ({{ closure.currency?.abreviation }}) | 
+            <span
+                class="inline-flex items-center justify-center text-[9px] font-semibold px-1 py-[1px] rounded-full leading-none min-w-[50px] text-center"
+                [ngClass]="{
+                  'bg-green-100 text-green-700': closure.status === 'validated',
+                  'bg-yellow-100 text-yellow-700': closure.status === 'pending',
+                  'bg-red-100 text-red-700': closure.status === 'rejected'
+                }"
+              >
+                {{ closure.status | titlecase }}
+              </span><br>
+            Total: {{ closure.total_amount | number:'1.0-2' }} | Reçu: {{ (closure.received_amount?closure.received_amount:0) | number:'1.0-2' }} | Solde: 
+            <span [ngClass]="{
+              'text-green-600': closure.solde_status==='créditeur',
+              'text-red-600': closure.solde_status==='débiteur',
+              'text-gray-700': closure.solde_status==='équilibré'
+            }">{{ closure.solde_status }}</span>
+          </div>
+          <div class="flex gap-1">
+            <div *ngIf="!closure.loading">
+              <ion-button mode="ios" size="small" color="success" (click)="validate(closure)" *ngIf="closure.status==='pending'">Recevoir</ion-button>
+              <ion-button mode="ios" size="small" color="danger" (click)="reject(closure)" *ngIf="closure.status==='pending'">Rejeter</ion-button>
+              <ion-button mode="ios" size="small" color="primary" (click)="downloadPDF(closure)">PDF</ion-button>
+              <ion-button mode="ios" size="small" color="secondary" (click)="downloadTicket(closure)">Ticket</ion-button>
+            </div>
+            <ion-spinner name="dots" *ngIf="closure.loading"></ion-spinner>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <app-skeleton-loader type="list" *ngIf="loading"></app-skeleton-loader>
+  
+  <div class="flex justify-between mt-4">
+    <ion-button (click)="prevPage()" [disabled]="page<=1">Précédent</ion-button>
+    <span>Page {{ page }} / {{ lastPage }}</span>
+    <ion-button (click)="nextPage()" [disabled]="page>=lastPage">Suivant</ion-button>
+  </div>
+
+</ion-content>

@@ -1,0 +1,46 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+      <ion-icon name="chevron-back" size="large" color="primary" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text>Détail première mise</ion-text>
+      <ion-icon name="trash-outline" color="warning" slot="end" size="small" (click)="deletefirstentry()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <br>
+  <div class="userprofiltoedit ion-text-center">
+    <ion-note class="font-size-14" color="secondary">{{firstentrysent.member_fullname}} ({{firstentrysent.member_uuid}})</ion-note>
+    <br>
+    <ion-note class="font-size-12">Op.ID. {{firstentrysent.uuid}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">{{firstentrysent.done_at | date}}</ion-note>
+  </div>
+
+  <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+    <ion-item class="font-size-12 default-list-item2" mode="ios" lines="full">
+      <ion-text slot="start">Collecteur</ion-text>
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{firstentrysent.collector_fullname}}</ion-text></h2>
+     </ion-item> 
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+      <ion-text slot="start">Montant</ion-text> 
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{firstentrysent.amount | number}} {{firstentrysent.abreviation}}</ion-text></h2>
+     </ion-item> 
+  </ion-card>
+
+  <ion-card mode="ios">
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+      <ion-text slot="start">Opération faite par</ion-text> 
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{firstentrysent.done_by_fullname?firstentrysent.done_by_fullname:firstentrysent.done_by_name | titlecase}}</ion-text></h2>
+     </ion-item>   
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="none">
+      <ion-text slot="start">Description</ion-text>
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{firstentrysent.description}}</ion-text></h2>
+     </ion-item>
+  </ion-card>
+  <br>
+  <ion-item mode="ios" class="contentbody footeritem" lines="none">
+      <h4 class="font-size-12"><ion-note>Effectuée le {{firstentrysent.done_at | date}} </ion-note></h4> <br> <br>
+      <h4 class="font-size-12"><ion-note> &nbsp; par {{firstentrysent.done_by_fullname?firstentrysent.done_by_fullname:firstentrysent.done_by_name | titlecase}} </ion-note></h4>
+</ion-item>
+</ion-content>

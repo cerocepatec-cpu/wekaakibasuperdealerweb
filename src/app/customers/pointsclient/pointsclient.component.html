@@ -1,0 +1,54 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item  lines="none">
+      <ion-icon name="chevron-back" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text slot="start">Situation points client</ion-text>
+      <ion-icon name="download-outline" color="success" slot="end" [matMenuTriggerFor]="menuexport"></ion-icon>
+      <ion-icon name="share-outline" color="primary" slot="end"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item ><ion-text class="font-size-12">Exporter en Excel</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-12">Exporter en PDF</ion-text></button>
+    </mat-menu>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-item lines="none" class="contentbody margin-left-moins-15">
+    <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche"></ion-searchbar>
+    <ion-icon name="calendar-outline" slot="end" color="primary" size="small" (click)="getdatesfilter()"></ion-icon>
+    <ion-icon name="filter-outline" slot="end"  size="small" [matMenuTriggerFor]="animals2" color="primary"></ion-icon>
+  
+    <mat-menu #animals2="matMenu">
+      <button mat-menu-item><ion-text class="font-size-12">Utilisés</ion-text></button>
+      <button mat-menu-item><ion-text class="font-size-12">Non utilisés</ion-text></button>
+    </mat-menu>
+  
+  </ion-item>
+    <ion-list class="contentbody">
+      <ion-list-header>
+        <h2>Client : {{customersent.customerName | titlecase}}</h2>
+      </ion-list-header>
+      <hr class="hr">
+      <ion-item mode="ios" class="default-list-item3"  lines="inset" *ngFor="let caution of listpoints" >
+        <ion-avatar slot="start"><ion-icon name="arrow-down"></ion-icon></ion-avatar>
+        <ion-label>
+          <h2 class="item-label-title">{{caution.created_at}}</h2>
+          <h4 class="secondpara font-size-11"><ion-note>{{caution.amount}}</ion-note></h4>
+        </ion-label>
+        <ion-chip slot="end" class="font-size-11 chipset" color="danger">{{caution.amount_used}}</ion-chip>
+        <ion-text slot="end" class="font-size-11" color="danger">
+         {{caution.amount}}
+        </ion-text>
+      </ion-item>
+
+      <ion-card color="warning" mode="ios" class="ion-padding display-flex-center" *ngIf="listpoints.length<=0">
+        <ion-text>Aucune donnée à afficher</ion-text> &nbsp;
+        <ion-icon name="alert-circle-outline"></ion-icon>
+      </ion-card>
+       
+    </ion-list>
+  </ion-content>
+<ion-footer>
+
+</ion-footer>

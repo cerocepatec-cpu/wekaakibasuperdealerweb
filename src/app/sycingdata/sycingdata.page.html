@@ -1,0 +1,170 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+        <ion-text color="primary" class="font-bold-600">Options de synchronisation</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding cartpreview-85">
+  <mat-tab-group>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <ion-icon name="cloud-outline"></ion-icon> &nbsp;
+        Synchronisation
+      </ng-template>
+      <br>
+        <ion-chip class="font-bold-600 font-size-16" color="primary" [disabled]="SyncingDataLength()<=0 || !this.appserv.isMyDeviceConnected()" slot="end" (click)="synchronous()">
+          <ion-icon name="cloud-outline" size="small" color="tertiary"></ion-icon>
+          <ion-label class="font-size-12">
+             Synchroniser Maintenant
+          </ion-label>
+        </ion-chip>
+        <ion-icon *ngIf="SyncingDataLength()>0" name="trash-outline" class="largedevicehidden ion-float-right" color="warning" (click)="removeSyncingData()"></ion-icon>
+      <ion-card mode="ios" class="ion-padding smalldevicehidden">
+        <ion-item mode="ios" class="bd-radius-20" lines="none">
+          <ion-avatar slot="start" class="bd-rounded">
+            <ion-icon name="cloud-outline" size="large"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <p class="font-size-12"><ion-note>Date Sauvegarde : {{appserv.today | date}} à {{appserv.today.getHours()}}:{{appserv.today.getMinutes()}}:{{appserv.today.getSeconds()}}</ion-note></p>
+            <p class="font-size-12">Nombre de données à envoyer : {{SyncingDataLength()}}</p>
+            <p class="font-size-12"><ion-icon name="lock-closed"></ion-icon> Votre sauvegarde est protégée</p>
+          </ion-label>
+          <ion-icon *ngIf="SyncingDataLength()>0" name="trash-outline" color="warning" slot="end" (click)="removeSyncingData()"></ion-icon>
+        </ion-item>
+        <ion-text class="font-size-12">
+          Sauvegardez vos données locales vous permet de les envoyer sur le Cloud afin de les retrouver partout où vous vous retrouvez. Si vous avez plusieurs autres utilisateurs utilisant les mêmes données, cette opération vous permettra de les synchroniser à fin de créer un équilibre entre vos bases de données. Si vous avez CERO UZISHA sur plusieurs appareils ou plates formes (Ordinateurs, téléphones, tablettes,etc.), vous synchronisez vos données sur tous ces derniers. 
+        </ion-text>
+      </ion-card>
+
+      <ion-card mode="ios" class="ion-padding">
+        <ion-item lines="inset" class="default-list-item2 cursor-pointer" mode="ios" detail="true" (click)="gotosyncingviewer('entries')">
+          <ion-label>
+            <h2 class="font-size-13 item-label-title"><ion-text>Entrées d'argent</ion-text></h2>
+          </ion-label>
+          <ion-chip slot="end" color="warning" *ngIf="syncingServ.getSyncingEntries().length>0">{{syncingServ.getSyncingEntries().length}}</ion-chip>
+          <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syncingServ.getSyncingEntries().length===0"></ion-icon>  
+         </ion-item> 
+         
+         <ion-item lines="inset" class="default-list-item2 cursor-pointer" mode="ios" detail="true" (click)="gotosyncingviewer('expenditures')">
+          <ion-label>
+            <h2 class="font-size-13 item-label-title"><ion-text>Dépenses</ion-text></h2>
+          </ion-label>
+          <ion-chip slot="end" color="warning" *ngIf="syncingServ.getSyncingExpenditures().length>0">{{syncingServ.getSyncingExpenditures().length}}</ion-chip> 
+          <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syncingServ.getSyncingExpenditures().length===0"></ion-icon> 
+         </ion-item> 
+         
+         <ion-item lines="inset"  class="default-list-item2 cursor-pointer" mode="ios" detail="true" (click)="gotosyncingviewer('customers')">
+          <ion-label>
+            <h2 class="font-size-13 item-label-title"><ion-text>Clients</ion-text></h2>
+          </ion-label>
+          <ion-chip slot="end" color="warning" *ngIf="syncingServ.getSyncingCustomers().length>0">{{syncingServ.getSyncingCustomers().length}}</ion-chip>
+          <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syncingServ.getSyncingCustomers().length===0"></ion-icon>  
+         </ion-item>   
+         
+         <ion-item lines="inset" class="default-list-item2 cursor-pointer" mode="ios" detail="true" (click)="gotosyncingviewer('invoices')">
+          <ion-label>
+            <h2 class="font-size-13 item-label-title"><ion-text>Factures</ion-text></h2>
+          </ion-label>
+          <ion-chip slot="end" color="warning" *ngIf="syncingServ.getSyncingOffLineInvoices().length>0">{{syncingServ.getSyncingOffLineInvoices().length}}</ion-chip>
+          <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syncingServ.getSyncingOffLineInvoices().length===0"></ion-icon> 
+         </ion-item>
+         
+         <ion-item lines="inset" class="default-list-item2 cursor-pointer" mode="ios" detail="true" (click)="gotosyncingviewer('stock')">
+          <ion-label>
+            <h2 class="font-size-13 item-label-title"><ion-text>Mouvements de Stock</ion-text></h2>
+          </ion-label>
+          <ion-chip slot="end" color="warning" *ngIf="syncingServ.getSyncingOffLineStockHistories().length>0">{{syncingServ.getSyncingOffLineStockHistories().length}}</ion-chip>
+          <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syncingServ.getSyncingOffLineStockHistories().length===0"></ion-icon>  
+         </ion-item> 
+         
+         <ion-item lines="inset" class="default-list-item2 cursor-pointer" mode="ios" detail="true" (click)="gotosyncingviewer('debts')">
+          <ion-label>
+            <h2 class="font-size-13 item-label-title"><ion-text>Dettes</ion-text></h2>
+          </ion-label>
+          <ion-chip slot="end" color="warning" *ngIf="syncingServ.getSyncingOffLineDebts().length>0">{{syncingServ.getSyncingOffLineDebts().length}}</ion-chip> 
+          <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syncingServ.getSyncingOffLineDebts().length===0"></ion-icon>
+         </ion-item> 
+         
+         <ion-item lines="none"class="default-list-item2 cursor-pointer" mode="ios" detail="true" (click)="gotosyncingviewer('payments')">
+          <ion-label>
+            <h2 class="font-size-13 item-label-title"><ion-text>Payements dettes</ion-text></h2>
+          </ion-label>
+          <ion-chip slot="end" color="warning" *ngIf="syncingServ.getSyncingOffLinePayments().length>0">{{syncingServ.getSyncingOffLinePayments().length}}</ion-chip>
+          <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syncingServ.getSyncingOffLinePayments().length===0"></ion-icon> 
+         </ion-item>
+      </ion-card>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label class="font-size-12">
+        <ion-icon name="server-outline" size="small"></ion-icon> &nbsp;
+        Importation données
+      </ng-template>
+        <br>
+        <ion-chip class="font-bold-600 font-size-16" color="primary" (click)="importalldata()" [disabled]="!this.appserv.isMyDeviceConnected()">
+          <ion-icon name="server-outline" size="small" color="tertiary"></ion-icon>
+          <ion-label class="font-size-12">
+             Importer Tout
+          </ion-label>
+        </ion-chip>
+        <ion-card mode="ios" class="ion-padding">
+          <ion-item>
+            <ion-text class="font-size-12">Liste des articles (Catalogue)</ion-text>
+            <ion-chip class="font-size-12" color="primary" (click)="ImportServices()" slot="end" *ngIf="!syngingData.articlesLoading && !syngingData.articlesDone && !syngingData.articlesFailed">Importer</ion-chip>
+            <ion-spinner name="bubbles" slot="end" color="warning" *ngIf="syngingData.articlesLoading"></ion-spinner>
+            <ion-icon name="close-circle" slot="end" color="danger" *ngIf="syngingData.articlesFailed"></ion-icon> 
+            <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syngingData.articlesDone"></ion-icon> 
+          </ion-item>
+          <ion-item>
+            <ion-text class="font-size-12">Produits à vendre</ion-text>
+            <ion-chip class="font-size-12" color="primary" (click)="getallservicesdatafordeposits()" slot="end" *ngIf="!syngingData.productsToSellLoading && !syngingData.productsToSellDone && !syngingData.productsToSellFailed">Importer</ion-chip>
+            <ion-spinner name="bubbles" slot="end" color="warning" *ngIf="syngingData.productsToSellLoading"></ion-spinner>
+            <ion-icon name="close-circle" slot="end" color="danger" *ngIf="syngingData.productsToSellFailed"></ion-icon> 
+            <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syngingData.productsToSellDone"></ion-icon> 
+          </ion-item>
+          <ion-item>
+            <ion-text class="font-size-12">Clients</ion-text>
+            <ion-chip class="font-size-12" color="primary" (click)="ImportCustomers()" slot="end" *ngIf="!syngingData.customersLoading && !syngingData.customersDone && !syngingData.customersFailed">Importer</ion-chip>
+            <ion-spinner name="bubbles" slot="end" color="warning" *ngIf="syngingData.customersLoading"></ion-spinner>
+            <ion-icon name="close-circle" slot="end" color="danger" *ngIf="syngingData.customersFailed"></ion-icon> 
+            <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syngingData.customersDone"></ion-icon> 
+          </ion-item>   
+          <ion-item>
+            <ion-text class="font-size-12">Tables</ion-text>
+            <ion-chip class="font-size-12" color="primary" (click)="ImportTables()" slot="end" *ngIf="!syngingData.tablesLoading && !syngingData.tablesDone && !syngingData.tablesFailed">Importer</ion-chip>
+            <ion-spinner name="bubbles" slot="end" color="warning" *ngIf="syngingData.tablesLoading"></ion-spinner>
+            <ion-icon name="close-circle" slot="end" color="danger" *ngIf="syngingData.tablesFailed"></ion-icon> 
+            <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syngingData.tablesDone"></ion-icon> 
+          </ion-item>
+          <ion-item>
+            <ion-text class="font-size-12">Serveurs</ion-text>
+            <ion-chip class="font-size-12" color="primary" (click)="ImportServers()" slot="end" *ngIf="!syngingData.serversLoading && !syngingData.serversDone && !syngingData.serversFailed">Importer</ion-chip>
+            <ion-spinner name="bubbles" slot="end" color="warning" *ngIf="syngingData.serversLoading"></ion-spinner>
+            <ion-icon name="close-circle" slot="end" color="danger" *ngIf="syngingData.serversFailed"></ion-icon> 
+            <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syngingData.serversDone"></ion-icon> 
+          </ion-item> 
+          <ion-item>
+            <ion-text class="font-size-12">Comptes</ion-text>
+            <ion-chip class="font-size-12" color="primary" (click)="ImportAccounts()" slot="end" *ngIf="!syngingData.accountsLoading && !syngingData.accountsDone && !syngingData.accountsFailed">Importer</ion-chip>
+            <ion-spinner name="bubbles" slot="end" color="warning" *ngIf="syngingData.accountsLoading"></ion-spinner>
+            <ion-icon name="close-circle" slot="end" color="danger" *ngIf="syngingData.accountsFailed"></ion-icon> 
+            <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syngingData.accountsDone"></ion-icon> 
+          </ion-item>
+          <ion-item>
+            <ion-text class="font-size-12">Conversions monnaies</ion-text>
+            <ion-chip class="font-size-12" color="primary" (click)="ImportMoneyConversions()" slot="end" *ngIf="!syngingData.conversionMoneyLoading && !syngingData.conversionMoneyDone && !syngingData.conversionMoneyFailed">Importer</ion-chip>
+            <ion-spinner name="bubbles" slot="end" color="warning" *ngIf="syngingData.conversionMoneyLoading"></ion-spinner>
+            <ion-icon name="close-circle" slot="end" color="danger" *ngIf="syngingData.conversionMoneyFailed"></ion-icon> 
+            <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syngingData.conversionMoneyDone"></ion-icon>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-text class="font-size-12">Monnaies</ion-text>
+            <ion-chip class="font-size-12" color="primary" (click)="ImportMoney()" slot="end" *ngIf="!syngingData.moneyLoading && !syngingData.moneyDone && !syngingData.moneyFailed">Importer</ion-chip>
+            <ion-spinner name="bubbles" slot="end" color="warning" *ngIf="syngingData.moneyLoading"></ion-spinner>
+            <ion-icon name="close-circle" slot="end" color="danger" *ngIf="syngingData.moneyFailed"></ion-icon> 
+            <ion-icon name="checkmark-circle" slot="end" color="success" *ngIf="syngingData.moneyDone"></ion-icon>
+          </ion-item>
+        </ion-card>
+    </mat-tab>
+  </mat-tab-group>
+</ion-content>

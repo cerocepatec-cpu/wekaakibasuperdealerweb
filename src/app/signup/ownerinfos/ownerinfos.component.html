@@ -1,0 +1,66 @@
+<ion-header class="ion-no-border" color="dark" mode="ios" collapse="fade">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" size="large" color="primary" [routerLink]="['/login']" routerLinkActive="router-link-active"></ion-icon>
+      <ion-avatar>
+        <ion-img src="../../assets/ceronewlogo.jpg"></ion-img>
+      </ion-avatar>
+      <ion-text color="dark" class="font-bold-500 text-italic">Créer nouveau compte</ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-grid>
+    <ion-row>
+      <ion-col sizeLg="4" sizeMd="3" sizeSm="0" class="smalldevicehidden"></ion-col>
+      <ion-col sizeLg="4" sizeMd="6" sizeSm="12" class="bg-dark bd-radius-10 ownerinfos-colum">
+        <div class="content">
+          <ion-grid>
+            <ion-row>
+              <ion-col size="12">
+                <form (ngSubmit)="validation()" [formGroup]="newagent" class="form">
+                  <ion-item class="bd-square bd-radius-10 ion-margin-bottom" lines="none">
+                    <ion-input type="text" placeholder="Votre nom (*)" formControlName="user_name" #defaultinput></ion-input>
+                  </ion-item> 
+                  <ion-item class="bd-square bd-radius-10 ion-margin-bottom" lines="none">
+                    <ion-input type="text" placeholder="Le nom de votre entreprise (*)" formControlName="enterprise_name"></ion-input>
+                  </ion-item> 
+                  <ion-item class="bd-square bd-radius-10 ion-margin-bottom" lines="none">
+                    <ion-select formControlName="defaultmoney">
+                      <ion-select-option value="CDF">CDF (Francs Congolais)</ion-select-option>
+                      <ion-select-option value="USD">USD (Dollars Américains)</ion-select-option>
+                    </ion-select>
+                  </ion-item> 
+                  <ion-item class="bd-square bd-radius-10 ion-margin-bottom" lines="none">
+                    <ion-input type="text" placeholder="Télephone (*)" formControlName="user_phone"></ion-input>
+                  </ion-item> 
+                  <ion-item class="bd-square bd-radius-10 ion-margin-bottom" lines="none">
+                    <ion-input type="text" placeholder="Email" formControlName="user_mail"></ion-input>
+                  </ion-item> 
+                  <ion-item class="bd-square bd-radius-10 ion-margin-bottom" lines="none">
+                    <ion-input type="password" placeholder="Mot de passe (*)" formControlName="user_password"></ion-input>
+                  </ion-item>
+                  <ion-item class="bd-square bd-radius-10 ion-margin-bottom" lines="none" [color]="showredbloc?'danger':''">
+                    <ion-input type="password" placeholder="Valider mot de passe (*)" formControlName="password2" (keyup)="keyupvalidation($event)"></ion-input>
+                  </ion-item>
+                </form>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="12" class="display-flex-center">
+                <ion-chip  [disabled]="!newagent.valid" color="warning" mode="ios" class="bg-warning font-size-15" (click)="validation()">
+                  <ion-text color="light" *ngIf="!showprogress">Terminer</ion-text>
+                  <span *ngIf="showprogress">Création compte en cours...</span>
+                </ion-chip>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+      </ion-col>
+      <ion-col sizeLg="4" sizeMd="3" sizeSm="0" class="smalldevicehidden">
+           
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+ </ion-content>

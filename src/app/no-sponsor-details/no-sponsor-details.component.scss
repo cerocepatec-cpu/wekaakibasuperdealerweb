@@ -1,0 +1,164 @@
+.modal-content {
+  --background: #f8fafc;
+  padding: 16px;
+}
+
+.hero {
+  margin: 18px;
+  padding: 22px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #111827, #7c2d12);
+  color: #fff;
+  text-align: center;
+
+  ion-icon {
+    font-size: 42px;
+    margin-bottom: 10px;
+    color: #facc15;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 900;
+  }
+
+  p {
+    margin: 8px 0 0;
+    opacity: 0.85;
+    font-size: 13px;
+  }
+}
+
+.amount-card {
+  margin: 18px;
+  padding: 18px;
+  border-radius: 22px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+
+  span {
+    display: block;
+    color: #9a3412;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 28px;
+    font-weight: 950;
+    color: #111827;
+  }
+}
+
+.details-card {
+  margin: 18px;
+  padding: 16px;
+  border-radius: 22px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  display: grid;
+  gap: 12px;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px dashed #e5e7eb;
+    padding-bottom: 8px;
+  }
+
+  div:last-child {
+    border-bottom: none;
+  }
+
+  span {
+    color: #6b7280;
+    font-size: 12px;
+  }
+
+  strong {
+    color: #111827;
+    font-size: 13px;
+    text-align: right;
+  }
+}
+
+.premium-input {
+  margin: 18px;
+  border-radius: 18px;
+  --background: #fff;
+  border: 1px solid #e5e7eb;
+}
+.sponsor-search-card {
+  margin: 18px;
+}
+
+.collectors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.collector-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.selected {
+    border: 2px solid #16a34a;
+    background: #f0fdf4;
+  }
+}
+
+.collector-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#111827,#92400e);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.collector-info {
+  flex: 1;
+
+  strong {
+    display: block;
+    color: #111827;
+    font-size: 14px;
+  }
+
+  span {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+}
+
+.empty-collectors {
+  text-align: center;
+  color: #6b7280;
+  padding: 20px;
+  font-size: 13px;
+}

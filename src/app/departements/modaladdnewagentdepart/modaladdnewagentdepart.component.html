@@ -1,0 +1,36 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" (click)="closemodal()" slot="start"></ion-icon>
+      <ion-text slot="start" class="font-size-12">Ajouter des agents {{affected.length}}/{{listagents.length}}</ion-text>
+      <mat-icon slot="end" (click)="sendpeoples()">check</mat-icon>
+    </ion-item>
+    <ion-progress-bar type="indeterminate" *ngIf="showprogress" ></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-item lines="none"><ion-searchbar placeholder="Recherche" [(ngModel)]="agentsearch" mode="ios"></ion-searchbar> <ion-icon name="filter-outline" size="small" slot="end" [color]="isfiltered?'primary':''" (click)="listfilter()"></ion-icon></ion-item>
+  <br>
+  <div class="margin-btm-10">
+    <ng-template swiperSlide *ngFor="let user of listaffectations" >
+      <ion-tab-button class="tab-button" (click)="deletefromlist(user)">
+        <ion-avatar>
+          <ion-img [src]="user.avatar?imgUrl+user.avatar:''" *ngIf="user.avatar" ></ion-img>
+          <ion-icon name="person-outline" *ngIf="!user.avatar"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2 class="item-label-title font-size-12">{{user.user_name | titlecase}}</h2>
+        </ion-label>
+        <ion-icon name="close-circle"  class="section2" size="small"></ion-icon>
+      </ion-tab-button> 
+    </ng-template>
+  </div>    
+  <ion-item mode="ios" class="list-item contentbody margin-btm-5" *ngFor="let agent of listagents | filter:agentsearch" lines="inset" (click)="addtolist(agent)">
+        <ion-avatar slot="start"><ion-img [src]="agent.avatar?imgUrl+agent.avatar:''" *ngIf="agent.avatar" ></ion-img> <mat-icon *ngIf="!agent.avatar">person</mat-icon></ion-avatar>
+        <ion-label>
+          <h2 [class]="agent.affectation_id?'item-label-title2':'item-label-title'">{{agent.user_name | titlecase}}</h2>
+          <h4 [class]="agent.affectation_id?'secondpara2':'secondpara'">{{agent.affectation_id?'Déjà ajouté.e au département':agent.note}}</h4>
+        </ion-label>
+        <ion-checkbox slot="end" [checked]="agent.selected?true:agent.affectation_id?true:false" size="small" [disabled]="agent.affectation_id?true:false"></ion-checkbox>
+      </ion-item>
+</ion-content>

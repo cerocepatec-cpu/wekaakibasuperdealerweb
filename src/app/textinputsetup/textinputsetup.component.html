@@ -1,0 +1,14 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar>
+      <ion-item lines="none">
+        <ion-icon name="chevron-back" size="large" color="secondary" (click)="appserv.closemodal()" slot="start"></ion-icon>
+        <ion-icon name="checkmark-outline" size="large" color="secondary" slot="end" (click)="sendmsg()"></ion-icon>
+      </ion-item>
+    </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding contentbody">
+  <ion-item class="contentbody" lines="none">
+    <ion-textarea [(ngModel)]="message" autoGrow="true" class="bd-square bd-radius-10 font-size-12 ion-padding" [label]="title" labelPlacement="floating"></ion-textarea>
+  </ion-item>
+    
+</ion-content>

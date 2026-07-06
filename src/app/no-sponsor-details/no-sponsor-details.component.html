@@ -1,0 +1,121 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Détail sans parrain</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="close()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="modal-content">
+  <div class="hero">
+    <ion-icon name="person-remove-outline"></ion-icon>
+
+    <h2>{{line?.member_fullname || line?.member_user_name || 'Membre sans parrain'}}</h2>
+
+    <p>Cette commission est non attribuée parce que le membre n’a pas encore de parrain.</p>
+  </div>
+
+  <div class="amount-card">
+    <span>Montant non attribué</span>
+    <strong>{{line?.amount | number}} {{line?.abreviation}}</strong>
+  </div>
+
+  <div class="details-card">
+    <div>
+      <span>Compte</span>
+      <strong>#{{line?.account_id || '-'}}</strong>
+    </div>
+
+    <div>
+      <span>Pourcentage</span>
+      <strong>{{line?.percent | number:'1.0-2'}}%</strong>
+    </div>
+
+    <div>
+      <span>Devise</span>
+      <strong>{{line?.money_name || line?.abreviation || '-'}}</strong>
+    </div>
+
+    <div>
+      <span>Membre</span>
+      <strong>{{line?.member_fullname || line?.member_user_name || '-'}}</strong>
+    </div>
+  </div>
+
+  <div class="sponsor-search-card">
+
+  <ion-searchbar
+    mode="ios"
+    debounce="300"
+    placeholder="Rechercher un collecteur..."
+    [(ngModel)]="collectorSearch"
+    (ionInput)="searchCollectors()"
+  ></ion-searchbar>
+
+  <div class="collectors-list">
+
+    <div
+      class="collector-item"
+      *ngFor="let collector of collectorsList"
+      [class.selected]="sponsorId === collector.id"
+      (click)="selectCollector(collector)"
+    >
+
+      <div class="collector-avatar">
+        {{
+          (
+            collector.full_name ||
+            collector.user_name ||
+            'C'
+          ) | slice:0:2
+        }}
+      </div>
+
+      <div class="collector-info">
+        <strong>
+          {{collector.full_name || collector.user_name}}
+        </strong>
+
+        <span>
+          {{collector.phone || collector.telephone || 'Sans téléphone'}}
+        </span>
+      </div>
+
+      <ion-icon
+        *ngIf="sponsorId === collector.id"
+        name="checkmark-circle"
+        color="success"
+      ></ion-icon>
+
+    </div>
+
+    <div
+      class="empty-collectors"
+      *ngIf="collectorsList.length === 0"
+    >
+      Aucun collecteur trouvé
+    </div>
+
+  </div>
+
+</div>
+
+  <ion-button
+    expand="block"
+    mode="ios"
+    color="warning"
+    [disabled]="!sponsorId"
+    (click)="confirm()"
+  >
+    <ion-icon name="person-add-outline" slot="start"></ion-icon>
+    Affecter ce parrain
+  </ion-button>
+
+  <ion-button expand="block" mode="ios" fill="clear" color="medium" (click)="close()">
+    Annuler
+  </ion-button>
+</ion-content>

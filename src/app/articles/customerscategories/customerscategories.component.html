@@ -1,0 +1,59 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="arrow-back-outline" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text slot="start">Nouvelle Catégorie</ion-text>
+      <ion-icon name="checkmark-outline" slot="end" size="large" (click)="addnewcategory()" color="success"></ion-icon> 
+    </ion-item>
+    <ion-progress-bar mode="indeterminate" *ngIf="showcreatingprogress" mode="ios"></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6" sizeMd="12" sizeSm="12" sizeXs="12">
+        <div class="newrequestform">
+          <form class="form" [formGroup]="newcategoryform">
+            <h2><ion-text>Informations sur la catégorie</ion-text></h2> 
+            <ion-item lines="none">
+              <ion-label>Nom</ion-label>
+              <ion-input formControlName="name"></ion-input>
+            </ion-item>
+            <ion-item lines="none">
+              <ion-label>Déscription</ion-label>
+              <ion-input formControlName="description"></ion-input>
+            </ion-item>
+            <ion-item lines="none">
+              <ion-label>Catégorie parent</ion-label>
+              <ion-select value="brown" okText="Okay" cancelText="Fermer" formControlName="parent_id">
+                <ion-select-option value="{{category.id}}" *ngFor="let category of listcategories">{{category.name}}</ion-select-option>
+              </ion-select>
+            </ion-item> 
+          </form>
+        </div>
+      </ion-col>
+      <ion-col size="6" sizeMd="12" sizeSm="12" sizeXs="12">
+        <ion-item lines="none" class="contentbody" (click)="showlistgroup=!showlistgroup">
+          <ion-text color="primary" slot="end" class="font-size-12" > {{showlistgroup?'Cacher la liste':'Afficher la liste'}}</ion-text>
+          <ion-icon name="chevron-down-outline" slot="end" size="small" *ngIf="!showlistgroup" ></ion-icon>
+          <ion-icon name="chevron-up-outline" slot="end" size="small" *ngIf="showlistgroup" ></ion-icon>
+        </ion-item>
+        <div *ngIf="showlistgroup">
+          <hr class="hr">
+          <ion-list>
+            <ion-list-header>
+              <h2>Catégories disponibles</h2>
+             </ion-list-header>
+            <ion-searchbar mode="ios" class="font-size-11" placeholder="Recherche..."></ion-searchbar>
+            <ion-item *ngFor="let categ of listcategories" class="contentbody default-list-item" lines="full" (click)="menucategory(categ)">
+              <ion-text class="item-label-title">{{categ.name | titlecase}}</ion-text>
+              <ion-icon name="ellipsis-vertical-outline" size="small" slot="end"></ion-icon>
+            </ion-item>
+          </ion-list>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+

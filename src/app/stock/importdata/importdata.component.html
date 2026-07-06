@@ -1,0 +1,61 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+      <ion-icon name="chevron-back" color="primary" size="large" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text>Importation Fichier</ion-text>
+      <ion-icon name="download-outline" (click)="importingModel()" slot="end" color="success"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-card mode="ios" color="secondary" class="bd-radius-20 ion-padding">
+      <ion-text class="font-size-12">Nous acceptons seulement les formats csv, xlsx d'Excel. Cliquer sur le bouton de téléchargement au dessus à droite pour télécharger le model du fichier à importer.</ion-text>
+  </ion-card>
+
+  <ion-card mode="ios" class="ion-padding bd-radius-20" *ngIf="showinputfile">
+    <input type="file" (change)="fileadding($event)" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" label="Charger fichier">
+  </ion-card>
+   
+  <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche" [(ngModel)]="keyword" *ngIf="!showinputfile"></ion-searchbar>
+  
+  <ion-item lines="none" class="contentbody" *ngIf="result.length>0">
+    <ion-text slot="start" color="primary" class="font-size-14">Résultat ({{result.length}})</ion-text>
+    <ion-icon name="grid" slot="end" color="primary" size="small" (click)="showcheckbox=!showcheckbox"></ion-icon>
+    <ion-text slot="end" color="primary" class="font-size-14" [matMenuTriggerFor]="importation">Importer</ion-text>
+  </ion-item>
+  <mat-menu #importation="matMenu">
+    <button mat-menu-item (click)="sendresult()"><ion-text class="font-size-11">Envoyer sur le serveur</ion-text></button>
+    <button mat-menu-item (click)="saveoffline()"><ion-text class="font-size-11">Enregistrer en local</ion-text></button>
+  </mat-menu>
+  <hr class="hr">
+  <ion-item mode="ios" class="default-list-item3 contentbody"  lines="full" *ngFor="let mouv of result |filter:keyword">
+    <ion-avatar slot="start"><ion-icon [name]="mouv.type==='withdraw'?'arrow-up':'arrow-down'" [color]="mouv.type==='withdraw'?'danger':''"></ion-icon></ion-avatar>
+    <ion-label>
+      <ion-text class="item-label-title" [color]="mouv.type==='withdraw'?'danger':''">{{mouv.service_name | titlecase}}</ion-text>
+      <h4 class="secondpara font-size-11"><ion-note>Dépôt: {{mouv.deposit_name | titlecase}}</ion-note></h4>
+      <h4 class="secondpara font-size-11">
+        <ion-note class="ion-margin-end">Stock initial : {{(mouv.quantity_before?mouv.quantity_before:'0')}}</ion-note>
+      </h4>
+      <h4 class="secondpara font-size-11">
+        <ion-note class="font-bold-600">Solde : {{(mouv.quantity_before>0?mouv.quantity_before-mouv.quantity:mouv.quantity)}} {{mouv.uom_symbol |lowercase}}</ion-note>
+      </h4>
+      <h4 class="secondpara font-size-11">
+        <ion-note class="font-bold-600">Fait, le {{mouv.created_at}} </ion-note>
+      </h4> 
+      <h4 class="secondpara">
+        <ion-note class="done_by_bloc">Par {{mouv.done_by_name | titlecase}}</ion-note>
+      </h4>
+    </ion-label>
+    <ion-chip slot="end" class="font-size-11 chipset" [color]="mouv.type==='withdraw'?'danger':''">{{mouv.type_approvement | titlecase}}</ion-chip>
+    <ion-text slot="end" class="font-size-11" [color]="mouv.type==='withdraw'?'danger':''">
+      {{mouv.quantity }} {{mouv.uom_symbol}} 
+    </ion-text>
+    <ion-icon name="radio-button-on-outline" color="secondary" slot="end" size="small" class="unreadbutton ion-padding-start" *ngIf="!mouv.read" ></ion-icon>
+  </ion-item>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" (click)="showinputfile=!showinputfile" *ngIf="!showinputfile" >
+    <ion-fab-button color="secondary">
+      <ion-icon name="document-attach"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

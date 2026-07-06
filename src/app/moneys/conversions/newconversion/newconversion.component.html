@@ -1,0 +1,38 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar>
+      <ion-item class="contentbody" lines="none">
+        <ion-icon name="chevron-back" size="large" color="secondary" (click)="appserv.closemodal()"></ion-icon>
+        <ion-text>Nouvelle Conversion</ion-text>
+        <ion-chip (click)="saveconversion()" slot="end" color="tertiary">Convertir</ion-chip>
+      </ion-item>
+    </ion-toolbar>
+    <ion-progress-bar *ngIf="showsaveprogress" type="indeterminate" mode="ios"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+    <ion-grid class="contentbody">
+      <ion-row>
+          <ion-col size="6">
+            <ion-tab-button>
+              <ion-chip class="font-size-12" color="primary" (click)="moneypicker1()">Conversion Entre</ion-chip>
+              <ion-label>
+                <ion-text *ngIf="actualMoney1.money_name" >{{actualMoney1.abreviation}}</ion-text>
+              </ion-label>
+            </ion-tab-button> 
+          </ion-col>
+          <ion-col size="6">
+            <ion-tab-button>
+              <ion-chip class="font-size-12" color="secondary" (click)="moneypicker2()">Et</ion-chip> 
+              <ion-label>
+                <ion-text *ngIf="actualMoney2.money_name" >{{actualMoney2.abreviation}}</ion-text>
+              </ion-label>
+            </ion-tab-button> 
+          </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-input type="number" label="Entrer le taux de change" class="bd-rounded font-bold-600 font-size-12" labelPlacement="floating" [(ngModel)]="rate"></ion-input>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+</ion-content>
+

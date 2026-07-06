@@ -1,0 +1,36 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="arrow-back" color="primary" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-text slot="start" class="font-size-14" color="primary">Nouveau compte</ion-text>
+      <ion-chip [disabled]="!newaccount.valid" color="secondary" (click)="addnew()" slot="end"><ion-icon name="checkmark-outline" size="large"></ion-icon></ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" type="indeterminate" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <br>
+  <div class="mobileform">
+
+    <form class="contentbody form" [formGroup]="newaccount">
+      <ion-card mode="ios" class="ion-padding-top ion-padding-bottom">
+        <ion-text class="font-size-12 ion-padding-start" color="primary">Cochez un Type</ion-text> 
+        <br> <br>
+        <ion-segment formControlName="type" mode="ios">
+          <ion-segment-button value="gestion" (click)="editType('gestion')">Gestion</ion-segment-button>
+          <ion-segment-button value="caisse" (click)="editType('caisse')">Caisse</ion-segment-button>
+        </ion-segment>
+      </ion-card>
+      <ion-card mode="ios">
+        <ion-item lines="full" class="font-size-12 contentbody">
+          <ion-input placeholder="Nom" type="text" formControlName="name"></ion-input>
+        </ion-item>
+        
+        <ion-item lines="none" class="font-size-12 contentbody">
+          <ion-input placeholder="Déscription" type="text" formControlName="description"></ion-input>
+        </ion-item> 
+
+      </ion-card>
+    </form>
+  </div>
+</ion-content>

@@ -1,0 +1,68 @@
+<ion-header>
+  <ion-toolbar>
+     <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" slot="start" (click)="appserv.closemodal()" size="large" color="warning"></ion-icon>
+      <ion-label>
+        <h2 class="text-lg font-bold mb-6">
+        Modifier le Code PIN
+      </h2>
+      </ion-label>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="bg-slate-50 dark:bg-slate-900">
+  <div class="max-w-md mx-auto p-6">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6">
+      
+
+      <form action="" [formGroup]="form">
+        <!-- Mot de passe -->
+        <ion-item class="mb-3">
+          <ion-label position="stacked">Mot de passe actuel</ion-label>
+          <ion-input type="password" formControlName="current_password" #defaultinput>
+          </ion-input>
+        </ion-item>
+
+        <p
+          *ngIf="f.current_password.touched && f.current_password.invalid"
+          class="text-red-500 text-xs"
+        >
+          Mot de passe requis
+        </p>
+
+        <!-- Nouveau PIN -->
+        <ion-item class="mb-3">
+          <ion-label position="stacked">Nouveau PIN (4 chiffres)</ion-label>
+          <ion-input type="password" maxlength="4" formControlName="new_pin">
+          </ion-input>
+        </ion-item>
+
+        <p
+          *ngIf="f.new_pin.touched && f.new_pin.invalid"
+          class="text-red-500 text-xs"
+        >
+          PIN invalide (4 chiffres requis)
+        </p>
+
+        <!-- Confirmation -->
+        <ion-item class="mb-4">
+          <ion-label position="stacked">Confirmer PIN</ion-label>
+          <ion-input
+            type="password"
+            maxlength="4"
+            formControlName="confirm_pin"
+          >
+          </ion-input>
+        </ion-item>
+
+        <button
+          (click)="submit()"
+          [disabled]="isSubmitting"
+          class="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold transition hover:bg-emerald-700 disabled:opacity-50"
+        >
+          {{ isSubmitting ? "Modification..." : "Modifier PIN" }}
+        </button>
+      </form>
+    </div>
+  </div>
+</ion-content>

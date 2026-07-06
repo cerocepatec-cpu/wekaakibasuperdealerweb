@@ -1,0 +1,807 @@
+<ion-header class="carnet-header ion-no-border">
+  <ion-toolbar>
+    <div class="topbar">
+      <div class="title-section">
+        <h1>Construction des carnets</h1>
+
+        <span> Préparation et génération des fichiers d'impression </span>
+      </div>
+
+      <div class="stats-section">
+        <div class="stat-card found">
+          <small>Trouvés</small>
+          <strong>{{ stats.total }}</strong>
+        </div>
+
+        <div class="stat-card selected">
+          <small>Sélectionnés</small>
+          <strong>{{ stats.selected }}</strong>
+        </div>
+
+        <div class="stat-card excluded">
+          <small>Exclus</small>
+          <strong>{{ stats.excluded }}</strong>
+        </div>
+      </div>
+
+      <div class="action-section">
+        <ion-button
+          color="success"
+          [disabled]="isGeneratingPdf"
+          (click)="generatePdf()"
+        >
+          <ion-spinner *ngIf="isGeneratingPdf" slot="start" name="circular">
+          </ion-spinner>
+
+          <ion-icon *ngIf="!isGeneratingPdf" slot="start" name="print-outline">
+          </ion-icon>
+
+          {{ isGeneratingPdf ? "Génération en cours..." : "Générer PDF" }}
+        </ion-button>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="carnet-content" fullscreen>
+  <div class="page-layout">
+    <!-- COLONNE GAUCHE -->
+
+    <div class="left-panel">
+      <ion-card class="filter-card">
+        <ion-card-header>
+          <ion-card-title> Paramètres </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="section-title">
+            <h2>Carnet à imprimer</h2>
+
+            <span> Choisissez le modèle de carnet </span>
+          </div>
+
+          <!-- LOADING SERVICES -->
+
+          <div *ngIf="loadingServices" class="loading-services">
+            <ion-spinner name="circular"> </ion-spinner>
+
+            <span> Chargement des carnets... </span>
+          </div>
+
+          <!-- SERVICE SELECTIONNE -->
+
+          <div
+            *ngIf="!loadingServices && selectedService"
+            class="selected-service-banner"
+          >
+            <div class="selected-service-info">
+              <h3>
+                {{ selectedService.name }}
+              </h3>
+
+              <span>
+                {{ selectedService.nature }}
+              </span>
+            </div>
+
+            <ion-button
+              fill="clear"
+              color="light"
+              (click)="clearSelectedService()"
+            >
+              <ion-icon name="close-circle"> </ion-icon>
+            </ion-button>
+          </div>
+
+          <!-- LISTE DES SERVICES -->
+
+          <div
+            *ngIf="!loadingServices && !selectedService"
+            class="services-grid"
+          >
+            <div
+              *ngFor="let service of services"
+              class="service-card"
+              (click)="selectService(service)"
+            >
+              <div class="service-header">
+                <div
+                  class="service-badge"
+                  [ngClass]="{
+                    golden: service.nature?.toLowerCase().includes('gold'),
+                    green: service.nature?.toLowerCase().includes('green'),
+                    red: service.nature?.toLowerCase().includes('red')
+                  }"
+                >
+                  {{ service.nature }}
+                </div>
+              </div>
+
+              <div class="service-body">
+                <h3>
+                  {{ service.name }}
+                </h3>
+
+                <p>
+                  {{ service.nbr_operations }}
+                  opérations
+                </p>
+
+                <div class="service-meta">
+                  <div>
+                    <ion-icon name="calendar-outline"> </ion-icon>
+
+                    <span>
+                      {{ service.expiration_period }}
+                    </span>
+                  </div>
+
+                  <div>
+                    <ion-icon name="wallet-outline"> </ion-icon>
+
+                    <span>
+                      {{ service.min_amount | number }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DEPOTS -->
+
+          <ion-item class="custom-item">
+            <ion-label position="stacked"> Dépôts concernés </ion-label>
+
+            <div *ngIf="loadingDeposits" class="loading-box">
+              <ion-spinner name="circular"> </ion-spinner>
+
+              <span> Chargement des dépôts... </span>
+            </div>
+
+            <ion-select
+              *ngIf="!loadingDeposits"
+              interface="popover"
+              multiple="true"
+              [(ngModel)]="selectedDeposits"
+            >
+              <ion-select-option *ngFor="let d of deposits" [value]="d.id">
+                {{ d.name }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- BOUTON CHARGER -->
+
+          <ion-button
+            expand="block"
+            color="primary"
+            size="large"
+            [disabled]="loadingSerials"
+            (click)="loadSerials()"
+          >
+            <ion-spinner *ngIf="loadingSerials" slot="start" name="circular">
+            </ion-spinner>
+
+            <ion-icon
+              *ngIf="!loadingSerials"
+              slot="start"
+              name="search-outline"
+            >
+            </ion-icon>
+
+            {{ loadingSerials ? "Chargement..." : "Charger les carnets" }}
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- NUMEROS DE SERIE -->
+
+      <ion-card class="serial-card">
+        <ion-card-header class="panel-header">
+          <div>
+            <ion-card-title> Carnets chargés </ion-card-title>
+
+            <span>
+              {{ serialPageStart }} - {{ serialPageEnd }} sur
+              {{ filteredSerials.length }}
+            </span>
+          </div>
+
+          <ion-select
+            interface="popover"
+            [(ngModel)]="serialPageSize"
+            (ionChange)="serialPage = 1"
+            class="page-size-select"
+          >
+            <ion-select-option [value]="10">10</ion-select-option>
+            <ion-select-option [value]="20">20</ion-select-option>
+            <ion-select-option [value]="50">50</ion-select-option>
+          </ion-select>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div *ngIf="loadingSerials" class="serial-loader">
+            <ion-spinner name="circular"> </ion-spinner>
+
+            <span> Chargement des numéros de série... </span>
+          </div>
+
+          <ng-container *ngIf="!loadingSerials">
+            <ion-searchbar
+              mode="ios"
+              placeholder="Recherche..."
+              [(ngModel)]="search"
+              (ionInput)="filterSerials()"
+            >
+            </ion-searchbar>
+
+            <div class="selection-controller">
+              <ion-button
+                size="small"
+                fill="outline"
+                (click)="selectVisibleSerials(true)"
+              >
+                <ion-icon slot="start" name="checkmark-done-outline">
+                </ion-icon>
+
+                Page
+              </ion-button>
+
+              <ion-button
+                size="small"
+                fill="outline"
+                color="medium"
+                (click)="selectVisibleSerials(false)"
+              >
+                <ion-icon slot="start" name="remove-circle-outline">
+                </ion-icon>
+
+                Retirer
+              </ion-button>
+
+              <ion-button
+                size="small"
+                fill="clear"
+                (click)="selectAllSerials(true)"
+              >
+                Tout
+              </ion-button>
+
+              <ion-button
+                size="small"
+                fill="clear"
+                color="medium"
+                (click)="selectAllSerials(false)"
+              >
+                Aucun
+              </ion-button>
+            </div>
+
+            <div class="serial-list">
+              <ion-item
+                *ngFor="let item of paginatedSerials"
+                class="serial-item"
+              >
+                <ion-checkbox
+                  slot="start"
+                  [(ngModel)]="item.selected"
+                  (ionChange)="calculateStats(); queuePreviewRefresh()"
+                >
+                </ion-checkbox>
+
+                <ion-label>
+                  <h3>
+                    {{ item.serial_number }}
+                  </h3>
+
+                  <p>
+                    {{ item.unique_key }}
+                  </p>
+                </ion-label>
+              </ion-item>
+            </div>
+
+            <div class="pager-bar">
+              <ion-button
+                size="small"
+                fill="clear"
+                [disabled]="serialPage <= 1"
+                (click)="previousSerialPage()"
+              >
+                <ion-icon name="chevron-back-outline"> </ion-icon>
+              </ion-button>
+
+              <span>Page {{ serialPage }} / {{ serialTotalPages }}</span>
+
+              <ion-button
+                size="small"
+                fill="clear"
+                [disabled]="serialPage >= serialTotalPages"
+                (click)="nextSerialPage()"
+              >
+                <ion-icon name="chevron-forward-outline"> </ion-icon>
+              </ion-button>
+            </div>
+          </ng-container>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- COLONNE DROITE -->
+
+    <!-- COLONNE CENTRALE -->
+
+    <div class="right-panel">
+      <ion-card class="preview-card">
+        <ion-card-header class="preview-header">
+          <div>
+            <ion-card-title> Aperçu PDF </ion-card-title>
+
+            <span *ngIf="selectedCover">
+              {{ selectedCover.serial_number }}
+            </span>
+
+            <span *ngIf="!selectedCover && selectedCoverGroupPage">
+              {{ selectedCoverGroupLabel }}
+            </span>
+          </div>
+
+          <div class="preview-controls">
+            <ion-button
+              size="small"
+              fill="clear"
+              [disabled]="selectedCoverIndex <= 0"
+              (click)="openPreviousCover()"
+            >
+              <ion-icon name="chevron-back-outline"> </ion-icon>
+            </ion-button>
+
+            <span>
+              {{ selectedCoverIndex + 1 > 0 ? selectedCoverIndex + 1 : 0 }}
+              / {{ filteredCovers.length }}
+            </span>
+
+            <ion-button
+              size="small"
+              fill="clear"
+              [disabled]="
+                selectedCoverIndex < 0 ||
+                selectedCoverIndex >= filteredCovers.length - 1
+              "
+              (click)="openNextCover()"
+            >
+              <ion-icon name="chevron-forward-outline"> </ion-icon>
+            </ion-button>
+          </div>
+
+          <div class="acrobat-toolbar">
+            <ion-button
+              size="small"
+              fill="clear"
+              [disabled]="previewZoom <= 50"
+              (click)="zoomPreviewOut()"
+            >
+              <ion-icon name="remove-outline"> </ion-icon>
+            </ion-button>
+
+            <span>{{ previewZoom }}%</span>
+
+            <ion-button
+              size="small"
+              fill="clear"
+              [disabled]="previewZoom >= 200"
+              (click)="zoomPreviewIn()"
+            >
+              <ion-icon name="add-outline"> </ion-icon>
+            </ion-button>
+
+            <ion-button
+              size="small"
+              fill="clear"
+              [class.active-tool]="previewFitMode === 'width'"
+              (click)="fitPreviewToWidth()"
+            >
+              <ion-icon name="resize-outline"> </ion-icon>
+            </ion-button>
+
+            <ion-button
+              size="small"
+              fill="clear"
+              [class.active-tool]="previewFitMode === 'page'"
+              (click)="fitPreviewToPage()"
+            >
+              <ion-icon name="document-outline"> </ion-icon>
+            </ion-button>
+
+            <ion-button size="small" fill="clear" (click)="rotatePreview()">
+              <ion-icon name="reload-outline"> </ion-icon>
+            </ion-button>
+
+            <ion-button size="small" fill="clear" (click)="resetPreviewView()">
+              <ion-icon name="contract-outline"> </ion-icon>
+            </ion-button>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="preview-wrapper">
+            <div *ngIf="previewLoading" class="preview-loader">
+              <ion-spinner name="circular"> </ion-spinner>
+
+              <span> Génération de l'aperçu... </span>
+            </div>
+
+            <iframe
+              *ngIf="!previewLoading"
+              [srcdoc]="previewHtml"
+              class="preview-frame"
+              [style.transform]="previewTransform"
+            >
+            </iframe>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- COLONNE EXPLORATEUR -->
+
+    <div class="explorer-panel">
+      <ion-card class="preview-tree-card">
+        <ion-card-header>
+          <ion-card-title> Explorateur </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <!-- FILTRE -->
+
+          <ion-item>
+            <ion-label> Type </ion-label>
+
+            <ion-select [(ngModel)]="pageFilter">
+              <ion-select-option value="all"> Toutes </ion-select-option>
+
+              <ion-select-option value="covers">
+                Couvertures
+              </ion-select-option>
+
+              <ion-select-option value="internal">
+                Pages internes
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- COUVERTURES -->
+
+          <div
+            *ngIf="pageFilter === 'all' || pageFilter === 'covers'"
+            class="tree-section"
+          >
+            <div class="tree-section-title">
+              <ion-icon name="book-outline"> </ion-icon>
+
+              Couvertures
+
+              <span class="cover-counter">
+                {{ filteredCovers.length }}
+              </span>
+            </div>
+
+            <ion-searchbar
+              class="cover-search"
+              mode="ios"
+              placeholder="Rechercher..."
+              [(ngModel)]="coverSearch"
+              (ionInput)="filterCoverList()"
+            >
+            </ion-searchbar>
+
+            <div *ngIf="coverGroups.length" class="cover-download-panel">
+              <ion-button
+                size="small"
+                fill="outline"
+                (click)="openCurrentCoverGroup()"
+              >
+                <ion-icon slot="start" name="albums-outline"> </ion-icon>
+
+                Page complète
+              </ion-button>
+
+              <ion-button
+                size="small"
+                color="success"
+                [disabled]="downloadingCoverPage"
+                (click)="downloadCoverPage()"
+              >
+                <ion-spinner
+                  *ngIf="downloadingCoverPage"
+                  slot="start"
+                  name="circular"
+                >
+                </ion-spinner>
+
+                <ion-icon
+                  *ngIf="!downloadingCoverPage"
+                  slot="start"
+                  name="download-outline"
+                >
+                </ion-icon>
+
+                Page
+              </ion-button>
+
+              <div class="cover-range-controls">
+                <ion-input
+                  type="number"
+                  min="1"
+                  [(ngModel)]="coverFromPage"
+                >
+                </ion-input>
+
+                <span>à</span>
+
+                <ion-input
+                  type="number"
+                  min="1"
+                  [(ngModel)]="coverToPage"
+                >
+                </ion-input>
+
+                <ion-button
+                  size="small"
+                  color="success"
+                  [disabled]="downloadingCoverRange"
+                  (click)="downloadCoverRange()"
+                >
+                  <ion-spinner
+                    *ngIf="downloadingCoverRange"
+                    slot="start"
+                    name="circular"
+                  >
+                  </ion-spinner>
+
+                  <ion-icon
+                    *ngIf="!downloadingCoverRange"
+                    slot="start"
+                    name="download-outline"
+                  >
+                  </ion-icon>
+
+                  Intervalle
+                </ion-button>
+              </div>
+
+              <ion-button
+                size="small"
+                fill="clear"
+                color="success"
+                [disabled]="downloadingAllCovers"
+                (click)="downloadAllCovers()"
+              >
+                <ion-spinner
+                  *ngIf="downloadingAllCovers"
+                  slot="start"
+                  name="circular"
+                >
+                </ion-spinner>
+
+                <ion-icon
+                  *ngIf="!downloadingAllCovers"
+                  slot="start"
+                  name="cloud-download-outline"
+                >
+                </ion-icon>
+
+                Toutes
+              </ion-button>
+            </div>
+
+            <div *ngIf="!coverGroups.length" class="tree-empty">
+              Aucun carnet
+            </div>
+
+            <div *ngIf="currentCoverGroup" class="cover-page-group">
+              <div
+                class="cover-page-title"
+                [class.selected-cover-page]="isCoverGroupSelected(currentCoverGroup)"
+                role="button"
+                tabindex="0"
+                (click)="openCurrentCoverGroup()"
+                (keyup.enter)="openCurrentCoverGroup()"
+              >
+                <span>{{ currentCoverGroup.label }}</span>
+
+                <small>{{ currentCoverGroup.covers.length }}</small>
+              </div>
+
+              <div
+                *ngFor="let cover of currentCoverGroup.covers"
+                class="tree-node"
+                [class.active]="
+                  selectedCover?.serial_number === cover.serial_number
+                "
+                (click)="openCover(cover)"
+              >
+                <ion-icon name="document-text-outline"> </ion-icon>
+
+                <span>
+                  {{ cover.serial_number }}
+                </span>
+              </div>
+            </div>
+
+            <div *ngIf="coverGroups.length" class="pager-bar cover-pager">
+              <ion-button
+                size="small"
+                fill="clear"
+                [disabled]="coverGroupPageIndex <= 0"
+                (click)="previousCoverGroup()"
+              >
+                <ion-icon name="chevron-back-outline"> </ion-icon>
+              </ion-button>
+
+              <span>{{ coverGroupPageLabel }}</span>
+
+              <ion-button
+                size="small"
+                fill="clear"
+                [disabled]="coverGroupPageIndex >= coverGroups.length - 1"
+                (click)="nextCoverGroup()"
+              >
+                <ion-icon name="chevron-forward-outline"> </ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <!-- PAGES INTERNES -->
+
+          <div
+            *ngIf="pageFilter === 'all' || pageFilter === 'internal'"
+            class="tree-section"
+          >
+            <div class="tree-section-title">
+              <ion-icon name="layers-outline"> </ion-icon>
+
+              Pages internes
+            </div>
+
+            <!-- PAGE 22-7 -->
+
+            <div class="internal-page-item">
+              <div class="internal-page-info">
+                <ion-icon name="document-outline"> </ion-icon>
+
+                <span> Opérations 22-7 </span>
+              </div>
+
+              <div class="internal-page-actions">
+                <ion-button
+                  size="small"
+                  fill="outline"
+                  (click)="openInternalPage('page_22_7')"
+                >
+                  <ion-icon slot="start" name="eye-outline"> </ion-icon>
+
+                  Aperçu
+                </ion-button>
+
+                <ion-button
+                  size="small"
+                  color="success"
+                  [disabled]="isPageDownloading('page_22_7')"
+                  (click)="downloadSinglePage('page_22_7')"
+                >
+                  <ion-spinner
+                    *ngIf="isPageDownloading('page_22_7')"
+                    slot="start"
+                    name="circular"
+                  >
+                  </ion-spinner>
+
+                  <ion-icon
+                    *ngIf="!isPageDownloading('page_22_7')"
+                    slot="start"
+                    name="download-outline"
+                  >
+                  </ion-icon>
+
+                  PDF
+                </ion-button>
+              </div>
+            </div>
+
+            <!-- PAGE 8-21 -->
+
+            <div class="internal-page-item">
+              <div class="internal-page-info">
+                <ion-icon name="document-outline"> </ion-icon>
+
+                <span> Opérations 8-21 </span>
+              </div>
+
+              <div class="internal-page-actions">
+                <ion-button
+                  size="small"
+                  fill="outline"
+                  (click)="openInternalPage('page_8_21')"
+                >
+                  <ion-icon slot="start" name="eye-outline"> </ion-icon>
+
+                  Aperçu
+                </ion-button>
+
+                <ion-button
+                  size="small"
+                  color="success"
+                  [disabled]="isPageDownloading('page_8_21')"
+                  (click)="downloadSinglePage('page_8_21')"
+                >
+                  <ion-spinner
+                    *ngIf="isPageDownloading('page_8_21')"
+                    slot="start"
+                    name="circular"
+                  >
+                  </ion-spinner>
+
+                  <ion-icon
+                    *ngIf="!isPageDownloading('page_8_21')"
+                    slot="start"
+                    name="download-outline"
+                  >
+                  </ion-icon>
+
+                  PDF
+                </ion-button>
+              </div>
+            </div>
+
+            <!-- IDENTIFICATION -->
+
+            <div class="internal-page-item">
+              <div class="internal-page-info">
+                <ion-icon name="person-outline"> </ion-icon>
+
+                <span> Identification </span>
+              </div>
+
+              <div class="internal-page-actions">
+                <ion-button
+                  size="small"
+                  fill="outline"
+                  (click)="openInternalPage('identification')"
+                >
+                  <ion-icon slot="start" name="eye-outline"> </ion-icon>
+
+                  Aperçu
+                </ion-button>
+
+                <ion-button
+                  size="small"
+                  color="success"
+                  [disabled]="isPageDownloading('identification')"
+                  (click)="downloadSinglePage('identification')"
+                >
+                  <ion-spinner
+                    *ngIf="isPageDownloading('identification')"
+                    slot="start"
+                    name="circular"
+                  >
+                  </ion-spinner>
+
+                  <ion-icon
+                    *ngIf="!isPageDownloading('identification')"
+                    slot="start"
+                    name="download-outline"
+                  >
+                  </ion-icon>
+
+                  PDF
+                </ion-button>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

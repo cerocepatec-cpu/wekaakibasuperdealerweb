@@ -1,0 +1,16 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+      <ion-item lines="none">
+        <ion-icon name="chevron-back" color="primary" (click)="appserv.closemodal()"></ion-icon>
+        <ion-text>Centre de notifications</ion-text>
+      </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <ion-searchbar placeholder="Recherche" mode="ios"></ion-searchbar>
+  <ion-card mode="ios" color="warning" class="border-radius-10 ion-padding">
+    <ion-text color="dark" class="font-size-12">
+      Aucune notification....
+    </ion-text>
+  </ion-card>
+</ion-content>

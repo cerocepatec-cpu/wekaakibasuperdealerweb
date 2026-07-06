@@ -1,0 +1,314 @@
+<ion-content class="secure-container">
+  <div id="particle-bg"></div>
+
+  <div class="secure-overlay">
+    <div class="secure-shell">
+
+      <div class="secure-card">
+        <!-- Header premium -->
+        <div class="secure-header">
+          <div class="secure-badge">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+          </div>
+
+          <div class="secure-head-text">
+            <h2 class="title">Complétez votre profil</h2>
+            <p class="subtitle">
+              Pour sécuriser et finaliser votre accès, veuillez compléter les informations manquantes une par une.
+            </p>
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-wrap">
+          <div class="progress-top">
+            <span class="progress-label">Progression</span>
+            <span class="progress-count">{{ completedRequiredCount() }}/{{ requiredFields.length }}</span>
+          </div>
+
+          <div class="progress-bar">
+            <div class="progress-bar-fill" [style.width.%]="completionPercent()"></div>
+          </div>
+
+          <div class="progress-steps">
+            <div class="step-pill" [class.done]="!!actualuser.email" [class.active]="selectedTab === 'email'">
+              <ion-icon [name]="actualuser.email ? 'checkmark-circle' : 'mail-outline'"></ion-icon>
+              <span>Email</span>
+            </div>
+
+            <div class="step-pill" [class.done]="!!actualuser.name" [class.active]="selectedTab === 'fullname'">
+              <ion-icon [name]="actualuser.name ? 'checkmark-circle' : 'person-outline'"></ion-icon>
+              <span>Nom</span>
+            </div>
+
+            <div class="step-pill" [class.done]="!!actualuser.user_phone" [class.active]="selectedTab === 'phone'">
+              <ion-icon [name]="actualuser.user_phone ? 'checkmark-circle' : 'call-outline'"></ion-icon>
+              <span>Téléphone</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current step card -->
+        <div class="field-card">
+          <div class="field-card-top">
+            <div class="field-icon">
+              <ion-icon
+                [name]="
+                  selectedTab === 'email'
+                    ? 'mail-open-outline'
+                    : selectedTab === 'fullname'
+                    ? 'person-circle-outline'
+                    : selectedTab === 'phone'
+                    ? 'call-outline'
+                    : selectedTab === 'pin'
+                    ? 'key-outline'
+                    : 'lock-closed-outline'
+                ">
+              </ion-icon>
+            </div>
+
+            <div class="field-copy">
+              <div class="field-eyebrow">Étape actuelle</div>
+              <h3 class="field-title">
+                {{
+                  selectedTab === 'email'
+                    ? 'Ajoutez votre adresse e-mail'
+                    : selectedTab === 'fullname'
+                    ? 'Ajoutez votre nom complet'
+                    : selectedTab === 'phone'
+                    ? 'Ajoutez votre numéro de téléphone'
+                    : selectedTab === 'pin'
+                    ? 'Mettez à jour votre code PIN'
+                    : 'Mettez à jour votre mot de passe'
+                }}
+              </h3>
+
+              <p class="field-subtitle">
+                {{
+                  selectedTab === 'email'
+                    ? 'Utilisez une adresse valide pour recevoir les informations importantes.'
+                    : selectedTab === 'fullname'
+                    ? 'Entrez votre nom complet tel que vous souhaitez qu’il apparaisse dans votre compte.'
+                    : selectedTab === 'phone'
+                    ? 'Ajoutez un numéro joignable pour renforcer la sécurité et les notifications.'
+                    : selectedTab === 'pin'
+                    ? 'Définissez un code PIN sécurisé à 4 chiffres.'
+                    : 'Utilisez un mot de passe fort et unique.'
+                }}
+              </p>
+            </div>
+          </div>
+
+          <div class="tab-content">
+            <!-- EMAIL -->
+            <ng-container *ngIf="selectedTab === 'email'">
+              <ion-item lines="none" class="input-item">
+                <ion-icon name="mail-outline" slot="start"></ion-icon>
+                <ion-input
+                  type="email"
+                  placeholder="ex: user@email.com"
+                  [(ngModel)]="form.email"
+                  #emailInput>
+                </ion-input>
+              </ion-item>
+
+              <div class="action-row">
+                <ion-button expand="block" class="btn-validate" (click)="updateEmail()">
+                  <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                  Enregistrer et continuer
+                </ion-button>
+              </div>
+            </ng-container>
+
+            <!-- FULLNAME -->
+            <ng-container *ngIf="selectedTab === 'fullname'">
+              <ion-item lines="none" class="input-item">
+                <ion-icon name="person-outline" slot="start"></ion-icon>
+                <ion-input
+                  type="text"
+                  placeholder="ex: LUSANGE KIBASOMBA Florentine"
+                  [(ngModel)]="form.name"
+                  #fullnameInput>
+                </ion-input>
+              </ion-item>
+
+              <div class="action-row">
+                <ion-button expand="block" class="btn-validate" (click)="updateFullname()">
+                  <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                  Enregistrer et continuer
+                </ion-button>
+              </div>
+            </ng-container>
+
+            <!-- PHONE -->
+            <ng-container *ngIf="selectedTab === 'phone'">
+              <ion-item lines="none" class="input-item">
+                <ion-icon name="call-outline" slot="start"></ion-icon>
+                <ion-input
+                  type="tel"
+                  placeholder="+243 85 123 4567"
+                  [(ngModel)]="form.phone"
+                  #phoneInput>
+                </ion-input>
+              </ion-item>
+
+              <div class="action-row">
+                <ion-button expand="block" class="btn-validate" (click)="updatePhone()">
+                  <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                  Enregistrer et continuer
+                </ion-button>
+              </div>
+            </ng-container>
+
+            <!-- PIN -->
+            <ng-container *ngIf="selectedTab === 'pin'">
+              <div class="helper-chip-row">
+                <ion-chip (click)="resetpin()" color="medium" class="helper-chip">
+                  <ion-note>PIN oublié</ion-note>
+                </ion-chip>
+              </div>
+
+              <ion-item lines="none" class="input-item" *ngIf="pinforgot">
+                <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+                <ion-input
+                  type="password"
+                  placeholder="Votre mot de passe"
+                  [(ngModel)]="form.Pinpassword"
+                  #PinpasswordInput>
+                </ion-input>
+              </ion-item>
+
+              <ion-item lines="none" class="input-item" *ngIf="!pinforgot">
+                <ion-icon name="shield-outline" slot="start"></ion-icon>
+                <ion-input
+                  type="password"
+                  placeholder="Ancien PIN"
+                  [(ngModel)]="form.oldPin"
+                  maxlength="4"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  #oldPinInput>
+                </ion-input>
+              </ion-item>
+
+              <ion-item lines="none" class="input-item">
+                <ion-icon name="key-outline" slot="start"></ion-icon>
+                <ion-input
+                  type="password"
+                  placeholder="Nouveau PIN"
+                  [(ngModel)]="form.newPin"
+                  maxlength="4"
+                  inputmode="numeric"
+                  pattern="[0-9]*">
+                </ion-input>
+              </ion-item>
+
+              <ion-item lines="none" class="input-item">
+                <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+                <ion-input
+                  type="password"
+                  placeholder="Confirmer le PIN"
+                  [(ngModel)]="form.confirmPin"
+                  maxlength="4"
+                  inputmode="numeric"
+                  pattern="[0-9]*">
+                </ion-input>
+              </ion-item>
+
+              <div class="action-row">
+                <ion-button expand="block" class="btn-validate" (click)="updatePin()">
+                  <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                  Mettre à jour le PIN
+                </ion-button>
+              </div>
+            </ng-container>
+
+            <!-- PASSWORD -->
+            <ng-container *ngIf="selectedTab === 'password'">
+              <ion-item lines="none" class="input-item">
+                <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+                <ion-input
+                  type="password"
+                  placeholder="Ancien mot de passe"
+                  [(ngModel)]="form.oldPassword"
+                  #oldPasswordInput>
+                </ion-input>
+              </ion-item>
+
+              <ion-item lines="none" class="input-item">
+                <ion-icon name="lock-open-outline" slot="start"></ion-icon>
+                <ion-input
+                  type="password"
+                  placeholder="Nouveau mot de passe"
+                  [(ngModel)]="form.newPassword">
+                </ion-input>
+              </ion-item>
+
+              <ion-item lines="none" class="input-item">
+                <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+                <ion-input
+                  type="password"
+                  placeholder="Confirmer le mot de passe"
+                  [(ngModel)]="form.confirmPassword">
+                </ion-input>
+              </ion-item>
+
+              <div class="action-row">
+                <ion-button expand="block" class="btn-validate" (click)="updatePassword()">
+                  <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                  Mettre à jour le mot de passe
+                </ion-button>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Secondary actions -->
+        <div class="secondary-card">
+          <div class="secondary-title-row">
+            <ion-icon name="settings-outline"></ion-icon>
+            <span>Options supplémentaires</span>
+          </div>
+
+          <div class="secondary-buttons">
+            <ion-button
+              fill="clear"
+              size="small"
+              class="secondary-btn"
+              (click)="tabChange('pin')">
+              <ion-icon slot="start" name="key-outline"></ion-icon>
+              PIN
+            </ion-button>
+
+            <ion-button
+              fill="clear"
+              size="small"
+              class="secondary-btn"
+              (click)="tabChange('password')">
+              <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+              Mot de passe
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-actions">
+          <div
+            class="secure-footer danger cursor-pointer"
+            (click)="appserv.closemodal(); authserv.logout()">
+            <ion-icon name="log-out-outline"></ion-icon>
+            <span>Me déconnecter</span>
+          </div>
+
+          <div
+            class="secure-footer muted cursor-pointer"
+            *ngIf="isProfileComplete()"
+            (click)="appserv.closemodal()">
+            <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+            <span>Terminer</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,43 @@
+<ion-content class="ion-padding">
+  <div #printer_content class="content ion-padding bd-square">
+    <div class="header" id="header" hidden>
+      <ion-text class="font-size-20 font-bold-600" *ngIf="posprintoptions.name && appserv.getactualEse().name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br *ngIf="posprintoptions.name && appserv.getactualEse().name">
+      <ion-text *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">{{appserv.getactualEse().adresse}}</ion-text> <br *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">
+      <ion-text *ngIf="posprintoptions.description && appserv.getactualEse().description ">{{appserv.getactualEse().description}}</ion-text> <br *ngIf="posprintoptions.description">
+      <ion-text *ngIf="posprintoptions.num_impot && appserv.getactualEse().num_impot ">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br *ngIf="posprintoptions.description && appserv.getactualEse().description ">
+      <ion-text *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">
+      <ion-text *ngIf="posprintoptions.rccm && appserv.getactualEse().rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br *ngIf="posprintoptions.rccm">
+      <ion-text *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">
+    </div>
+    <div class="suheader ion-no-padding" id="subheader" hidden>
+      <ion-text>Imprimé le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+      <ion-text>Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+    </div>
+    <div id="stock_bloc">
+      <h6 class="font-size-20 font-bold-500">Inventaire en la date du {{datefiltered | date}}</h6>
+           
+      <div class="sells-body" *ngFor="let depot of listarticles">
+        <h6 class="bg-medium-clean font-bold-500 font-size-16">{{depot.deposit.name | uppercase}}</h6>
+        <table border="1" style="width:100% ;font-size: 12px;">
+          <caption class="font-bold-500 font-size-13 text-left">Produits</caption>
+          <thead>
+            <tr>
+              <th class="text-left font-size-16">N°</th>
+              <th class="text-left font-size-16">Produit</th>
+              <th class="text-left font-size-16">Description</th>
+              <th class="text-right font-size-16">Quantité</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let article of depot.services; let c=index;">
+              <td class="text-left">{{c+1}}</td>
+              <td class="text-left">{{article.service.name | titlecase}}</td>
+              <td class="text-right">{{article.service.description | titlecase}}</td>
+              <td class="text-right">{{(article.service.available_qte!==null?article.service.available_qte:'0')| number}} {{article.service.uom_symbol}}</td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+    </div>
+  </div>
+</ion-content>

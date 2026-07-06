@@ -1,0 +1,139 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" class="default-list-item">
+      <ion-icon name="chevron-back-outline" color="warning" (click)="closemodal()" size="large"></ion-icon>
+      <ion-avatar>
+        <ion-img [src]="customersent.photo?appserv.imgUrl+customersent.photo:''" *ngIf="customersent.photo"></ion-img>
+        <ion-icon [name]="customersent.type==='physique'?'person':customersent.type==='moral'?'people':'person'" size="large" *ngIf="!customersent.photo"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title">{{customersent.customerName | titlecase}}</p>
+        <p class="secondpara">
+          <ion-note class="font-size-11">Catég. {{customersent.category_name | titlecase}}</ion-note>
+        </p>
+      </ion-label>
+     <ion-icon name="document-outline" size="small" color="warning" slot="end" *ngIf="appserv.permissionFilter('clients', 'edit')" (click)="gotoedit()"></ion-icon>
+     <ion-icon name="trash-outline" size="small" color="warning" slot="end" *ngIf="appserv.permissionFilter('clients', 'delete')" (click)="deletecustomer(customersent)"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+    <ion-item class="font-size-12 default-list-item2" mode="ios" lines="inset" detail="true" (click)="customerserv.invoicesview(customersent)">
+      <ion-avatar slot="start" class="square-avatar-primary"><ion-icon name="cart"></ion-icon></ion-avatar> 
+      <ion-label>
+        <h2 class="font-size-12 item-label-title"><ion-text>Factures</ion-text></h2>
+      </ion-label> 
+     </ion-item> 
+
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="inset" detail="true" (click)="customerserv.comptecourant(customersent)" *ngIf="appserv.permissionFilter('customers','view_debts')">
+      <ion-avatar slot="start" class="square-avatar-warning">
+        <ion-icon name="bar-chart-outline"></ion-icon>
+      </ion-avatar> 
+      <ion-label>
+        <h2 class="font-size-12 item-label-title"><ion-text>Compte courant</ion-text></h2>
+      </ion-label> 
+     </ion-item> 
+
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="inset" detail="true" (click)="customerserv.cautionslist(customersent)">
+      <ion-avatar slot="start" class="square-avatar-primary">
+        <ion-icon name="card-outline"></ion-icon>
+      </ion-avatar> 
+      <ion-label>
+        <h2 class="font-size-12 item-label-title"><ion-text>Cautions</ion-text></h2>
+      </ion-label> 
+     </ion-item> 
+  </ion-card>
+ 
+  <ion-item lines="none" class="contentbody margin-btm-25 font-bold-500 smallavatar" *ngIf="appserv.permissionFilter('customers','view_debts')">
+    <ion-text slot="start" class="font-size-14">Total dettes ({{totaldebts | currency}})</ion-text>
+    <ion-avatar slot="end"  (click)="customerserv.comptecourant(customersent)"><ion-icon name="search-outline" size="small"></ion-icon></ion-avatar>
+    <ion-avatar slot="end" (click)="refreshlist()"><ion-icon name="refresh-outline" size="small"></ion-icon></ion-avatar>
+  </ion-item>
+  <br>
+  <ion-card class="bd-radius-10" mode="ios" *ngIf="appserv.permissionFilter('customers','view_debts')">
+    <ion-item class="bd-radius-10" color="warning" *ngIf="listdebts.length<=0" >
+     <ion-text class="font-size-13">Aucune opération déjà faite</ion-text>
+    </ion-item>
+    <ion-item class="default-list-item contentbody"  lines="inset" *ngFor="let debt of listdebts" detail="true" (click)="menudebt(debt)">
+      <ion-label>
+        <p class="item-label-title"><ion-text>{{debt.debt.invoiceUuid?debt.debt.invoiceUuid:''}}</ion-text></p>
+        <p class="secondpara font-bold-500"><ion-text class="font-bold-500">Total : {{debt.debt.amount | number}} {{debt.debt.abreviation}}</ion-text></p>
+        <p class="secondpara"><ion-text>Date : {{debt.debt.created_at | date}}</ion-text></p>
+      </ion-label>
+      <ion-text slot="end">Solde :{{debt.debt.sold | number}} {{debt.debt.abreviation}}</ion-text>
+      <ion-icon name="checkmark-outline" color="success" slot="end" *ngIf="debt.debt.status==='1'"></ion-icon>
+      <ion-icon name="ellipsis-horizontal-outline" color="warning" slot="end" *ngIf="debt.debt.status==='0'"></ion-icon>
+    </ion-item>
+    <ion-item mode="ios" lines="none" *ngIf="listdebts.length>10" (click)="customerserv.comptecourant(customersent)">
+      <ion-note slot="start" class="font-size-12">
+        Tout voir
+      </ion-note>
+      <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+    </ion-item>
+  </ion-card>
+<div class="invoice" #payment_content hidden>
+  <!-- <ngx-extended-pdf-viewer [src]="pdfurl"></ngx-extended-pdf-viewer> -->
+  <div class="header">
+    <ion-text *ngIf="posprintoptions.name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br>
+    <ion-text *ngIf="posprintoptions.adresse">{{appserv.getactualEse().adresse}}</ion-text> <br>
+    <ion-text *ngIf="posprintoptions.description">{{appserv.getactualEse().description}}</ion-text>
+    <ion-text *ngIf="posprintoptions.num_impot">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br>
+    <ion-text *ngIf="posprintoptions.national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br>
+    <ion-text *ngIf="posprintoptions.rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+    <ion-text *ngIf="posprintoptions.phone">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br>
+  </div>
+  <div class="suheader ion-no-padding">
+    <br>
+    <ion-text class="font-bold-600 font-size-20">Réçu: {{actualPayment.uuid}}</ion-text> <br>
+    <ion-text class="font-bold-600 font-size-10">Ref. Facture: {{debtSent.invoiceUuid?debtSent.invoiceUuid:''}}</ion-text> <br>
+    <ion-text>Imprimée le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+    <ion-text>Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+  </div>
+  <div class="body">
+    <br>
+    <table>
+      <thead>
+        <tr class="border-bottom-dashed">
+          <th class="text-left">Montant payé</th>
+          <th class="text-right">Solde</th>
+        </tr>
+      </thead>
+      <tbody class="body">
+        <tr>
+          <td class="text-wrapped">{{actualPayment.amount_payed | number}} {{debtSent.abreviation}}</td>
+          <td class="text-right">{{(debtSent.sold?debtSent.sold:0) |number}} {{debtSent.abreviation}}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2"></td>
+        </tr>
+        <tr>
+          <td colspan="2">Statut: {{debtSent.sold===0?'Dette soldée':'En cours'}}</td>
+        </tr>
+      
+        <tr>
+          <td colspan="2">Client: {{(debtSent.customerName?debtSent.customerName:'') | uppercase}}</td>
+        </tr>  
+        <tr>
+          <td colspan="2" class="text-right font-size-10 font-bold-600 text-italic">{{appserv.version}}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+<ng-template #payment_content>
+   
+</ng-template>
+</ion-content>
+<ion-footer class="ion-no-border">
+  <ion-item mode="ios" class="contentbody footeritem" lines="none">
+    <ion-label>
+      <h4 class="font-size-11"><ion-note>Crée le {{customersent.created_at | date}} par {{customersent.created_by_id}}</ion-note></h4>
+      <h4 class="font-size-11"><ion-note>Dernière modification {{customersent.updated_at | date}} </ion-note></h4>
+    </ion-label>
+</ion-item>
+</ion-footer>
+

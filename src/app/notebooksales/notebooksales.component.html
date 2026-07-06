@@ -1,0 +1,342 @@
+<ion-header class="cart-header ion-no-border">
+  <ion-toolbar>
+ <div class="header-inner">
+  <div class="header-title-box">
+    <ion-button fill="clear" class="back-btn" (click)="appserv.smartBack()">
+      <ion-icon name="chevron-back-outline" size="large"></ion-icon>
+    </ion-button>
+
+    <div class="header-title-content">
+      <h1 class="page-title">Vente Carnet</h1>
+      <p class="page-subtitle">
+        Sélection rapide des produits
+      </p>
+    </div>
+  </div>
+
+  <div class="header-badge">
+    <ion-icon name="cart-outline"></ion-icon>
+    <span>Cart ({{ listselectedarticles.length }})</span>
+  </div>
+</div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="board-page">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données..."
+    >
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <div class="board-wrapper">
+
+    <!-- MOBILE SEARCH TRIGGER -->
+    <div class="mobile-search-trigger d-mobile-only">
+      <div class="input-card mobile-search-card" (click)="openMobileCatalog()">
+        <label>Recherche article</label>
+        <ion-input
+          type="text"
+          [value]="search"
+          placeholder="Rechercher un article"
+          fill="outline"
+          class="custom-input"
+          readonly="true"
+        >
+        </ion-input>
+      </div>
+    </div>
+
+    <div
+      class="board-container"
+      [class.mobile-catalog-open]="mobileCatalogOpen"
+    >
+      <div class="top-section">
+
+        <!-- ARTICLES -->
+        <div class="articles-zone">
+          <div class="section-head desktop-only-head">
+            <div>
+              <h2>Articles</h2>
+              <p>Choisissez un article à ajouter au panier</p>
+            </div>
+
+            <ion-chip outline="true" color="primary">
+              <ion-label>{{ listarticles.length }} Articles</ion-label>
+            </ion-chip>
+          </div>
+
+          <!-- MOBILE CATALOG HEADER -->
+          <div class="mobile-catalog-header">
+            <div class="mobile-catalog-top">
+              <ion-button
+                fill="clear"
+                class="mobile-back-btn"
+                (click)="closeMobileCatalog()"
+              >
+                <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
+                Retour
+              </ion-button>
+            </div>
+
+            <div class="input-card mobile-inline-search">
+              <label>Recherche article</label>
+              <ion-input
+                #inputSearch
+                type="text"
+                [(ngModel)]="search"
+                placeholder="Rechercher un article"
+                fill="outline"
+                class="custom-input"
+                (ionInput)="filterItems($event)"
+              >
+              </ion-input>
+            </div>
+
+            <div class="input-card mobile-qty-card">
+              <label>Qté</label>
+              <ion-input
+                type="number"
+                min="0"
+                [(ngModel)]="NbrServiceSerrialNumber"
+                fill="outline"
+                class="custom-input qty-readonly"
+                placeholder="Entrer la quantité"
+                (ionInput)="IncreaseDecreaseSelection()"
+              >
+              </ion-input>
+            </div>
+          </div>
+
+          <div class="articles-grid">
+            <div
+              class="article-card"
+              [class.active]="
+                actualarticle?.service?.id === article?.service?.id ||
+                isArticleSelected(article)
+              "
+              [class.out-of-stock]="(article?.service?.available_qte || 0) <= 0"
+              *ngFor="let article of listarticles"
+              (click)="selectNotebookArticle(article)"
+            >
+              <div class="article-badge">
+                {{ article?.service?.id || "A" }}
+              </div>
+
+              <div class="article-content">
+                <div class="article-title">
+                  {{ article?.service?.name || article?.name }}
+                </div>
+
+                <div class="article-desc">
+                  {{ article?.service?.description || article?.description }}
+                </div>
+              </div>
+
+              <div class="article-footer">
+                <div class="article-meta-bottom">
+                  <span class="price">
+                    {{ getArticleDisplayPrice(article) | number }}
+                    {{ getArticleDisplayMoney(article) }}
+                  </span>
+
+                  <span
+                    class="stock-chip"
+                    [class.low-stock]="
+                      (article?.service?.available_qte || 0) <= 5 &&
+                      (article?.service?.available_qte || 0) > 0
+                    "
+                    [class.out]="(article?.service?.available_qte || 0) <= 0"
+                  >
+                    {{
+                      (article?.service?.available_qte || 0) <= 0
+                        ? 'RUPTURE'
+                        : ('Stock: ' + (article?.service?.available_qte || 0))
+                    }}
+                  </span>
+                </div>
+
+                <ion-button
+                mode="ios"
+                  size="small"
+                  fill="solid"
+                  shape="round"
+                  [disabled]="(article?.service?.available_qte || 0) <= 0"
+                  (click)="selectNotebookArticle(article); $event.stopPropagation()"
+                >
+                  Sélectionner
+                </ion-button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REVIEW -->
+        <div class="review-zone">
+          <div class="review-box">
+            <div class="section-head review-head">
+              <div>
+                <h2>Preview Vente</h2>
+                <p>Aperçu des articles du panier et des numéros attribués</p>
+              </div>
+
+              <ion-badge color="warning">
+                {{ listselectedarticles.length }} article(s)
+              </ion-badge>
+            </div>
+
+            <div class="review-list">
+              <div class="empty-review" *ngIf="listselectedarticles.length === 0">
+                <ion-icon name="receipt-outline"></ion-icon>
+                <p>Aucun article sélectionné</p>
+              </div>
+
+              <ng-container *ngFor="let item of listselectedarticles; let idx = index">
+                <div class="cart-item-group">
+                  <div class="review-item main-review-item">
+                    <div class="review-item-left">
+                      <div class="review-item-name">
+                        {{ item?.service?.name }}
+                      </div>
+                      <div class="review-item-meta">
+                        Qté: {{ item?.serial_numbers?.length || 0 }}
+                      </div>
+                      <div class="review-item-meta">
+                        Disponible: {{ item?.service?.available_qte || 0 }}
+                      </div>
+                    </div>
+
+                    <div class="review-item-actions">
+                      <div class="review-item-right">
+                        {{
+                          getArticleResolvedPrice(item) *
+                            (item?.serial_numbers?.length || 0) | number
+                        }}
+                        {{ getArticleDisplayMoney(item) }}
+                      </div>
+
+                      <ion-button
+                        fill="clear"
+                        size="small"
+                        color="danger"
+                        class="review-trash-btn"
+                        (click)="removefromlist(item); $event.stopPropagation()"
+                      >
+                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                      </ion-button>
+                    </div>
+                  </div>
+
+                  <div class="serials-preview-card inside-group">
+                    <div class="serials-preview-head">
+                      <span>
+                        Numéros de série attribués
+                        <small class="serials-subtitle">
+                          {{ item?.service?.name }}
+                        </small>
+                      </span>
+                      <strong>{{ item?.serial_numbers?.length || 0 }}</strong>
+                    </div>
+
+                    <div
+                      class="serials-list"
+                      *ngIf="item?.serial_numbers?.length > 0; else noSerialBlockItem"
+                    >
+                      <div
+                        class="serial-badge"
+                        *ngFor="let serial of item?.serial_numbers; let i = index"
+                      >
+                        <div class="serial-index">#{{ i + 1 }}</div>
+                        <div class="serial-value">
+                          {{ serial?.serial_number || serial }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <ng-template #noSerialBlockItem>
+                      <div class="no-serials">
+                        Aucun numéro de série sélectionné pour cet article.
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+
+            <div class="review-summary">
+              <div class="summary-row">
+                <span>Articles panier</span>
+                <strong>{{ listselectedarticles.length }}</strong>
+              </div>
+
+              <div class="summary-row">
+                <span>Client</span>
+                <strong>{{ getCustomerDisplayName() || '-' }}</strong>
+              </div>
+
+              <div class="summary-row total">
+                <span>Total panier</span>
+                <strong>
+                  {{ netToPay | number }}
+                  {{ defaultmoney?.abreviation || 'FC' }}
+                </strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM -->
+      <div class="bottom-section">
+        <div class="form-zone">
+          <div class="input-card">
+            <label>Collecteur / Client</label>
+            <ion-input
+              type="text"
+              [value]="getCustomerDisplayName()"
+              placeholder="Rechercher / sélectionner un collecteur"
+              fill="outline"
+              class="custom-input"
+              readonly="true"
+              (click)="openCollectorModal()"
+            >
+            </ion-input>
+          </div>
+
+          <div class="input-card desktop-qty-card">
+            <label>Qté</label>
+            <ion-input
+              type="number"
+              min="0"
+              [(ngModel)]="NbrServiceSerrialNumber"
+              fill="outline"
+              class="custom-input qty-readonly"
+              placeholder="Entrer la quantité"
+              (ionInput)="IncreaseDecreaseSelection()"
+            >
+            </ion-input>
+          </div>
+        </div>
+
+        <div class="actions-zone">
+          <ion-button
+            class="action-btn light-btn"
+            fill="outline"
+            (click)="clearCart()"
+          >
+            <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+          </ion-button>
+
+          <ion-button class="action-btn checkout-btn" (click)="cashmode()" [disabled]="listselectedarticles.length === 0" color="warning">
+            <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+            Valider
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

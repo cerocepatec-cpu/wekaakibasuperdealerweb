@@ -1,0 +1,85 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="full">
+      <ion-text slot="start" class="font-size-30 font-bold-600">Produits</ion-text>
+      <ion-text slot="start" color="primary" (click)="showcheckbox=!showcheckbox; listselectedarticles=[];" *ngIf="showcheckbox">Terminer</ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" *ngIf="showdefaultprogress" mode="ios" color="primary"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données...">
+    </ion-refresher-content>
+  </ion-refresher>
+ 
+  <ion-item lines="none" class="contentbody margin-left-moins-15">
+    <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche" [(ngModel)]="keyword" ></ion-searchbar>
+    <mat-menu #animals2="matMenu">
+      <button mat-menu-item (click)="deletingfilter()"> <ion-text class="font-size-11" color="danger"> Annuler le filtre</ion-text></button>
+      <button mat-menu-item [matMenuTriggerFor]="menutypes"> <ion-text class="font-size-11">Type</ion-text></button>
+      <button mat-menu-item [matMenuTriggerFor]="menucategories"><ion-text class="font-size-11">Catégorie</ion-text></button>
+      <button mat-menu-item [matMenuTriggerFor]="menuUoms"> <ion-text class="font-size-11">Unité de mesure</ion-text></button>
+    </mat-menu>
+    <mat-menu #menutypes="matMenu">
+      <button mat-menu-item (click)="filterbytype('1')" ><ion-text class="font-size-11">Article</ion-text></button>
+      <button mat-menu-item (click)="filterbytype('2')"><ion-text class="font-size-11">Service</ion-text></button>
+    </mat-menu>
+    
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item (click)="excelexport()"> <ion-text class="font-size-11">Exporter en Excel</ion-text></button>
+      <button mat-menu-item (click)="pdfdownload ()"> <ion-text class="font-size-11">Exporter en PDF</ion-text></button>
+    </mat-menu>
+    
+    <mat-menu #menucategories="matMenu">
+      <button mat-menu-item (click)="filterbycategory()"><ion-text class="font-size-11">Aucune</ion-text></button>
+      <button mat-menu-item *ngFor="let category of listcategories" (click)="filterbycategory(category.category.id)"><ion-text class="font-size-11">{{category.category.name | titlecase}}</ion-text></button>
+    </mat-menu>
+    
+    <mat-menu #menuUoms="matMenu">
+      <button mat-menu-item (click)="filterbyuom()"><ion-text class="font-size-11">Aucune</ion-text></button>
+      <button mat-menu-item *ngFor="let uom of listunitofmeasure" (click)="filterbyuom(uom.id)"><ion-text class="font-size-11">{{uom.name | titlecase}}</ion-text> </button>
+    </mat-menu>
+  </ion-item>
+  <ion-item lines="none" class="contentbody font-size-16">
+    <ion-text slot="start" color="primary" routerLink="catalogue">Catalogue des produits</ion-text>
+  </ion-item>
+  <hr class="hr">
+  <ion-list *ngFor="let depot of listarticles" class="contentbody">
+      <ion-list-header class="font-size-20 font-bold-600 contentbody">
+        {{depot.deposit.name | titlecase}}
+      </ion-list-header>
+      <ion-item class="contentbody default-list-item" *ngFor="let article of depot.services  |filter:keyword" lines="inset" detail="true">
+        <ion-checkbox slot="start" *ngIf="showcheckbox" mode="ios" size="small" aria-label="product" [checked]="article.selected"></ion-checkbox>
+        <ion-avatar slot="start">
+          <ion-text class="ion-text-uppercase">{{article.service.name | slice:0:2}}</ion-text>
+        </ion-avatar>
+        <ion-label>
+          <p class="item-label-title">
+            <ion-text>{{article.service.name | titlecase}}</ion-text> 
+          </p>
+          <p class="secondpara">
+            <span class="reqtotalprinted font-size-11">{{article.prices.length>0?article.prices[0].price:'Aucun prix'}} {{article.prices.length>0?article.prices[0].abreviation:''}} | Catég. {{article.service.category_name?article.service.category_name:'aucune' | titlecase}}</span>
+          </p>
+          <p class="secondpara">
+            {{article.service.description | titlecase}}
+          </p> 
+        </ion-label>
+        <ion-text class="font-size-14" *ngIf="article.service.type==='1'" >Qté. {{(article.service.available_qte!==null?article.service.available_qte:'0')| number}} {{article.service.uom_symbol}}</ion-text>
+        <ion-icon name="radio-button-on-outline" color="warning" slot="end" size="small" class="unreadbutton" *ngIf="article.service.sync_status==='0'" ></ion-icon>
+      </ion-item>
+  </ion-list>
+ 
+</ion-content>
+<ion-footer class="ion-no-border" [translucent]="true" *ngIf="showcheckbox && listselectedarticles.length>0">
+  <ion-toolbar>
+    <ion-item lines="none" class="font-size-14">
+      <ion-text slot="start" color="danger" (click)="multipledelete()">Supprimer</ion-text>
+      <ion-text slot="end" color="secondary" (click)="stockhistory()">Stock(entrée/sortie)</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>

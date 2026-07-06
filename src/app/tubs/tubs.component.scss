@@ -1,0 +1,43 @@
+ion-card{
+    ion-item{
+      ion-label{
+        h4{
+          color: grey;
+          span{
+            padding: 5px;
+          }
+          .point{
+            font-size:2em;
+          }
+          .reqtotalprinted{
+            color:#50c8ff;
+          }
+        }
+      }
+    }
+  }
+
+  ion-footer{
+    .inputbloc  {
+        ion-input{
+            height: 60px;
+            border-radius: 20px;
+            background: rgb(219, 215, 223);
+        }
+    }
+  }
+
+  ion-list-header{
+    font-size: large;
+    color: #f4f5f8;
+  }
+
+  .whitetext{
+    color: #f4f5f8;
+  }
+
+  ion-list-header{
+    border-radius: 20px;
+  }
+
+  

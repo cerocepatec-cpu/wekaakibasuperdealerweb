@@ -1,0 +1,44 @@
+.proforma-line{
+    background-color: #ec8b6d;
+    font-weight: bold;
+    border: 3px solid #ec8b6d;
+    border-radius: 5px;
+    width: 45px;
+    float: left;
+}
+
+.text-medium{
+    color: #a2a09f;
+}
+
+.bg-medium-clean-proforma{
+  background:   #f0f0f0; 
+}
+
+.table-proforma-model1{
+   width: 100%!important;
+
+  .thead-proforma-model1{
+    background: #f4a68f;
+    border-radius: 5px;
+    height: 20px!important;
+  }
+
+  .tbody-proforma-model1{
+    border-bottom: 2px solid #efb3a1;
+    padding: 5px!important;
+    line-height: 2.5;
+  }
+
+  .line-height-2-5{
+    line-height: 2.5;
+  }
+}
+
+.background-proforma-model1{
+  background: #f4a68f;
+}
+
+.margin-5{
+  margin: 5px;
+}

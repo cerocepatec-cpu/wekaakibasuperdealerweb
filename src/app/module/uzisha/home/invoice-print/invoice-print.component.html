@@ -1,0 +1,179 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start" (click)="cancel()">
+      <ion-icon color="primary" name="chevron-back-outline" size="large">
+      </ion-icon>
+    </ion-buttons>
+
+    <ion-title class="ion-text-center">Aperçu</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="printToCart()" [strong]="true">
+        <ion-icon name="print-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="invoice" class="invoice model3" id="invoiceOne">
+    <!-- ================= HEADER ================= -->
+    <div class="header text-center">
+      <ion-text *ngIf="posprintoptions.name" class="company-name">
+        {{ actualEse?.name | uppercase }} </ion-text
+      ><br />
+
+      <ion-text *ngIf="posprintoptions.adresse">
+        {{ actualEse?.adresse }} </ion-text
+      ><br *ngIf="posprintoptions.adresse" />
+
+      <ion-text *ngIf="posprintoptions.phone">
+        {{ actualEse?.phone }}
+      </ion-text>
+
+      <div class="separator"></div>
+
+      <ion-text class="invoice-title">
+        FACTURE {{ invoice.type_facture | uppercase }} </ion-text
+      ><br />
+
+      <ion-text class="invoice-number">
+        {{ invoice.uuid }}
+      </ion-text>
+
+      <div class="separator"></div>
+
+      <ion-text>
+        {{ invoice.created_at | date : "dd MMM yyyy 'à' HH:mm" }} </ion-text
+      ><br />
+
+      <ion-text>
+        Opérateur :
+        {{ invoice.editor?.name || "---" | titlecase }}
+      </ion-text>
+
+      <ion-text *ngIf="invoice.collector">
+        <br />
+        Collecteur :
+        {{ invoice.collector?.name || "---" | titlecase }}
+      </ion-text>
+    </div>
+
+    <!-- ================= BODY ================= -->
+
+    <div class="body">
+      <table class="items-table">
+        <tbody>
+          <tr *ngFor="let detail of invoice.details">
+            <td class="item-block">
+              <div class="item-name">
+                {{ detail.service?.name | titlecase }}
+              </div>
+
+              <div class="item-sub" *ngIf="detail.subservices?.length">
+                <span *ngFor="let sub of detail.subservices; let i = index">
+                  {{ sub.service?.name | titlecase }}
+                  {{ i < detail.subservices.length - 1 ? "," : "" }}
+                </span>
+              </div>
+
+              <div class="item-calculation">
+                {{ detail.quantity | number }} ×
+                {{ detail.price | number }}
+                <span class="item-total">
+                  {{ detail.total | number }}
+                </span>
+              </div>
+
+              <div class="item-serials" *ngIf="detail.serial_numbers?.length">
+                <div class="serials-title">Numéros de série :</div>
+                <div class="serials-list">
+                  <div *ngFor="let serial of detail.serial_numbers">
+                    - {{ serial }}
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="separator"></div>
+
+      <!-- ================= TOTALS ================= -->
+
+      <table class="totals-table">
+        <tr *ngIf="posprintoptions.totalht">
+          <td>Total HT</td>
+          <td class="text-right">
+            {{ invoice.total_ht | number }}
+            {{ invoice.money?.abreviation }}
+          </td>
+        </tr>
+
+        <tr *ngIf="posprintoptions.tva">
+          <td>TVA ({{ invoice.vat_percent }}%)</td>
+          <td class="text-right">
+            {{ invoice.vat_amount | number }}
+            {{ invoice.money?.abreviation }}
+          </td>
+        </tr>
+
+        <tr *ngIf="posprintoptions.reduction">
+          <td>Réduction</td>
+          <td class="text-right">
+            - {{ invoice.discount | number }}
+            {{ invoice.money?.abreviation }}
+          </td>
+        </tr>
+
+        <tr class="net-to-pay">
+          <td>NET À PAYER</td>
+          <td class="text-right font-bold-600">
+            {{ invoice.net_to_pay | number }}
+            {{ invoice.money?.abreviation }}
+          </td>
+        </tr>
+
+        <tr *ngIf="posprintoptions.totalReceived">
+          <td>Total Reçu</td>
+          <td class="text-right">
+            {{ invoice.total_received | number }}
+            {{ invoice.money?.abreviation }}
+          </td>
+        </tr>
+
+        <tr *ngIf="invoice.back > 0">
+          <td>Retour</td>
+          <td class="text-right">
+            {{ invoice.back | number }}
+            {{ invoice.money?.abreviation }}
+          </td>
+        </tr>
+      </table>
+
+      <div class="separator"></div>
+
+      <!-- ================= MEMBER ================= -->
+
+      <div *ngIf="invoice.customer">
+        Membre :
+        {{ invoice.customer?.name || "---" | titlecase }}
+      </div>
+
+      <div *ngIf="invoice.note">Note : {{ invoice.note }}</div>
+
+      <div class="separator"></div>
+
+      <!-- ================= FOOTER ================= -->
+
+      <div class="text-center small-text" *ngIf="posprintoptions.invoicefooter">
+        {{ actualEse?.invoicefooter }}
+      </div>
+
+      <div class="text-right small-text">
+        {{ appserv.version }}
+      </div>
+    </div>
+  </div>
+</ion-content>

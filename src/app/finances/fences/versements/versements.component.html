@@ -1,0 +1,58 @@
+
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" class="margin-left-moins-15 font-size-11">
+      <ion-icon name="chevron-back" size="large" (click)="appserv.closemodal()" slot="start" color="primary"></ion-icon>
+      <ion-text>{{fencesent.fence.user_name | titlecase}}</ion-text>
+      <ion-chip slot="end" color="primary" class="font-size-11">{{(fencesent.fence.amount_due-fencesent.fence.amount_paid) | number }} {{appserv.getDefaultmoney().abreviation}}</ion-chip>
+      <ion-chip slot="end" class="font-size-9">{{fencesent.fence.date_concerned | date }}</ion-chip>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item ><ion-text class="font-size-12">Exporter en Excel</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-12">Exporter en PDF</ion-text></button>
+    </mat-menu>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <ion-item lines="none" class="contentbody">
+    <h1 class="font-bold-600 font-size-20">{{selectedfencesticketing.length===0?'Versements ('+listfencesticketing.length+')':selectedfencesticketing.length>1?selectedfencesticketing.length + ' sélectionnés':selectedfencesticketing.length + ' sélectionné'}}</h1>
+  </ion-item>
+  
+  <ion-item lines="none" class="contentbody margin-left-moins-15">
+    <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche"></ion-searchbar>
+  </ion-item>  
+  <hr class="hr">
+
+  <ion-card class="bd-radius-10 ion-padding"  color="warning" *ngIf="listfencesticketing.length===0">
+    <ion-text class="font-size-13">Aucun versement</ion-text>
+  </ion-card>
+  
+  <ion-item class="default-list-item contentbody"  lines="inset" *ngFor="let ticketing of listfencesticketing" (click)="menufence(ticketing)">
+    <ion-checkbox slot="start" *ngIf="showcheckbox" mode="ios" size="small"></ion-checkbox>
+    <ion-avatar slot="start">
+      <ion-icon name="document" size="small"></ion-icon>
+    </ion-avatar>
+    <ion-label>
+      <p class="item-label-title"><ion-text>{{ ticketing.created_at | date}}</ion-text></p>
+      <p class="secondpara"><ion-text>{{ticketing.user_name | titlecase}}</ion-text></p>
+    </ion-label>
+    <ion-note slot="end" class="font-bold-500 font-size-15">{{ticketing.amount | number}}$</ion-note>
+  </ion-item>
+  <ion-fab *ngIf="!showcheckbox && selectedfencesticketing.length===0 && (fencesent.fence.amount_due-fencesent.fence.amount_paid)>0" slot="fixed" vertical="bottom" horizontal="end" (click)="newticketing()">
+    <ion-fab-button color="secondary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+<ion-footer class="ion-no-border" [translucent]="true" *ngIf="showcheckbox && selectedfencesticketing.length>0">
+  <ion-toolbar>
+    <ion-item lines="none" class="font-size-14">
+      <ion-text slot="start" color="danger" (click)="multipledelete()"><ion-icon name="trash-outline"></ion-icon></ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>
+
+
+
+

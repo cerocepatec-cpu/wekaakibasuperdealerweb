@@ -1,0 +1,75 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="dark">
+    <ion-item lines="none">
+      <ion-icon
+        name="chevron-back-outline"
+        (click)="closemodal()"
+        slot="start"
+        color="warning"
+        size="large">
+      </ion-icon>
+      <ion-text slot="start" class="header-title">
+        {{ tubsent?.description | uppercase }}
+      </ion-text>
+      <ion-buttons slot="end">
+        <ion-button size="small" color="warning" mode="ios" (click)="openPinModal()">
+          <ion-chip color="warning">
+            <ion-icon name="checkmark" size="small"></ion-icon> 
+            <ion-note>Valider</ion-note>
+          </ion-chip>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="contentbody ion-padding">
+   <div class="newrequestform ion-padding ion-margin-bottom">
+      <form [formGroup]="newoperation" class="form">
+        
+          <ion-segment formControlName="type" mode="ios">
+            <ion-segment-button value="entry" *ngIf="tubsent.type==='automatic' && appserv.permissionFilter('caisses','entry')">
+              <ion-label>Entrée</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="withdraw" *ngIf="appserv.permissionFilter('caisses','withdraw')">
+              <ion-label>Sortie</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+      
+        <ion-item class="default-list-item2" lines="none">
+          <ion-label>Montant</ion-label>
+          <ion-input type="number" formControlName="amount" #amountInput></ion-input>
+        </ion-item>
+
+        <ion-item class="default-list-item2" lines="none">
+          <ion-label>Libellé</ion-label>
+          <ion-textarea autoGrow="true" formControlName="motif" required="true"></ion-textarea>
+        </ion-item>
+
+        <ion-item *ngIf="newoperation.value.type === 'withdraw'" class="form-item" lines="none">
+          <ion-label>Nature d'opération</ion-label>
+          <ion-select formControlName="nature" interface="popover" placeholder="Choisir...">
+            <ion-select-option value="transfert" *ngIf="appserv.permissionFilter('transactions','transfert')">Transfert</ion-select-option>
+            <ion-select-option value="approvment" *ngIf="appserv.permissionFilter('transactions','deposit')">Créditer compte</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item *ngIf="newoperation.value.nature === 'transfert'" class="form-item" lines="none">
+          <ion-label>Caisse de destination</ion-label>
+          <ion-select formControlName="fund_receiver_id" interface="popover" placeholder="Sélectionner une caisse...">
+            <ion-select-option *ngFor="let f of availableFunds" [value]="f.id">
+              {{ f.description }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item *ngIf="newoperation.value.nature === 'approvment'" class="form-item" lines="none" >
+          <ion-label (click)="pickaccount()">Compte membre</ion-label>
+          <ion-note slot="end" (click)="pickaccount()">
+            {{ actualAccount.account_number || actualAccount.description || 'Sélectionner un membre...' }}
+          </ion-note>
+          <ion-icon name="close-outline" size="small" slot="end" (click)="removeaccount()" *ngIf="actualAccount.id"></ion-icon>
+        </ion-item>
+      </form>
+   </div>
+</ion-content>

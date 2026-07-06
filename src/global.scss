@@ -1,0 +1,146 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "~@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "~@ionic/angular/css/normalize.css";
+@import "~@ionic/angular/css/structure.css";
+@import "~@ionic/angular/css/typography.css";
+@import '~@ionic/angular/css/display.css';
+
+/* Optional CSS utils that can be commented out */
+@import "~@ionic/angular/css/padding.css";
+@import "~@ionic/angular/css/float-elements.css";
+@import "~@ionic/angular/css/text-alignment.css";
+@import "~@ionic/angular/css/text-transformation.css";
+@import "~@ionic/angular/css/flex-utils.css";
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.tailwind-zone {
+  @apply flex flex-col items-center justify-center text-center;
+}
+
+.premium-modal {
+  --border-radius: 28px;
+}
+
+.text-icon-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px; /* espace entre texte et icône, optionnel */
+}
+.fullscreen-modal {
+  --width: 100vw !important;
+  --height: 100vh !important;
+  --max-width: 100vw !important;
+  --max-height: 100vh !important;
+  --border-radius: 0 !important;
+  --backdrop-opacity: 0.4;
+}
+
+ion-segment{
+  height: 35px;
+  width: 220px !important;
+  padding: 5px !important;
+  background-color: #daeaef !important;
+  border-radius: 20px !important;
+  ion-segment-button{
+    font-size: 11px;
+    top: 2.5px;
+    --border-radius: 40px !important;
+    color:rgb(73, 72, 72);
+  }
+}
+/* 🔐 Style premium pour l'alerte de validation */
+.custom-alert.alert-transaction-validation {
+  --backdrop-opacity: 0.35;
+  --background: #0d1117;
+  --color: #ffffff;
+  --border-radius: 16px;
+  --max-width: 360px;
+  --box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
+
+  .alert-wrapper {
+    background: var(--background);
+    color: var(--color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    backdrop-filter: blur(6px);
+  }
+
+  .alert-title {
+    color: #00e6ff;
+    font-weight: 600;
+    font-size: 1rem;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  .alert-message {
+    color: #cfd8dc;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-top: 6px;
+  }
+
+  /* ⚙️ Groupe des boutons */
+  .alert-button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 10px 10px; /* ✅ marges internes équilibrées */
+    gap: 10px; /* ✅ séparation nette entre les deux boutons */
+  }
+
+  /* 🎛️ Boutons Oui / Non */
+  .alert-button {
+    flex: 1;
+    border-radius: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    min-width: 90px;
+    height: 34px; /* ✅ taille compacte */
+    transition: all 0.25s ease-in-out;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ❌ Bouton "Non" */
+  .alert-button:first-child {
+    background: #ff3b30;
+    color: #fff;
+    margin-left: 5px; /* ✅ espace à gauche */
+  }
+
+  /* ✅ Bouton "Oui" */
+  .alert-button:last-child {
+    background: #00e6ff;
+    color: #000;
+    margin-right: 5px; /* ✅ espace à droite */
+  }
+
+  /* ✨ Effet hover */
+  .alert-button:hover {
+    transform: scale(1.05);
+    filter: brightness(1.15);
+  }
+}
+
+
+

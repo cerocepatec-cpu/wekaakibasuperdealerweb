@@ -1,0 +1,21 @@
+.buttons-group{
+    float: left; 
+    .lightbutton{
+     justify-content: center;
+      width: max-content;
+      font-size: small;
+      border-radius: 40px;
+      background: 0 0;
+      box-shadow: 0 8px 16px rgb(2 8 20 / 10%), 0 4px 8px rgb(2 8 20 / 8%);
+      color: var(--ion-color-dark);
+    }
+  
+    .submitbutton{
+      justify-content: center;
+      width: max-content;
+      font-size: small;
+      border-radius: 40px;
+      background-color:#00b2f7;
+      color:#ffffff;
+    }
+  }

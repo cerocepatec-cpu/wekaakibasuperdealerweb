@@ -1,0 +1,19 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-icon name="chevron-back-outline" (click)="appserv.closemodal()" size="large" color="warning"></ion-icon>
+    <ion-title>Choix des comptes</ion-title>
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" *ngIf="showprogress" color="primary"></ion-progress-bar>
+</ion-header>
+<ion-content class="ion-padding">
+      <ion-searchbar placeholder="Rechercher..." (ionInput)="handlesearchChange($event)" #defaultinput></ion-searchbar>
+      <ion-item mode="ios" detail="true" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" *ngFor="let account of accountslist" (click)="select(account)">
+        <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+          <ion-icon name="book-outline"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <p class="item-label-title font-size-14">{{account.description}}</p>
+          <p class="secondpara font-size-12">{{account.account_number}}</p>
+        </ion-label>
+      </ion-item>
+</ion-content>

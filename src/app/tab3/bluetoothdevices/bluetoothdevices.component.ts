@@ -1,0 +1,235 @@
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { BleClient,dataViewToText,numbersToDataView,ScanResult } from '@capacitor-community/bluetooth-le';
+import { AppservicesService } from 'src/app/services/appservices.service';
+@Component({
+  selector: 'app-bluetoothdevices',
+  templateUrl: './bluetoothdevices.component.html',
+  styleUrls: ['./bluetoothdevices.component.scss'],
+})
+export class BluetoothdevicesComponent implements OnInit {
+bluetoothScanResults : ScanResult[]=[];
+connectedDevices: ScanResult[]=[];
+bluetoothIsScanning =false;
+ble=false;
+bluetoothConnectedDevice?: ScanResult;
+
+// readonly goproBaseUrl ="http://10.5.5.9:8000";
+
+readonly goProControlAndQueryServiceUUID =
+    '0000fea6-0000-1000-8000-00805f9b34fb'.toUpperCase();
+
+  readonly goProWifiAccessPointServiceUUID =
+    `b5f90001-aa8d-11e3-9046-0002a5d5c51b`.toUpperCase();
+
+  readonly goProCommandReqCharacteristicsUUID =
+    'b5f90072-aa8d-11e3-9046-0002a5d5c51b'.toUpperCase();
+
+  readonly goProWifiSSIDCharacteristicUUID =
+    `b5f90002-aa8d-11e3-9046-0002a5d5c51b`.toUpperCase();
+
+  readonly goProWifiPASSCharacteristicUUID =
+    `b5f90003-aa8d-11e3-9046-0002a5d5c51b`.toUpperCase();
+
+  readonly shutdownCommand = [0x01, 0x05];
+
+  readonly shutterCommand = [0x03, 0x01, 0x01, 0x01];
+
+  readonly enableGoProWiFiCommand = [0x03, 0x17, 0x01, 0x01];
+  constructor(public appserv: AppservicesService, private change: ChangeDetectorRef) { }
+
+  ngOnInit() {
+    this.isBleEnabled();
+  }
+
+  async isBleEnabled(){
+    if( await BleClient.isEnabled()){
+      this.ble=true;
+      this.scanForBluetoothDevices();
+    }
+    return await BleClient.isEnabled();
+  }
+
+  toggleBle(event: any){
+    if(this.ble==true){
+      this.enableBluetooth();
+    }else{
+      this.disableBluetooth();
+    }
+  }
+
+  enableBluetooth(){
+    BleClient.enable();
+  }
+
+  disableBluetooth(){
+    BleClient.disable();
+  }
+
+  addnewconnectedDevice(device: ScanResult){
+
+    const records = localStorage.getItem('connectedDevices');
+    if (records !== null) {
+      this.connectedDevices.push(device);
+    }else{
+      localStorage.setItem('connectedDevices',JSON.stringify(this.connectedDevices));
+    }
+
+  }
+
+  async scanForBluetoothDevices(){
+    if(this.ble){
+      try {
+        await BleClient.initialize();
+        this.bluetoothScanResults =[];
+        this.bluetoothIsScanning=true;
+
+        await BleClient.requestLEScan({allowDuplicates:false},(device)=>{
+          if(device.localName){
+            this.bluetoothScanResults.push(device);
+            this.change.detectChanges();
+          }
+        });
+
+        const stopScanAfterMilliSeconds = 20000;
+        setTimeout(async()=>{
+          await BleClient.stopLEScan();
+          this.bluetoothIsScanning=false;
+        }, stopScanAfterMilliSeconds);
+      } catch(error){
+        this.bluetoothIsScanning=false;
+        //console.log('ScanForBluetoothDevices',error);
+      }
+    }else{
+      BleClient.initialize();
+      this.ble=true;
+      BleClient.enable();
+    }
+
+  }
+
+
+  onBluetoothDeviceFound(result: ScanResult){
+    this.bluetoothScanResults.push(result);
+  }
+
+  async connectToBluetoothDevice(scanResult : ScanResult){
+    const device = scanResult.device;
+
+    try{
+      await BleClient.connect(
+        device.deviceId,
+        this.onBluetooDeviceDisconnected.bind(this)
+      );
+      this.bluetoothConnectedDevice=scanResult;
+      this.addnewconnectedDevice(scanResult);
+      // await this.triggerBluetoothPairing();
+
+      const deviceName = device.name ?? device.deviceId;
+      this.appserv.presentToast(`Connecté à l'appareil ${deviceName}`);
+    }catch(error){
+      console.error('connecteToDevice',error);
+      this.appserv.presentToast(JSON.stringify(error));
+    }
+  }
+
+  async triggerBluetoothPairing(){
+    await this.sendBluetoothWriteCommand(this.enableGoProWiFiCommand);
+  }
+
+  onBluetooDeviceDisconnected(disconnectedDeviceId: string){
+    alert(`Disconnected ${disconnectedDeviceId}`);
+    this.bluetoothConnectedDevice=undefined;
+  }
+
+  async testprinting(){
+    if(!this.bluetoothConnectedDevice){
+      this.appserv.presentToast(`Aucun appareil connecté`);
+      return;
+    }
+
+    try {
+      await BleClient.write(
+        this.bluetoothConnectedDevice.device.deviceId,
+        this.bluetoothConnectedDevice.device.deviceId,
+        this.bluetoothConnectedDevice.device.deviceId,
+        numbersToDataView([1,2,3,4])
+      );
+      this.appserv.presentToast(`Commande envoyée...`);
+    } catch (error) {
+      //console.log(`error : ${JSON.stringify(error)}`);
+      this.appserv.presentToast('error impression');
+    }
+  }
+
+  async sendBluetoothWriteCommand(command: number[]){
+    if(!this.bluetoothConnectedDevice){
+      this.appserv.presentToast(`Aucun appareil connecté`);
+      return;
+    }
+
+    try{
+      await BleClient.write(
+        this.bluetoothConnectedDevice.device.deviceId,
+        this.goProControlAndQueryServiceUUID,
+        this.goProCommandReqCharacteristicsUUID,
+        numbersToDataView(command)
+      );
+      this.appserv.presentToast(`Commande envoyée...`);
+    }catch(error){
+      //console.log(`error : ${JSON.stringify(error)}`);
+      this.appserv.presentToast(JSON.stringify(error));
+    }
+  }
+
+  async disconnectFromBluetoothDevice(scanResult: ScanResult) {
+    const device = scanResult.device;
+    try {
+      await BleClient.disconnect(scanResult.device.deviceId);
+      const deviceName = device.name ?? device.deviceId;
+      alert(`disconnected from device ${deviceName}`);
+    } catch (error) {
+      //console.error('disconnectFromDevice', error);
+    }
+  }
+
+  sendBluetoothReadCommand(command : number[]){
+    if(!this.bluetoothConnectedDevice){
+      this.appserv.presentToast(`Aucun appareil connecté`);
+      return ;
+    }
+
+    if(JSON.stringify(command) === JSON.stringify(this.shutdownCommand)){
+      // this.getGoProWiFiCreds();
+    }
+  }
+
+  // async  getGoProWiFiCreds(): Promise<{ wifiPASS: string; wifiSSID: string }> {
+
+  //   const device = this.bluetoothConnectedDevice.device;
+
+  //   try {
+  //     const wifiSSID = dataViewToText(
+  //       await BleClient.read(
+  //         device.deviceId,
+  //         this.goProWifiAccessPointServiceUUID,
+  //         this.goProWifiSSIDCharacteristicUUID
+  //       )
+  //     );
+  //     const wifiPASS = dataViewToText(
+  //       await BleClient.read(
+  //         device.deviceId,
+  //         this.goProWifiAccessPointServiceUUID,
+  //         this.goProWifiPASSCharacteristicUUID
+  //       )
+  //     );
+
+  //     this.appserv.presentToast(`GoPro WiFi SSID: ${wifiSSID} PASS: ${wifiPASS}`);
+  //     console.log({ wifiSSID, wifiPASS });
+
+  //     return { wifiSSID, wifiPASS };
+  //   } catch (error) {
+  //     console.error('getGoProWiFiCreds', JSON.stringify(error));
+  //     this.appserv.presentToast(`${JSON.stringify(error)}`);
+  //   }
+  // }
+}

@@ -1,0 +1,122 @@
+<ion-content class="bg-gray-100 dark:bg-gray-900">
+    <div>
+      RAVIS DE VOUS LIRE CHER PAPA FABRICE
+    </div>
+  <div class="p-4 max-w-4xl mx-auto space-y-6">
+
+    <!-- 🔥 FORMULAIRE -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow">
+
+      <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+        {{ editingId ? 'Modifier une limite' : 'Ajouter une limite' }}
+      </h2>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-3">
+
+        <div class="grid grid-cols-2 gap-2">
+
+          <ion-input type="number" label="Enterprise ID" labelPlacement="floating"
+                     formControlName="enterprise_id"></ion-input>
+
+          <ion-input type="number" label="Money ID" labelPlacement="floating"
+                     formControlName="money_id"></ion-input>
+
+          <ion-select label="Type" formControlName="transaction_type">
+            <ion-select-option value="entry">Entrée</ion-select-option>
+            <ion-select-option value="withdraw">Retrait</ion-select-option>
+            <ion-select-option value="transfer">Transfert</ion-select-option>
+          </ion-select>
+
+          <ion-select label="Scope" formControlName="scope">
+            <ion-select-option value="national">National</ion-select-option>
+            <ion-select-option value="international">International</ion-select-option>
+          </ion-select>
+
+          <ion-input type="number" label="Min" labelPlacement="floating"
+                     formControlName="min_amount"></ion-input>
+
+          <ion-input type="number" label="Max" labelPlacement="floating"
+                     formControlName="max_amount"></ion-input>
+
+          <ion-input type="number" label="Daily" labelPlacement="floating"
+                     formControlName="daily_limit"></ion-input>
+
+          <ion-input type="number" label="Monthly" labelPlacement="floating"
+                     formControlName="monthly_limit"></ion-input>
+
+          <ion-select label="KYC" formControlName="kyc_level_required">
+            <ion-select-option value="none">None</ion-select-option>
+            <ion-select-option value="basic">Basic</ion-select-option>
+            <ion-select-option value="verified">Verified</ion-select-option>
+            <ion-select-option value="premium">Premium</ion-select-option>
+          </ion-select>
+
+        </div>
+
+        <div class="flex justify-between items-center mt-2">
+
+          <ion-toggle formControlName="is_active">
+            Actif
+          </ion-toggle>
+
+          <ion-toggle formControlName="is_for_collector">
+            Collector
+          </ion-toggle>
+
+        </div>
+
+        <div class="flex gap-2 mt-4">
+          <ion-button expand="block" type="submit">
+            {{ editingId ? 'Mettre à jour' : 'Ajouter' }}
+          </ion-button>
+
+          <ion-button color="medium" *ngIf="editingId" (click)="resetForm()">
+            Annuler
+          </ion-button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- 📋 LISTE -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow">
+
+      <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+        Limites existantes
+      </h2>
+
+      <div *ngIf="loading" class="text-center text-gray-500">
+        Chargement...
+      </div>
+
+      <div *ngFor="let item of limits"
+           class="p-3 mb-3 rounded-xl bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
+
+        <div class="text-sm text-gray-700 dark:text-gray-200">
+          <div class="font-semibold">
+            {{ item.transaction_type }} - {{ item.scope }}
+          </div>
+          <div>
+            {{ item.min_amount }} → {{ item.max_amount }}
+          </div>
+          <div class="text-xs opacity-70">
+            KYC: {{ item.kyc_level_required }}
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <ion-button size="small" (click)="edit(item)">
+            ✏️
+          </ion-button>
+          <ion-button size="small" color="danger" (click)="delete(item.id)">
+            🗑️
+          </ion-button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</ion-content>

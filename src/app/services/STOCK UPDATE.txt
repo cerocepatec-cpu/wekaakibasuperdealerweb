@@ -1,0 +1,69 @@
+BASE URL 
+  public apiUrl = 'https://uzishaceroapi.cerouzisha.com/api';
+  public imgUrl: string = 'https://uzishaceroapi.cerouzisha.com/app/uploads/';
+  public urlimgupload='https://uzishaceroapi.cerouzisha.com/app/upload.php';
+
+RECHERCHER ARTICLE PAR NOM: POST METHOD
+- /services/searchbyword/enterprise
+{enterprise_id:1,word:"a",type:"stock"}
+
+COMMENT ENVOYER UN OU PLUSIEURS APPROVISIONNEMENTS : POST METHOD
+- /stockhistory/multiplestore
+export class StockHistory{
+    id?: number;
+    service_name?: string;
+    description?: string;
+    uom_name?: string;
+    uom_symbol?: string;
+    depot_id?: number; +
+    deposit_name?: string;	
+    service_id?: number; +
+    user_id?: number; +
+    done_by_name?: string;
+    done_at?: string; +
+    quantity?: number; +
+    quantity_before?: number;
+    price?: number;
+    expiration_date?: string;
+    bon_livraison?: string;
+    motif?: string;
+    invoice_id?: number;
+    code_bar?: string;
+    note?: string;
+    type?: string;+ (entry,withdraw)
+    total?: number;
+    customer_id?: number;
+    provider_id?: number;
+    providerName?:string;
+    document_type?: number;
+    document_name?: string;
+    document_number?: string;
+    type_approvement?: string;
+    attachment?: string;
+    status?: string;
+    uuid?:string;
+    showWithdraw? : boolean;
+    showbarcode?: boolean;
+    showpu?: boolean;
+    showtotal?: boolean;
+    showcalendar?: boolean;
+    created_at?:string;
+    selected?:boolean;
+    read?:boolean;
+    enterprise_id?: number; +
+    sync_status?: string;
+}
+
+
+LISTE DES DEPOTS PAR UTILISATEUR: POST METHOD
+/deposit/users
+data:{user_id:1}
+
+RECHERCHES ARTICLES PAR DEPOT
+CFR JEAN
+/deposit/services/searchbywords
+{deposit_id:1,word:"A"}
+
+INVENTAIRE
+
+/deposit/articlesdepositpaginated/depot_id

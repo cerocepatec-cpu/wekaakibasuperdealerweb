@@ -1,0 +1,103 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar *ngIf="!showsearch_input">
+    <ion-item lines="none">
+      
+      <ion-avatar slot="start"><ion-img src="../../assets/cero_Uzisha.png"></ion-img></ion-avatar>
+      <ion-icon color="dark" name="notifications-outline" slot="end" size="small" (click)="gotonotifications()"></ion-icon>
+      <ion-icon color="dark" name="search-outline" slot="end" size="small" (click)="showsearch_input=!showsearch_input"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-toolbar *ngIf="showsearch_input" class="ion-padding">
+    <ion-item class="contentbody" lines="none" >
+      <ion-searchbar [debounce]="100" placeholder="Recherche" mode="ios" (ionInput)="searchmenu($event)"></ion-searchbar>
+      <ion-icon name="close-circle-outline" (click)="showsearch_input=!showsearch_input" slot="end"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="contentbody">
+  <div class="slides ion-margin-bottom">
+      <ion-item lines="none" class="contentbody default-avatar-item" routerLink="/tabs/tab3">
+        <ion-avatar slot="start" class="light-border-radius">
+          <ion-img [src]="actualuser.avatar?appserv.imgUrl+actualuser.avatar:''" *ngIf="actualuser.avatar"></ion-img>
+            <ion-icon name="person-outline" size="large" *ngIf="!actualuser.avatar"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2 class="font-size-12 text-italic"><ion-note>Bonjour,</ion-note></h2>
+          <h4 class="font-size-14">{{appserv.getactualuser().user_name | titlecase}}</h4>
+        </ion-label>
+      </ion-item>
+      <swiper-container autoplay="{delay: 2500,disableOnInteraction: false}" *ngIf="actualuser.enterprise_id">
+        <swiper-slide class="bg-light bd-radius-10 ion-margin-end" (click)="gotoexpiredarticles()">
+          <ion-tab-button>
+            <ion-avatar>
+              <ion-img src="../../assets/product.png"></ion-img> 
+            </ion-avatar>
+              <ion-text color="medium" class="font-size-15">
+                Articles expirés <ion-badge color="warning">22</ion-badge>
+              </ion-text>
+          </ion-tab-button>
+        </swiper-slide>
+        <swiper-slide class="bg-light bd-radius-20 ion-margin-end" (click)="gotounpaid()">
+          <ion-tab-button>
+            <ion-avatar>
+              <ion-img src="../../assets/facturation.jpg"></ion-img> 
+            </ion-avatar>
+              <ion-text color="medium" class="font-size-15">
+                Dettes non payées <ion-badge color="primary">22</ion-badge>
+              </ion-text>
+          </ion-tab-button>
+        </swiper-slide>
+        <swiper-slide class="bg-light bd-radius-20 ion-padding ion-margin-end" (click)="gotoarticlestosupply()">
+          <ion-tab-button>
+            <ion-avatar>
+              <ion-img src="../../assets/stock.jpeg"></ion-img> 
+            </ion-avatar>
+              <ion-text color="medium" class="font-size-15">
+                Articles à approvisionner <ion-badge color="danger">22</ion-badge>
+              </ion-text>
+          </ion-tab-button>
+        </swiper-slide>
+        <swiper-slide class="bg-light bd-radius-20 ion-padding" (click)="gotosubscription()">
+          <ion-tab-button>
+            <ion-avatar>
+              <ion-icon name="checkmark-circle-outline" color="success" size="large"></ion-icon>
+            </ion-avatar>
+              <ion-text color="medium" class="font-size-15">
+                Mon abonnement 
+              </ion-text>
+          </ion-tab-button>
+        </swiper-slide>
+      </swiper-container>
+  </div>
+  <div class="othersactions">
+    <ion-item class="font-size-15 ion-text-center bg-moderate-light" lines="none">
+      <ion-chip color="primary" slot="start">
+        Que voulez-vous faire aujourd'hui? 
+      </ion-chip>
+      <ion-avatar slot="end" class="greeting-img">
+        <ion-img src="../../assets/greetings-animation-hello.gif"></ion-img>
+      </ion-avatar>
+    </ion-item>
+    <ion-card mode="ios" color="warning" lines="none" class="bd-radius-10 ion-padding" *ngIf="!actualuser.enterprise_id" (click)="setupenterprise()">
+      <ion-text class="font-size-14">Veuillez terminer avec la configuration de votre entreprise s'il vous plaît!</ion-text>
+    </ion-card>
+    <ion-grid *ngIf="actualuser.enterprise_id">
+      <ion-row>
+        <ion-col size="6" [routerLink]="item.router" *ngFor="let item of results" >
+          <ion-card color="secondary" mode="ios" class="bd-square ion-padding dashboard-card">
+              <ion-tab-button class="ion-text-center">
+                <ion-label color="light" class="font-bold-600 font-size-13">
+                  <ion-text>{{item.title | uppercase}}</ion-text>
+              </ion-label>
+                <ion-avatar class="dashboard-avatar">
+                  <ion-img [src]="item.imgSrc" *ngIf="item.imgSrc"></ion-img>
+                  <ion-icon [name]="item.icon" size="large" *ngIf="!item.imgSrc" ></ion-icon> 
+                </ion-avatar>
+              </ion-tab-button>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

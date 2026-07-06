@@ -1,0 +1,44 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-text>{{marginSent.description | titlecase}}</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <br>
+  <div class="mobileform">
+      <ion-card mode="ios" class="ion-padding-top">
+        <ion-text class="font-size-12" color="primary ion-padding-start">Informations</ion-text>
+        <ion-item lines="full" class="font-size-12">
+          <ion-text>Description</ion-text>
+          <ion-text slot="end">{{marginSent.description}} </ion-text>
+        </ion-item>
+        <ion-item lines="full" class="font-size-12">
+          <ion-text>Minimum</ion-text>
+          <ion-text slot="end">{{marginSent.minimum}} {{marginSent.abreviation}}</ion-text>
+        </ion-item>
+        <ion-item lines="none" class="font-size-12">
+          <ion-text>Maximum</ion-text>
+          <ion-text slot="end">{{marginSent.maximum}} {{marginSent.abreviation}}</ion-text>
+        </ion-item>
+      </ion-card>
+      <ion-searchbar mode="ios" placeholder="Recherche" [(ngModel)]="search"></ion-searchbar>
+      <ion-item class="default-list-item contentbody" detail="true" lines="inset" *ngFor="let user of listusers | filter:search" (click)="menuparticipant(user)">
+        <ion-avatar slot="start">
+          <ion-img [src]="user.avatar?appserv.imgUrl+user.avatar:''" *ngIf="user.avatar"></ion-img>
+          <ion-icon name="person-outline" size="small" *ngIf="!user.avatar"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <p class="item-label-title"><ion-text>{{(user.user_name?user.user_name:user.created_at)|titlecase }}</ion-text></p>
+          <p class="secondpara"><ion-text>{{user.note}}</ion-text></p>
+        </ion-label>
+      </ion-item> 
+  </div>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" (click)="pickusers()">
+    <ion-fab-button color="secondary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

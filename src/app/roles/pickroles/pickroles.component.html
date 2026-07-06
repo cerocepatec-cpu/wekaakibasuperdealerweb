@@ -1,0 +1,25 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back" color="primary" slot="start" (click)="appserv.closemodal()" *ngIf="ismodal"></ion-icon>
+      <ion-icon *ngIf="appserv.permissionFilter('roles', 'add')" name="add-circle-outline" color="primary" slot="end" (click)="addnewrule()" size="large"></ion-icon>
+      <ion-chip slot="end" [disabled]="selectedroles.length<1" (click)="senddata()" *ngIf="canPick"><ion-icon name="checkmark" color="primary" size="large"></ion-icon></ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <h4  class="font-bold-600 ion-padding-start">Liste des rôles</h4>
+    <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-12" [(ngModel)]="search"></ion-searchbar>
+    <ion-item lines="full" *ngFor="let role of listroles.reverse() | filter:search" (click)="selected(role)" class="font-size-15 default-list-item contentbody">
+      <ion-avatar slot="start">
+        <ion-icon name="document-outline" size="small"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title"><ion-text>{{(role.title?role.title:role.description)|titlecase }}</ion-text></p>
+        <p class="secondpara"><ion-text>{{role.description}}</ion-text></p>
+      </ion-label>
+      <ion-icon slot="end" *ngIf="role.selected"  name="checkmark-circle-outline" color="success" size="small"></ion-icon>
+    </ion-item>
+</ion-content>
+

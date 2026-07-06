@@ -1,0 +1,22 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon slot="start" color="primary" (click)="closemodal()" name="chevron-back-outline">Annuler</ion-icon>
+      <h4 slot="start" class="font-bold-600 font-size-14">Nouvelle monnaie</h4>
+      <ion-icon name="checkmark-outline" size="large" color="success" (click)="addnew()" slot="end"></ion-icon>
+    </ion-item>
+    <ion-progress-bar mode="ios" type="indeterminate" *ngIf="showprogress" ></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <form class="contentbody" [formGroup]="newmoneyform">
+    <ion-item lines="full" class="font-size-12 contentbody">
+      <ion-input placeholder="Nom" type="text" formControlName="money_name"></ion-input>
+    </ion-item>
+    
+    <ion-item lines="full" class="font-size-12 contentbody">
+      <ion-input placeholder="Abréviation" type="text" formControlName="abreviation"></ion-input>
+    </ion-item> 
+
+  </form>
+</ion-content>

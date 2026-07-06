@@ -1,0 +1,138 @@
+<ion-header>
+  <ion-toolbar>
+     <ion-item lines="none">
+        <ion-text class="font-bold-600 font-size-30" slot="start">GESTION DES DROITS D'ACCES</ion-text>
+      </ion-item>
+      <ion-searchbar mode="ios" placeholder="Recherche" [(ngModel)]="searchpermission" #searchpermissioninput></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+   <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedTabChange)="handletabchanged($event)">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <ion-icon name="book-outline"></ion-icon> &nbsp;
+          Permissions
+        </ng-template>
+        <div>
+            <app-skeleton-loader type="grid" *ngIf="permissionsLoader"></app-skeleton-loader>
+            <ion-chip
+              [disabled]="selectedPermissions.length === 0"
+              (click)="assignToUser()" color="medium"> &nbsp;
+              <ion-icon name="person-add-outline" size="small"></ion-icon>
+              <ion-label>Attribuer à un utilisateur</ion-label>
+            </ion-chip>
+            <ion-chip
+              [disabled]="selectedPermissions.length === 0"
+              (click)="createRole()" color="medium"> &nbsp;
+              <ion-icon name="shield-outline" size="small"></ion-icon>
+              <ion-label>Créer un rôle</ion-label>
+            </ion-chip>
+      
+           <div class="permission-container">
+              <ion-card *ngFor="let group of (groupedPermissions | keyvalue) | filter:searchpermission" class="permission-card">
+                <ion-card-header (click)="viewPermissionParticipants(group)">
+                  <ion-card-title>
+                    <ion-icon name="shield-checkmark-outline" class="icon-title"></ion-icon>
+                    {{ group.key | titlecase }}
+                  </ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <ion-list lines="none">
+                    <ion-item *ngFor="let permission of group.value">
+                      <ion-toggle
+                        [checked]="selectedPermissions.includes(permission)"
+                        (ionChange)="togglePermission($event, permission)">
+                        {{ permission.split('.')[1] | titlecase }}
+                      </ion-toggle>
+                    </ion-item>
+                  </ion-list>
+                </ion-card-content>
+              </ion-card>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <ion-icon name="book-outline"></ion-icon> &nbsp;
+          Rôles
+        </ng-template>
+           <app-skeleton-loader type="grid" *ngIf="rolesLoader"></app-skeleton-loader>
+            <div *ngIf="!rolesLoader">
+                  <ion-searchbar mode="ios" placeholder="Rechercher role" [(ngModel)]="searchrole" #searchrolesinput></ion-searchbar>
+                <div class="role-container">
+                  <ion-accordion-group>
+                  <ion-accordion *ngFor="let role of roles">
+                    <!-- Header du rôle -->
+                    <ion-item slot="header" color="light" lines="full" detail="false">
+                      <ion-icon name="shield-outline" slot="start" color="primary"></ion-icon>
+                      <ion-label>
+                        <h2>{{ role.title || role.name }}</h2>
+                        <p>{{ role.description || 'Aucune description' }}</p>
+                      </ion-label>
+                    </ion-item>
+                  <!-- Contenu du rôle -->
+                    <div class="ion-padding" slot="content">
+                      <ion-item lines="none">
+                          <ion-text color="medium"><strong>Permissions:</strong> </ion-text>
+                          <ion-chip
+                            (click)="viewUsersParticipants(role)" color="medium" slot="end"> &nbsp;
+                            <ion-icon name="eye-outline" size="small"></ion-icon>
+                            <ion-label>Participants</ion-label>
+                          </ion-chip>
+                          <ion-chip
+                            (click)="assignRoleToUser(role)" color="medium" slot="end"> &nbsp;
+                            <ion-icon name="person-add-outline" size="small"></ion-icon>
+                            <ion-label>Ajouter participants</ion-label>
+                          </ion-chip>
+                          <ion-chip
+                            (click)="pickpermission(role)" color="medium" slot="end"> &nbsp;
+                            <ion-icon name="add-circle" size="small"></ion-icon>
+                            <ion-label>Ajouter permissions</ion-label>
+                          </ion-chip>
+                      </ion-item>
+                      
+                      <!-- Modules -->
+                      <div *ngFor="let group of (role.permissions | keyvalue)" class="module-block ion-margin-top">
+                        <ion-card color="light" class="ion-no-margin shadow-card">
+                          <ion-card-header>
+                            <ion-card-title class="module-title">
+                              <ion-icon name="folder-outline" slot="start" color="tertiary"></ion-icon>
+                              {{ group.key | titlecase }}
+
+                              <ion-toggle
+                                slot="end"
+                                [checked]="isModuleFullyChecked(group.value)"
+                                [indeterminate]="isModulePartiallyChecked(group.value)"
+                                [disabled]="loadingModules[group.key]"
+                                (ionChange)="toggleModulePermissions($event, group.value, role.id)">
+                                {{ group.key | titlecase }}
+                              </ion-toggle>
+                              <ion-spinner *ngIf="loadingModules[group.key]" name="dots" slot="end"></ion-spinner>
+                            </ion-card-title>
+                          </ion-card-header>
+
+                          <ion-card-content>
+                            <div class="permissions-list">
+                              <ion-item *ngFor="let perm of group.value" lines="none">
+                                <ion-label>{{ getActionLabel(perm) }}</ion-label>
+                               <ion-toggle
+                                  slot="end"
+                                  [checked]="roleHasPermission(role, perm)"
+                                  [disabled]="loadingPermissions[perm]"
+                                  (ionChange)="onPermissionToggle($event, perm, role.id)">
+                                </ion-toggle>
+                                <ion-spinner *ngIf="loadingPermissions[perm]" name="dots" slot="end"></ion-spinner>
+                              </ion-item>
+                            </div>
+                          </ion-card-content>
+                        </ion-card>
+                      </div>
+                    </div>
+                  </ion-accordion>
+                </ion-accordion-group>
+              </div>
+            </div>
+      </mat-tab>
+   </mat-tab-group>
+</ion-content>

@@ -1,0 +1,29 @@
+.contentbody ion-chip {
+  --padding-start: 2px;
+  --padding-end: 2px;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --min-height: 16px;
+  font-size: 9px;
+  line-height: 1;
+  border-radius: 4px;
+  height: auto;
+//   background: var(--ion-color-primary-tint);
+//   color: var(--ion-color-primary-contrast);
+  margin: 1px 2px;
+}
+
+/* Supprime aussi la marge excessive des labels et active le wrap */
+.contentbody ion-label p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 2px 0 0 0;
+}
+
+/* Assure le retour à la ligne et évite les “...” */
+.contentbody ion-label {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}

@@ -1,0 +1,103 @@
+<div class="p-6 space-y-4">
+
+  <h2 class="text-lg font-semibold">
+    {{ rule ? 'Modifier règle' : 'Nouvelle règle' }}
+  </h2>
+
+  <!-- NOM -->
+  <input
+    type="text"
+    [(ngModel)]="form.name"
+    placeholder="Nom de la règle"
+    class="w-full border rounded-lg px-3 py-2 dark:bg-slate-800">
+
+  <!-- CATÉGORIE -->
+  <select
+    [(ngModel)]="form.category"
+    class="w-full border rounded-lg px-3 py-2 dark:bg-slate-800">
+
+    <option value="">-- Catégorie --</option>
+    <option value="staff">Personnel</option>
+    <option value="expense">Charge</option>
+    <option value="reserve">Réserve</option>
+    <option value="other">Autre</option>
+  </select>
+
+  <!-- TYPE CALCUL -->
+  <select
+    [(ngModel)]="form.calculation_type"
+    class="w-full border rounded-lg px-3 py-2 dark:bg-slate-800">
+    <option value="percentage">Pourcentage</option>
+    <option value="fixed">Montant fixe</option>
+    <option value="hybrid">Hybride</option>
+  </select>
+
+  <!-- MONTANT FIXE -->
+  <input
+    *ngIf="form.calculation_type !== 'percentage'"
+    type="number"
+    [(ngModel)]="form.fixed_amount"
+    placeholder="Montant fixe"
+    class="w-full border rounded-lg px-3 py-2 dark:bg-slate-800">
+
+  <!-- POURCENTAGE -->
+  <input
+    *ngIf="form.calculation_type !== 'fixed'"
+    type="number"
+    [(ngModel)]="form.percentage_rate"
+    placeholder="Pourcentage (%)"
+    class="w-full border rounded-lg px-3 py-2 dark:bg-slate-800">
+
+  <!-- MONNAIE -->
+  <select
+    [(ngModel)]="form.money_id"
+    class="w-full border rounded-lg px-3 py-2 dark:bg-slate-800">
+
+    <option value="">Monnaie principale (par défaut)</option>
+
+    <option *ngFor="let money of moneys"
+            [value]="money.id">
+      {{ money.abreviation }}
+      <span *ngIf="money.principal"> (Principale)</span>
+    </option>
+
+  </select>
+
+  <!-- UTILISATEUR (si personnel) -->
+  <select
+    *ngIf="form.category === 'staff'"
+    [(ngModel)]="form.user_id"
+    class="w-full border rounded-lg px-3 py-2 dark:bg-slate-800">
+
+    <option value="">-- Sélectionner un employé --</option>
+
+    <option *ngFor="let user of users"
+            [value]="user.id">
+      {{ user.name | titlecase}}
+    </option>
+
+  </select>
+
+  <!-- ACTIF -->
+  <div class="flex items-center justify-between">
+    <span class="text-sm">Activer cette règle</span>
+    <ion-toggle [(ngModel)]="form.is_active"></ion-toggle>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="flex justify-end gap-3 mt-6">
+
+    <button (click)="close()" class="text-gray-500">
+      Annuler
+    </button>
+
+    <button
+      (click)="save()"
+      class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+      Enregistrer
+    </button>
+
+  </div>
+
+</div>
+

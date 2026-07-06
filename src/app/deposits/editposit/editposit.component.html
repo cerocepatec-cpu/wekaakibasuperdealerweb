@@ -1,0 +1,49 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+     <ion-icon name="chevron-back-outline" color="primary" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-text slot="start">Modifier Dépôt</ion-text>
+      <ion-chip slot="end" (click)="validate()" [disabled]="!newdeposit.valid" color="secondary"><ion-icon name="checkmark-outline" size="large" color="primary"></ion-icon> </ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar mode="indeterminate" *ngIf="showprogress" mode="ios"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+    <div class="newrequestform">
+      <form class="form" [formGroup]="newdeposit">
+        <h2><ion-text>Informations sur le dépôt</ion-text></h2> 
+        <ion-card mode="ios" class="ion-padding-top ion-padding-bottom">
+          <ion-text class="font-size-12 ion-padding-start" color="primary">Cochez un Type</ion-text> 
+          <br> <br>
+          <ion-segment formControlName="type" mode="ios">
+            <ion-segment-button value="group" (click)="changetype('group')">Groupe</ion-segment-button>
+            <ion-segment-button value="category" (click)="changetype('category')">Catégorie</ion-segment-button>
+          </ion-segment>
+        </ion-card>
+        <ion-item lines="none">
+          <ion-input formControlName="name" label="Nom"></ion-input>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-input formControlName="description" label="Déscription"></ion-input>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-select formControlName="withdrawing_method" label="Méthode" mode="ios">
+            <ion-select-option value="fifo">FIFO</ion-select-option>
+            <ion-select-option value="lifo">LIFO</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </form>
+    </div>
+    <ion-card class="bd-radius-10" mode="ios" *ngIf="selectedcategories.length>0" >
+        <ion-list-header class="font-size-13">Catégories selectionnées</ion-list-header>
+        <hr class="hr">
+        <ion-item mode="ios" class="default-list-item3"  lines="full" *ngFor="let categ of selectedcategories" >
+          <ion-avatar slot="start"><ion-icon name="document-outline" size="small"></ion-icon></ion-avatar>
+          <ion-label>
+            <h2 class="item-label-title">{{categ.category.name}}</h2>
+          </ion-label>
+         <ion-icon slot="end" name="trash" size="small" color="primary" (click)="deletecategory(categ)"></ion-icon>
+        </ion-item>
+    </ion-card>
+</ion-content>
+

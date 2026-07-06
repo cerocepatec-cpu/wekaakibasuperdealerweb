@@ -1,0 +1,56 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+     <ion-icon name="chevron-back-outline" color="primary" slot="start" (click)="appserv.closemodal()"></ion-icon>
+     <ion-text color="dark" slot="start">{{typesent==='entry'?"BON D'ENTREE CAISSE N° ":'BON DE SORTIE CAISSE N° '}} {{expendituresent.id}}</ion-text>
+     <ion-icon name="print-outline" size="large" color="primary" slot="end" (click)="printOperation()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding" [fullscreen]="true">
+<div id="printableBlock">
+    <div class="bd-square-dark-1px">
+      <ion-text *ngIf="posprintoptions.name" class="font-bold-600 font-size-16">{{appserv.getactualEse().name | uppercase}}</ion-text><br *ngIf="appserv.getactualEse().description">
+      <div class="bg-yellow font-size-13 font-bold-600 upper-case full-width" *ngIf="appserv.getactualEse().description">
+        <ion-text *ngIf="posprintoptions.description">{{appserv.getactualEse().description}}</ion-text>
+      </div>
+        <ion-text class="font-size-12" *ngIf="posprintoptions.adresse">{{appserv.getactualEse().adresse}}</ion-text> <br *ngIf="posprintoptions.adresse">
+        <ion-text class="font-size-12" *ngIf="posprintoptions.num_impot">N° Impôt: {{appserv.getactualEse().num_impot}}</ion-text> <br *ngIf="posprintoptions.num_impot">
+        <ion-text class="font-size-12" *ngIf="posprintoptions.national_identification">Id. Nat: {{appserv.getactualEse().national_identification}}</ion-text> <br  *ngIf="posprintoptions.national_identification">
+        <ion-text class="font-size-12" *ngIf="posprintoptions.rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br *ngIf="posprintoptions.rccm">
+        <ion-text class="font-size-12" *ngIf="posprintoptions.phone">Téléphone: {{appserv.getactualEse().phone}}</ion-text>
+    </div>
+  
+<br>
+ 
+  <div class="ion-padding bd-square-dark-1px">
+    <ion-text class="font-bold-600 font-size-16">{{typesent==='entry'?"BON D'ENTREE CAISSE N° ":'BON DE SORTIE CAISSE N° '}} <span class="font-size-16">{{expendituresent.id?expendituresent.id:expendituresent.uuid}}</span></ion-text> <br>
+    <ion-text> {{expendituresent.created_at| date}}</ion-text> <br *ngIf="duplicated"> 
+    <ion-text *ngIf="duplicated" class="font-size-10 font-bold-600">Duplicata</ion-text> 
+  </div>
+  <br>
+  <div class="title ion-padding bd-square-dark-1px">
+    <div class="title bd-square-dark-1px ion-float-right">
+      <ion-text class="font-bold-600 font-size-15 border-right-dark-1px">{{expendituresent.amount | number}} &nbsp;</ion-text> {{expendituresent.abreviation}}
+    </div>
+    <ion-text class="font-bold-600 font-size-15"> Réçu de Mr, Mme, ONG : {{expendituresent.beneficiary_name | titlecase}}</ion-text>
+  </div>
+  <br>
+  <div class="title ion-padding bd-square-dark-1px">
+    <ion-text class="font-bold-600 font-size-15"> Motif:  {{expendituresent.motif | titlecase}}</ion-text>
+  </div>
+  <br>
+  <div class="ion-padding">
+     <span>Pour acquit</span> <br>
+     <span>La caisse</span> <br>
+     <span>Pour autorisation</span> <br>
+  </div>
+  
+  <div class="bg-medium-clean-proforma ion-padding text-center bd-radius-10 footer ion-float-right">
+    <span class="text-center font-size-10 font-bold-600 text-italic">{{appserv.version}}</span>
+  </div>
+</div>
+</ion-content>
+
+
+

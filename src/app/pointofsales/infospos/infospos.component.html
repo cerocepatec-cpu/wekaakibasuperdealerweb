@@ -1,0 +1,85 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+     <ion-icon name="chevron-back-outline" color="primary" (click)="appserv.closemodal()"></ion-icon>
+     <ion-text color="dark">Infos sur le POS </ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <br>
+  <div class="userprofiltoedit ion-text-center">
+    <ion-note class="font-size-20 font-bold-600" color="dark">{{posSent.name | titlecase}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">Type. {{posSent.type | titlecase}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">Déscription. {{posSent.description| titlecase}}</ion-note>
+  
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" (click)="gotoedit()">
+            <ion-chip color="primary">
+              <ion-text class="font-size-12">Modifier</ion-text>
+            </ion-chip>
+          </ion-col>
+          <ion-col size="6" (click)="deletepos(posSent)">
+            <ion-chip color="danger">
+              <ion-text class="font-size-12">Supprimer</ion-text>
+            </ion-chip>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+  </div>
+
+  <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+    <ion-item class="font-size-12 default-list-item2" mode="ios" lines="inset" detail="true" (click)="gotodeposits()">
+      <ion-avatar slot="start" class="square-avatar-primary"><ion-icon name="cart"></ion-icon></ion-avatar> 
+      <ion-label>
+        <h2 class="font-size-12 item-label-title"><ion-text>Depots</ion-text></h2>
+      </ion-label> 
+     </ion-item>       
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="none" detail="true" (click)="gotousersviewer()">
+      <ion-avatar slot="start" class="square-avatar-success"><ion-icon name="people"></ion-icon></ion-avatar> 
+      <ion-label>
+        <h2 class="font-size-12 item-label-title"><ion-text>Agents</ion-text></h2>
+      </ion-label> 
+     </ion-item> 
+  </ion-card>
+  <ion-text class="font-size-20 ion-padding-start ion-padding-bottom">Agents ({{agents.length}})</ion-text>
+  <br>
+  <ion-card class="bd-radius-10" mode="ios">
+    <ion-item lines="full" class="ion-padding-top default-list-item ion-padding-bottom" (click)="adduser()">
+      <ion-avatar>
+        <ion-icon name="add-outline"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title font-size-12">Ajouter</p>
+        <p class="secondpara font-size-12">un nouvel agent</p>
+      </ion-label>
+    </ion-item>
+    <ion-item lines="full" class="default-list-item ion-padding-bottom" *ngFor="let user of agents">
+      <ion-avatar>
+        <ion-img [src]="user.avatar?appserv.imgUrl+user.avatar:''" *ngIf="user.avatar"></ion-img> <ion-text *ngIf="!user.avatar" color="light">{{user.user_name | slice:0:1 | titlecase}} </ion-text>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title font-size-12">{{(user.user_name?user.user_name:user.user_mail) | titlecase}}</p>
+        <p class="secondpara font-size-12">{{user.user_mail}}</p>
+      </ion-label>
+      <ion-icon name="trash-outline" (click)="deleteuser(user)"></ion-icon>
+    </ion-item>
+    <ion-item mode="ios" lines="none" *ngIf="agents.length>10" (click)="gotousersviewer()">
+      <ion-note slot="start" class="font-size-12">
+        Tout voir
+      </ion-note>
+      <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+    </ion-item>
+  </ion-card>
+  <ion-item mode="ios" class="contentbody footeritem" lines="none">
+    <ion-label>
+      <h4 class="font-size-11"><ion-note>Crée le {{posSent.created_at | date}}</ion-note></h4>
+      <h4 class="font-size-11"><ion-note>Dernière modification {{posSent.updated_at | date}} </ion-note></h4>
+    </ion-label>
+</ion-item>
+</ion-content>
+

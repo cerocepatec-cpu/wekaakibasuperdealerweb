@@ -1,0 +1,115 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+     <ion-icon name="chevron-back-outline" color="primary" slot="start" (click)="closemodal()"></ion-icon>
+     <ion-text color="dark" slot="start">Infos sur {{servicename}} </ion-text>
+     <ion-icon name="document-outline" color="warning" slot="end" *ngIf="appserv.permissionFilter('produits', 'edit')" (click)="gotoedit()"></ion-icon>
+     <ion-icon name="trash-outline" color="warning" slot="end" *ngIf="appserv.permissionFilter('produits', 'delete')" (click)="deleteproduct()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <br>
+  <div class="userprofiltoedit ion-text-center">
+    <ion-avatar style="margin:auto;">
+      <ion-icon name="image-outline" size="small"></ion-icon>
+    </ion-avatar>
+    <ion-note class="font-size-20 font-bold-600" color="dark">{{servicesent.service.name | titlecase}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">{{servicesent.service.description | titlecase}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">Catég. {{servicesent.service.category_name | titlecase}}</ion-note>
+    <br>
+    <br>
+    <ion-grid>
+      <ion-row>
+          <ion-col size="6">
+            <ion-chip class="font-size-11" mode="ios">
+              Appliquer la TVA
+              <ion-icon size="small" [name]="servicesent.service.has_vat?'thumbs-up-outline':'thumbs-down-outline'"></ion-icon>
+            </ion-chip>
+          </ion-col>
+          <ion-col size="6">
+            <ion-chip class="font-size-11" mode="ios">
+              Bonus applicable 
+              <ion-icon size="small" [name]="servicesent.service.bonus_applicable?'thumbs-up-outline':'thumbs-down-outline'"></ion-icon>
+            </ion-chip>
+          </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+    <ion-item class="font-size-12 default-list-item2" mode="ios" lines="inset" detail="true" (click)="reportsales()">
+      <ion-avatar slot="start" class="square-avatar-primary"><ion-icon name="cart"></ion-icon></ion-avatar>
+      <ion-label>
+        <h2 class="font-size-12 item-label-title"><ion-text>Ventes</ion-text></h2>
+      </ion-label>
+     </ion-item>
+
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="inset" detail="true">
+      <ion-avatar slot="start" class="square-avatar-warning"><ion-icon name="sync"></ion-icon></ion-avatar>
+      <ion-label>
+        <h2 class="font-size-12 item-label-title"><ion-text>Fiche Stock</ion-text></h2>
+      </ion-label>
+     </ion-item>
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="none" detail="true">
+      <ion-avatar slot="start" class="square-avatar-danger"><ion-icon name="people"></ion-icon></ion-avatar>
+      <ion-label>
+        <h2 class="font-size-12 item-label-title"><ion-text>Situation Fournisseurs</ion-text></h2>
+      </ion-label>
+     </ion-item>
+  </ion-card> -->
+  <ion-card mode="ios">
+    <ion-item class="font-size-12" lines="none">
+      <ion-text slot="start">Prix</ion-text>
+    </ion-item>
+
+    <div class="block">
+      <ion-item lines="full" class="contentbody font-size-11" *ngFor="let pricing of listpricing" >
+        <ion-note class="font-bold-600" [color]="pricing.principal===1?'primary':''">{{pricing.label | titlecase}} : {{pricing.price | number}} {{pricing.abreviation | uppercase}}</ion-note>
+        <ion-icon name="checkmark-outline" color="secondary" *ngIf="pricing.principal" slot="end" size="small"></ion-icon>
+      </ion-item>
+    </div>
+  </ion-card>
+  <ion-item lines="none" class="contentbody margin-btm-25 font-bold-500 smallavatar">
+    <ion-text slot="start" class="font-size-14"> Mouvements</ion-text>
+    <ion-segment mode="ios" slot="end">
+      <ion-segment-button value="all">Toutes</ion-segment-button>
+      <ion-segment-button value="entry">Entrées</ion-segment-button>
+      <ion-segment-button value="wayout">Sorties</ion-segment-button>
+    </ion-segment>
+    <ion-avatar slot="end"><ion-icon name="search-outline" size="small"></ion-icon></ion-avatar>
+  </ion-item>
+  <br>
+  <ion-card class="bd-radius-10 ion-padding" mode="ios">
+    <ion-item class="bd-radius-10" *ngIf="mouvements.length===0" color="warning">
+     <ion-text class="font-size-13">Aucune opération déjà faite</ion-text>
+    </ion-item>
+    <ion-item mode="ios" class="default-list-item3"  lines="inset" *ngFor="let mouv of mouvements | slice:0:5" >
+      <ion-avatar slot="start"><ion-icon [name]="mouv.type==='withdraw'?'arrow-up':'arrow-down'"></ion-icon></ion-avatar>
+      <ion-label>
+        <h2 class="item-label-title">{{mouv.created_at | date}}</h2>
+        <h4 class="secondpara font-size-11"><ion-note>{{mouv.motif}}</ion-note></h4>
+      </ion-label>
+      <ion-chip slot="end" class="font-size-11 chipset" [color]="mouv.type==='withdraw'?'danger':''">{{mouv.type_approvement | titlecase}}</ion-chip>
+      <ion-text slot="end" class="font-size-11" [color]="mouv.type==='withdraw'?'danger':''">
+        {{mouv.quantity | number}} {{servicesent.service.uom_symbol}}
+      </ion-text>
+    </ion-item>
+    <ion-item mode="ios" lines="none" *ngIf="mouvements.length>5" >
+      <ion-note slot="start" class="font-size-12">
+        Tout voir
+      </ion-note>
+      <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+    </ion-item>
+  </ion-card>
+  <ion-item mode="ios" class="contentbody footeritem" lines="none">
+    <ion-label>
+      <h4 class="font-size-11"><ion-note>Crée le {{servicesent.service.created_at | date}} par {{servicesent.service.user_id}}</ion-note></h4>
+      <h4 class="font-size-11"><ion-note>Dernière modification {{servicesent.service.updated_at | date}} </ion-note></h4>
+    </ion-label>
+</ion-item>
+</ion-content>
+

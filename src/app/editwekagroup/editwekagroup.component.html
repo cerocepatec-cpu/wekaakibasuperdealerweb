@@ -1,0 +1,25 @@
+<ion-header class="ion-no-border ion-padding">
+  <ion-toolbar>
+    <ion-row>
+      <ion-col (click)="appserv.closemodal()"><ion-text color="warning">Annuler</ion-text></ion-col>
+      <ion-col>
+        <ion-title>{{groupsent.name}}</ion-title>
+      </ion-col>
+      <ion-col (click)="nextstep()"><ion-text color="warning">Modifier</ion-text></ion-col>
+    </ion-row>
+  </ion-toolbar>  
+</ion-header>
+<ion-content>
+  <ng-container *ngIf="groupsent">
+    <div class="ion-padding">
+        <form [formGroup]="groupform">
+          <ion-item lines="full" class="bd-square bd-radius-10 ion-margin-bottom">
+            <ion-input formControlName="name" placeholder="Nom du groupe (*)" #groupinput (ionInput)="handlegroupenamechange($event)"></ion-input>
+          </ion-item> 
+          <ion-item lines="full" class="bd-square bd-radius-10">
+            <ion-input formControlName="description" placeholder="Description"></ion-input>
+          </ion-item>
+        </form>
+    </div>
+  </ng-container>
+</ion-content>

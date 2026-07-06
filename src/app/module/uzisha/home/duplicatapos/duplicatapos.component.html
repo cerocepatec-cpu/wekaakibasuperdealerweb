@@ -1,0 +1,245 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start" (click)="cancel()">
+      <ion-icon color="medium" name="chevron-back-outline" size="large"></ion-icon>
+    </ion-buttons>
+    <ion-title style="text-align:center;">Aperçu Facture</ion-title>
+    <ion-buttons slot="end">
+      <ion-button  (click)="printToCart()" [strong]="true">Imprimer</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding" style="height: 100% !important;">
+    <ng-container *ngIf="typeInvoice === 'model1'">
+      <div class="invoice model1" id="invoiceOne">
+        <div class="header">
+          <ion-item lines="none">
+            <ion-img id="imgbloc" [src]="appserv.getactualEse().logo?appserv.imgUrl+appserv.getactualEse().logo:''" style="width: 50px;height: 50px;" *ngIf="posprintoptions.logo"></ion-img>
+            &nbsp;&nbsp;
+            <ion-text *ngIf="posprintoptions.name" class="font-bold-600 font-size-20" style="top:15px!important;">{{appserv.getactualEse().name | uppercase}}</ion-text>
+          </ion-item>
+          <!-- <br *ngIf="posprintoptions.name"> -->
+          <ion-text *ngIf="posprintoptions.adresse">{{appserv.getactualEse().adresse}}</ion-text> <br>
+          <ion-text *ngIf="posprintoptions.description">{{appserv.getactualEse().description}}</ion-text> <br *ngIf="posprintoptions.description">
+          <ion-text *ngIf="posprintoptions.num_impot">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br *ngIf="posprintoptions.num_impot">
+          <ion-text *ngIf="posprintoptions.national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br  *ngIf="posprintoptions.national_identification">
+          <ion-text *ngIf="posprintoptions.rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br *ngIf="posprintoptions.rccm">
+          <ion-text *ngIf="posprintoptions.phone">CONTACT: {{appserv.getactualEse().phone}}</ion-text>
+        </div>
+        <div class="suheader ion-no-padding">
+          <br>
+          <ion-text class="font-bold-600 font-size-20">Duplicata N°: {{invoice.invoice.uuid}}</ion-text> <br>
+          <ion-text class="font-size-12">Créée le {{invoice.invoice.created_at | date}}, par {{invoice.invoice.user_name | titlecase}}</ion-text> <br>
+          <ion-text class="font-size-11">Imprimée le {{today.toLocaleDateString('fr')}} à {{today.getHours()}}h {{today.getMinutes()}}min {{today.getSeconds()}}s par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br> <br>
+        </div>
+        <div class="body">
+          <table>
+            <thead>
+              <tr class="border-bottom-dashed">
+                <th class="text-left">Article</th>
+                <th class="text-right">Qté</th>
+                <th class="text-right">Prix</th>
+                <th class="text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody class="body">
+              <tr *ngFor="let detail2 of listselectedarticles">
+                <td class="text-wrapped">{{detail2.service_name}}</td>
+                <td class="text-right">{{detail2.quantity | number}}</td>
+                <td class="text-right">{{detail2.price | number}}</td>
+                <td class="text-right">{{detail2.quantity*detail2.price | number}}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr *ngIf="posprintoptions.totalht">
+                <td colspan="3">Total HT :</td>
+                <td  class="text-right">{{totalgeneral | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr *ngIf="posprintoptions.tva">
+                <td colspan="3">TVA ({{tva_rate}}%) :</td>
+                <td  class="text-right">{{vat_amount | number}} {{defaultmoney.abreviation}} </td>
+              </tr>
+              <tr *ngIf="posprintoptions.reduction">
+                <td colspan="3">Réduction :</td>
+                <td  class="text-right">{{reduction | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr *ngIf="posprintoptions.netToPay">
+                <td colspan="3">Net à payer :</td>
+                <td  class="text-right">{{netToPay | number}} {{defaultmoney.abreviation}} </td>
+              </tr>
+              <tr *ngIf="posprintoptions.reduction">
+                <td colspan="3">Retour :</td>
+                <td  class="text-right">{{invoice.invoice.back | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr *ngIf="posprintoptions.totalReceived">
+                <td colspan="3">Total Reçu :</td>
+                <td  class="text-right">{{total_received | number}} {{defaultmoney.abreviation}}</td>
+              </tr> 
+              <tr class="border-bottom-dashed" *ngIf="invoice.invoice.type_facture==='credit'">
+                <td colspan="3">Solde :</td>
+                <td  class="text-right">{{netToPay-total_received | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr *ngIf="posprintoptions.cashMode">
+                <td>Cash</td>
+                <td>:</td>
+                <td colspan="2" class="text-right">{{invoice.invoice.totalespeces | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr *ngIf="posprintoptions.bankMode">
+                <td>Banque</td>
+                <td>:</td>
+                <td colspan="2" class="text-right">{{invoice.invoice.totalcreditcard | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr *ngIf="posprintoptions.mobileMode">
+                <td>Mobile money</td>
+                <td>:</td>
+                <td colspan="2" class="text-right">{{invoice.invoice.totalmobilemoney | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr class="border-bottom-dashed">
+                <td colspan="3"></td>
+              </tr>
+              <tr *ngIf="posprintoptions.customerName">
+                <td>Nom Client</td>
+                <td>:</td>
+                <td colspan="2"> {{invoice.invoice.customer_name?invoice.invoice.customer_name:'Anonyme'}}</td>
+              </tr>
+              <tr class="border-bottom-dashed">
+                <td colspan="3"></td>
+              </tr>
+              <tr *ngIf="posprintoptions.invoicefooter">
+                <td colspan="3" class="text-right font-size-10 font-bold-600 text-italic">
+                {{actualEse.invoicefooter}}
+                </td>
+              </tr>
+              <tr>
+                <td colspan="3" class="text-right font-size-10 font-bold-600 text-italic">{{appserv.version}}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="typeInvoice === 'model2'">
+      <div class="invoice model2" id="print-section">
+        <ion-row>
+          <ion-col size="3">
+            <div class="containerlogo">
+              <img src="../assets/cero_Uzisha.png" alt="Logo" class="logo">
+            </div>
+          </ion-col>
+          <ion-col size="9">
+            <div class="header border-bottom-dashed">
+              <ion-text *ngIf="posprintoptions.name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br>
+              <ion-text *ngIf="posprintoptions.adresse">{{appserv.getactualEse().adresse}}</ion-text> <br>
+              <ion-text *ngIf="posprintoptions.description">{{appserv.getactualEse().description}}</ion-text>
+              <ion-text *ngIf="posprintoptions.num_impot">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br>
+              <ion-text *ngIf="posprintoptions.national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br>
+              <ion-text *ngIf="posprintoptions.rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+              <ion-text *ngIf="posprintoptions.phone">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br>
+            </div>
+          </ion-col>
+        </ion-row>
+
+        <div class="suheader ion-no-padding">
+            <ion-text class="font-bold-600 font-size-20">Facture {{invoice.type_facture==='credit'?'crédit':invoice.type_facture | titlecase}} N°: {{invoice.uuid}}</ion-text> <br>
+          <!-- <ion-text class="font-bold-600">Type Facture: </ion-text> <br> -->
+          <!-- <ion-text class="font-bold-600">Type Impréssion: {{printingtype | titlecase}}</ion-text> <br> -->
+          <ion-text>Imprimée le {{today.toLocaleDateString('fr')}} à {{today.getHours()}}h {{today.getMinutes()}}min {{today.getSeconds()}}s</ion-text> <br>
+          <ion-text>Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+        </div>
+        <div class="body">
+          <table>
+            <thead>
+              <tr class="border-bottom-dashed">
+                <th class="text-left">Article</th>
+                <th class="text-right">Qté</th>
+                <th class="text-right">Prix</th>
+                <th class="text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody class="body">
+              <tr *ngFor="let detail2 of listselectedarticles">
+                <td class="text-wrapped">{{detail2.service.name}}</td>
+                <td class="text-right">{{detail2.service.selling_qte | number}}</td>
+                <td class="text-right">{{detail2.service.price | number}}</td>
+                <td class="text-right">{{detail2.service.selling_qte*detail2.service.price | number}}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td>Total HT :</td>
+                <td  class="text-right">{{totalgeneral | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr>
+                <td colspan="2"></td>
+                <td>TVA ({{tva_rate}}%) :</td>
+                <td  class="text-right">{{vat_amount | number}} {{defaultmoney.abreviation}} </td>
+              </tr>
+              <tr>
+                <td colspan="2"></td>
+                <td>Réduction :</td>
+                <td  class="text-right">{{reduction | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr>
+                <td colspan="2"></td>
+                <td>Net à payer :</td>
+                <td  class="text-right">{{netToPay | number}} {{defaultmoney.abreviation}} </td>
+              </tr>
+              <tr >
+                <td colspan="2"></td>
+                <td>Retour :</td>
+                <td  class="text-right">{{invoice.back | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr class="border-bottom-dashed">
+                <td colspan="2"></td>
+                <td>Total Reçu :</td>
+                <td  class="text-right">{{total_received | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr>
+                <td>Cash</td>
+                <td>:</td>
+                <td colspan="2" class="text-right">{{invoice.totalespeces | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr>
+                <td>Banque</td>
+                <td>:</td>
+                <td colspan="2" class="text-right">{{invoice.totalcreditcard | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr class="border-bottom-dashed">
+                <td>Mobile money</td>
+                <td>:</td>
+                <td colspan="2" class="text-right">{{invoice.totalmobilemoney | number}} {{defaultmoney.abreviation}}</td>
+              </tr>
+              <tr>
+                <td>Nom Client</td>
+                <td>:</td>
+                <td colspan="2"> {{invoice.invoice.customerName?invoice.invoice.customerName:''}}</td>
+              </tr>
+              <tr>
+                <td>Téléphone</td>
+                <td>:</td>
+                <td colspan="2"> {{invoice.invoice.phone?invoice.invoice.phone:''}}</td>
+              </tr>
+              <tr>
+                <td>Total Points</td>
+                <td>:</td>
+                <td colspan="2"> {{invoice.invoice.totalpoints?invoice.invoice.totalpoints:0}}</td>
+              </tr>
+              <tr *ngIf="posprintoptions.invoicefooter">
+                <td colspan="3">
+                {{actualEse.invoicefooter}}
+                </td>
+              </tr>
+              <tr>
+                <td colspan="3" class="text-right font-size-10 font-bold-600 text-italic">{{appserv.version}}
+                </td>
+
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </ng-container>
+</ion-content>
+

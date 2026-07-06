@@ -1,0 +1,96 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar> 
+      <ion-item lines="none">
+        <H1 color="primary" class="font-bold-600 font-size-30">Ventes</H1>
+        <ion-icon name="refresh-outline" slot="end" (click)="resetchart()"></ion-icon>
+        <ion-text slot="end"><ion-icon name="hourglass-outline" size="large"></ion-icon>{{savedInvoices.length}}</ion-text>
+      </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showdefaultprogress"></ion-progress-bar>
+</ion-header> 
+
+<ion-content [fullscreen]="true" class="contentbody">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données...">
+    </ion-refresher-content>
+  </ion-refresher>
+  <div class="">
+    <br>
+    <ion-item lines="none" class="categories-list contentbody bd-radius-10 bd-rounded box-big horizontal-scrol">
+        <ion-text class="cursor-pointer focused-primary ion-padding-end text-ellipsis" *ngFor="let categ of listcategories">{{categ.category.name | titlecase}}</ion-text>
+        <ion-icon name="add-circle-outline" slot="end" size="large" (click)="newproduct()"></ion-icon>
+    </ion-item>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" sizeMd="12" sizeSm="12" sizeXs="12">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="3" sizeLg="3" sizeSm="3" sizeXs="6" *ngFor="let article of listarticles | filter:search">
+              <ion-card>
+                <ion-img *ngIf="article.service.photo" [src]="article.service.photo"  (click)="addtocart(article)"></ion-img>
+                  <div class="thumbnail-full-width" *ngIf="!article.service.photo">
+                      <ion-icon name="image-outline"></ion-icon>          
+                  </div>
+                <ion-card-header class="ion-text-center" (click)="addtocart(article)">
+                  <ion-card-title color="secondary" class="font-bold-500 name-service-cart">{{article.name | titlecase}}</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <div class="circle-pricing ion-text-center">
+                    <ion-avatar style="margin:auto;" (click)="addtocart(article)">
+                      <ion-text class="font-size-10">
+                        <span>{{article.abreviation}}</span> 
+                        <br>
+                        <span>{{article.price | number}}</span>  
+                      </ion-text>
+                    </ion-avatar>
+                    <ion-button (click)="this.addstockhistory(article)" mode="ios" size="small" expand="outline" *ngIf="article.type==='1'">{{article.available_qte | number}} {{article.uom_symbol | titlecase}}</ion-button>
+                    <ion-button mode="ios" size="small" expand="outline" *ngIf="article.type==='2'">servir</ion-button>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+      <!-- <ion-col size="2" class="ion-padding smalldevicehidden">
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">0</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">1</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">2</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">3</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">4</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">5</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">6</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">7</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">8</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">9</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center"><ion-text class="margin-auto">10</ion-text></ion-chip>
+        <ion-chip class="bd-square box-big bd-radius-10 chip-square font-bold-600 font-size-30 ion-text-center">...</ion-chip>
+      </ion-col> -->
+    </ion-row>
+  </ion-grid>
+</div>
+<ion-fab slot="fixed" vertical="center" horizontal="start" *ngIf="showsearch" (click)="showsearch=!showsearch">
+  <ion-fab-button color="light">
+    <ion-icon name="search"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+<ion-fab slot="fixed" vertical="center" horizontal="end" (click)="cartpreview()" class="ion-margin-bottom">
+  <ion-fab-button [disabled]="listselectedarticles.length<=0?true:false">
+    <ion-icon name="cart" size="large"></ion-icon>
+  </ion-fab-button>
+  <div class="section2 font-bold-600 font-size-20">{{listselectedarticles.length}}</div>
+</ion-fab>
+
+</ion-content>
+<ion-footer class="ion-no-border ion-padding" translucent="true">
+    <ion-item lines="none" class="contentbody bd-square bd-rounded box-big" *ngIf="!showsearch">
+      <ion-icon name="search" slot="start"></ion-icon>
+      <ion-icon name="scan-outline" slot="start"></ion-icon>
+      <ion-input slot="start"  mode="ios" [(ngModel)]="search" placeholder="entrer nom ou code-barre" clearInput="true"></ion-input>
+      <ion-icon name="close" slot="end" (click)="showsearch=!showsearch"></ion-icon>
+    </ion-item>
+</ion-footer>

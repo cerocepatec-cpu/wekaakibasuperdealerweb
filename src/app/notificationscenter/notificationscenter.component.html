@@ -1,0 +1,9 @@
+<div class="notifications-center" *ngIf="notifications.length > 0">
+  <div *ngFor="let notif of notifications; let i = index" 
+       class="notification" 
+       [ngClass]="notif.color"
+       [@fadeInOut]>
+    <span>{{ notif.message }}</span>
+    <button class="close-btn" (click)="remove(i)">✕</button>
+  </div>
+</div>

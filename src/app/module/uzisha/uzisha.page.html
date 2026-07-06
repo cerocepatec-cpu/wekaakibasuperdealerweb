@@ -1,0 +1,83 @@
+<ion-app>
+  <ion-grid class="ion-no-padding">
+    <ion-row class="ion-no-padding">
+        <ion-col size="0.5" color="dark" class="content smalldevicehidden">
+          <ion-grid style="background-color: black; height: 100%; display: flex; flex-flow: column;">
+            <ion-row>
+              <ion-col class="menu-bar-left">
+                <img src="../../../assets/wekaakibalight.png" alt="Avatar" class="avatar">
+                <div class="menu-list">
+                  <ion-icon name="home" color="warning" size="large" routerLink="/uzisha"></ion-icon>
+                </div>
+              </ion-col>
+            </ion-row>
+
+            <ion-row style="flex-grow: 1;">
+              <ion-col >
+              </ion-col>
+            </ion-row>
+
+            <ion-row>
+              <ion-col class="menu-bar-left">
+                <div class="menu-list cursor-pointer" (click)="showsettingspage()">
+                  <ion-icon name="settings-outline" color="warning" size="large"></ion-icon>
+                </div> 
+                <div class="menu-list cursor-pointer" routerLink="/uzisha/sycingdata" *ngIf="appserv.permissionFilter('syncing', 'send')">
+                  <ion-icon name="cloud-outline" color="warning" size="large"></ion-icon>
+                </div>
+                <div class="menu-list cursor-pointer" (click)="shownotificationcenter()">
+                  <ion-icon name="notifications-outline" color="warning" size="large"></ion-icon>
+                </div>
+                <div class="menu-list cursor-pointer" (click)="showcerouzishainfos()">
+                  <ion-icon name="information-circle-outline" color="warning" size="large"></ion-icon>
+                </div>
+                <div class="menu-list cursor-pointer">
+                  <ion-icon name="person-circle-outline" color="warning" size="large" [matMenuTriggerFor]="menuavatar"></ion-icon>
+                </div>
+                <mat-menu #menuavatar="matMenu" class="ion-no-padding">
+                  <button mat-menu-item>
+                    <ion-item lines="none" routerLink="settings" class="default-avatar-item user-bloc">
+                      <ion-avatar slot="start">
+                        <ion-img [src]="actualuser.avatar?appserv.imgUrl+actualuser.avatar:''" *ngIf="actualuser.avatar"></ion-img>
+                        <ion-text *ngIf="!actualuser.avatar" color="warning" class="font-size-20 font-bold-600">
+                          {{appserv.getactualuser().user_name | slice:0:1 | uppercase}}
+                        </ion-text>
+                      </ion-avatar>
+                      <ion-label>
+                        <h2><ion-text class="font-size-13">{{actualuser.user_name | titlecase}}</ion-text></h2>
+                        <h4><ion-note class="font-size-13">{{actualuser.user_mail?actualuser.user_mail:actualuser.user_phone?actualuser.user_phone:actualuser.note | titlecase}}</ion-note></h4>
+                      </ion-label>
+                    </ion-item>
+                  </button>
+                  <hr class="hr">
+                  <button mat-menu-item (click)="gotouserprofil()">
+                      <ion-text class="font-size-11">Données personnelles</ion-text>
+                  </button>
+                  <button mat-menu-item (click)="showsettingspage()">
+                    <ion-text class="font-size-11">Autres configurations</ion-text>
+                  </button>
+                  <hr class="hr">
+                  <button mat-menu-item (click)="logout()">
+                    <ion-item lines="none">
+                      <ion-icon name="log-out-outline" slot="start" color="warning"></ion-icon>
+                      <span class="font-size-11">Se déconnecter</span>
+                    </ion-item>
+                  </button>
+                </mat-menu>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-col>
+         
+        <ion-col sizeSm="12"sizeMd="12" sizeLg="11.5" class="normal-contentbody">
+          <ion-grid>
+            <ion-row>
+              <ion-col size="12" class="main-content">
+                <router-outlet></router-outlet>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-app>

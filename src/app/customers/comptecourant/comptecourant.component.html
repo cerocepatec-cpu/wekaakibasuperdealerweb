@@ -1,0 +1,180 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" class="default-list-item">
+      <ion-icon name="chevron-back-outline" color="warning" (click)="appserv.closemodal()" size="large"></ion-icon>
+      <ion-avatar>
+        <ion-img [src]="customersent.photo?appserv.imgUrl+customersent.photo:''" *ngIf="customersent.photo"></ion-img>
+        <ion-icon [name]="customersent.type==='physique'?'person':customersent.type==='moral'?'people':'person'" size="large" *ngIf="!customersent.photo"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title">{{customersent.customerName | titlecase}}</p>
+        <p class="secondpara" *ngIf="customersent.category_name">
+          <ion-note class="font-size-11">Catég. {{customersent.category_name | titlecase}}</ion-note>
+        </p> 
+        <p class="secondpara">
+          <ion-note class="font-size-13 font-bold-600">Total général. {{totaldebts | number}} {{defaultmoney.abreviation}}</ion-note>
+        </p>
+      </ion-label>
+      <ion-icon name="download-outline" color="warning" slot="end" [matMenuTriggerFor]="menuexport"></ion-icon>
+      <!-- <ion-icon name="share-outline" color="warning" slot="end"></ion-icon> -->
+      <ion-icon name="print-outline" slot="end"  size="small" color="warning" (click)="printlist()"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item >Exporter en Excel</button>
+      <!-- <button mat-menu-item >Exporter en PDF</button> -->
+    </mat-menu>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-list-header>
+      <h2 class="font-size-16" *ngIf="from===to">Situation dettes du {{from | date}}</h2>
+      <h2 class="font-size-16" *ngIf="from!==to">Situation dettes du {{from | date}} au {{to | date}}</h2>
+    </ion-list-header>
+    <ion-item lines="none" class="margin-left-moins-15">
+      <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche..." [(ngModel)]="search"></ion-searchbar>
+      <ion-icon name="calendar-outline" slot="end" color="warning" size="small" (click)="getdatesfilter()"></ion-icon>
+      <ion-icon name="filter-outline" slot="end"  size="small" [matMenuTriggerFor]="animals2" color="warning"></ion-icon>
+    
+      <mat-menu #animals2="matMenu" xPosition="before">
+        <button mat-menu-item><ion-text class="font-size-11" color="danger" (click)="DeleteFilterByType()">Annuler</ion-text></button>
+        <button mat-menu-item><ion-text class="font-size-11" (click)="filterByType('cash')">Aucune avance</ion-text></button>
+        <button mat-menu-item><ion-text class="font-size-11" (click)="filterByType('cash')">En cours</ion-text></button>
+        <button mat-menu-item><ion-text class="font-size-11" (click)="filterByType('proforma')">Terminés</ion-text></button>
+      </mat-menu>
+      
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+    
+      <ion-card class="bd-radius-10" mode="ios" *ngIf="appserv.permissionFilter('customers','view_debts')">
+        <ion-item class="default-list-item contentbody"  lines="inset" *ngFor="let debt of listdebts | filter:search" detail="true" (click)="menudebt(debt)">
+          <ion-label>
+            <p class="item-label-title"><ion-text>{{debt.debt.invoiceUuid?debt.debt.invoiceUuid:''}}</ion-text></p>
+            <p class="secondpara font-bold-500"><ion-text class="font-bold-500">Total : {{debt.debt.amount | number}} {{debt.debt.abreviation}}</ion-text></p>
+            <p class="secondpara"><ion-text>Date : {{debt.debt.created_at | date}}</ion-text></p>
+          </ion-label>
+          <ion-text slot="end">Solde :{{debt.debt.sold | number}} {{debt.debt.abreviation}}</ion-text>
+          <ion-icon name="checkmark-outline" color="success" slot="end" *ngIf="debt.debt.status==='1'"></ion-icon>
+          <ion-icon name="ellipsis-horizontal-outline" color="warning" slot="end" *ngIf="debt.debt.status==='0'"></ion-icon>
+        </ion-item>
+        <ion-item mode="ios" lines="none" *ngIf="listdebts.length>10" (click)="customerserv.comptecourant(customersent)">
+          <ion-note slot="start" class="font-size-12">
+            Tout voir
+          </ion-note>
+          <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+        </ion-item>
+      </ion-card>
+
+      <ion-card color="warning" mode="ios" class="ion-padding display-flex-center" *ngIf="listdebts.length<=0" >
+        <ion-text>Aucune donnée à afficher</ion-text> &nbsp;
+        <ion-icon name="alert-circle-outline"></ion-icon>
+      </ion-card>
+        
+
+        <div  #printer_content hidden>
+          <div class="font-size-12">
+            <ion-text class="font-size-20 font-bold-600" *ngIf="posprintoptions.name && appserv.getactualEse().name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br *ngIf="posprintoptions.name && appserv.getactualEse().name">
+            <ion-text *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">{{appserv.getactualEse().adresse}}</ion-text> <br *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">
+            <ion-text *ngIf="posprintoptions.description && appserv.getactualEse().description ">{{appserv.getactualEse().description}}</ion-text>
+            <ion-text *ngIf="posprintoptions.num_impot && appserv.getactualEse().num_impot ">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br *ngIf="posprintoptions.description && appserv.getactualEse().description ">
+            <ion-text *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">
+            <ion-text *ngIf="posprintoptions.rccm && appserv.getactualEse().rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+            <ion-text *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">
+          </div>
+          <hr class="hr">
+          <div class="suheader ion-no-padding">
+            <h2 class="font-bold-600 font-size-16">Client : {{customersent.customerName | titlecase}}</h2>
+            <h2 class="font-size-16" *ngIf="from===to">Situation dettes du {{from | date}}</h2>
+            <h2 class="font-size-16" *ngIf="from!==to">Situation dettes du {{from | date}} au {{to | date}}</h2>
+            <ion-text class="font-size-10 ion-float-end">Date impression le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+            <ion-text class="font-size-10 ion-float-end">Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+          </div>
+          <div class="body">
+            <table border="1" style="width:100% ;font-size: 12px;">
+              <thead>
+                <tr>
+                  <th class="text-left">N°</th>
+                  <th class="text-left">OP.ID</th>
+                  <th class="text-left">Date</th>
+                  <th class="text-right">Montant</th>
+                  <th class="text-right">Avance</th>
+                  <th class="text-right">Solde</th>
+                  <th class="text-left">Statut</th>
+                </tr>
+              </thead>
+              <tbody class="body">
+                <tr *ngFor="let debt of listdebts; let i =index;">
+                    <td>{{i+1}}</td>
+                    <td>{{debt.debt.invoiceUuid | uppercase}}</td>
+                    <td>{{debt.debt.created_at | date}}</td>
+                    <td class="text-right">{{debt.debt.amount | number}} {{debt.debt.abreviation}}</td>
+                    <td class="text-right">{{debt.debt.amount-debt.debt.sold}} {{debt.debt.abreviation}}</td>
+                    <td class="text-right">{{debt.debt.sold| number}} {{debt.debt.abreviation}}</td>
+                    <td class="text-left">{{debt.debt.status===0?'En cours':'Payée'}}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="5" class="font-size-16 font-bold-600">TOTAL GENERAL</th>
+                  <th colspan="2" class="font-size-16 font-bold-600 text-right">{{totaldebts | number}} {{defaultmoney.abreviation | uppercase}}</th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+        <div class="invoice" #payment_content hidden>
+          <!-- <ngx-extended-pdf-viewer [src]="pdfurl"></ngx-extended-pdf-viewer> -->
+          <div class="header">
+            <ion-text *ngIf="posprintoptions.name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br>
+            <ion-text *ngIf="posprintoptions.adresse">{{appserv.getactualEse().adresse}}</ion-text> <br>
+            <ion-text *ngIf="posprintoptions.description">{{appserv.getactualEse().description}}</ion-text>
+            <ion-text *ngIf="posprintoptions.num_impot">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br>
+            <ion-text *ngIf="posprintoptions.national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br>
+            <ion-text *ngIf="posprintoptions.rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+            <ion-text *ngIf="posprintoptions.phone">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br>
+          </div>
+          <div class="suheader ion-no-padding">
+            <br>
+            <ion-text class="font-bold-600 font-size-20">Réçu: {{actualPayment.uuid}}</ion-text> <br>
+            <ion-text class="font-bold-600 font-size-10">Ref. Facture: {{debtSent.invoiceUuid?debtSent.invoiceUuid:''}}</ion-text> <br>
+            <ion-text>Imprimée le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+            <ion-text>Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+          </div>
+          <div class="body">
+            <br>
+            <table>
+              <thead>
+                <tr class="border-bottom-dashed">
+                  <th class="text-left">Montant payé</th>
+                  <th class="text-right">Solde</th>
+                </tr>
+              </thead>
+              <tbody class="body">
+                <tr>
+                  <td class="text-wrapped">{{actualPayment.amount_payed | number}} {{debtSent.abreviation}}</td>
+                  <td class="text-right">{{(debtSent.sold?debtSent.sold:0) |number}} {{debtSent.abreviation}}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"></td>
+                </tr>
+                <tr>
+                  <td colspan="2">Statut: {{debtSent.sold===0?'Dette soldée':'En cours'}}</td>
+                </tr>
+              
+                <tr>
+                  <td colspan="2">Client: {{(debtSent.customerName?debtSent.customerName:'') | uppercase}}</td>
+                </tr>  
+                <tr>
+                  <td colspan="2" class="text-right font-size-10 font-bold-600 text-italic">{{appserv.version}}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+        <ng-template #payment_content>
+           
+        </ng-template>
+  </ion-content>

@@ -1,0 +1,202 @@
+<!-- HEADER -->
+<ion-header class="ion-no-border">
+
+  <ion-toolbar class="px-2">
+
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="beforeleft()">
+        <ion-icon name="chevron-back-outline" size="large" color="warning"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <div class="flex items-center gap-3 w-full">
+
+      <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+        <ion-icon name="person-outline" class="text-lg"></ion-icon>
+      </div>
+
+      <div class="flex-1">
+        <p class="font-size-17 font-semibold">
+          {{ (usersent.name ? usersent.name : usersent.user_name) | titlecase }}
+        </p>
+        <p class="text-xs opacity-60">
+          {{ usersent.note }}
+        </p>
+      </div>
+
+      <!-- <ion-chip *ngIf="usersent.uuid" class="text-xs">
+        {{ usersent.uuid }}
+      </ion-chip> -->
+
+    </div>
+
+  </ion-toolbar>
+
+  <ion-progress-bar mode="ios" *ngIf="showprogress"></ion-progress-bar>
+
+</ion-header>
+
+
+
+<!-- CONTENT -->
+<ion-content fullscreen class="bg-slate-50 dark:bg-slate-900">
+
+  <div class="px-4 py-4">
+
+    <form [formGroup]="transactionform" class="space-y-5">
+
+      <!-- COMPTE -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
+
+        <p class="text-xs text-primary mb-2">Compte</p>
+
+        <ion-select
+          mode="ios"
+          formControlName="member_account_id"
+          interface="popover"
+          placeholder="Sélectionner un compte"
+          (ionChange)="filterAccountAndFunds()"
+          class="w-full border border-gray-200 dark:border-slate-600 rounded-xl px-3 py-2"
+        >
+          <ion-select-option
+            *ngFor="let account of accountslist"
+            [value]="account.id"
+          >
+            ({{account.money_abreviation}})
+            {{account.account_number ? account.account_number : account.description}}
+          </ion-select-option>
+        </ion-select>
+
+      </div>
+
+
+
+      <!-- TYPE OPERATION + CAISSE -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm space-y-5">
+
+        <!-- TYPE OPERATION -->
+        <div>
+          <p class="text-xs text-primary mb-2">Type Opération</p>
+
+          <ion-segment
+            formControlName="type"
+            mode="ios"
+            (ionChange)="segmentChanged($event)"
+            class="rounded-full"
+          >
+            <ion-segment-button value="deposit">
+              Dépôt
+            </ion-segment-button>
+
+            <ion-segment-button value="withdraw">
+              Retrait
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- CAISSE -->
+        <div>
+          <p class="text-xs text-primary mb-2">Caisse</p>
+
+          <ion-select
+            mode="ios"
+            formControlName="fund_id"
+            interface="popover"
+            placeholder="Sélectionner une caisse"
+            (ionChange)="filterAccountAndFunds()"
+            class="w-full border border-gray-200 dark:border-slate-600 rounded-xl px-3 py-2"
+          >
+            <ion-select-option
+              *ngFor="let tub of listtubs"
+              [value]="tub.id"
+            >
+              ({{tub.money_abreviation}})
+              {{tub.description}}
+            </ion-select-option>
+          </ion-select>
+        </div>
+
+      </div>
+
+
+
+      <!-- AUTRES INFORMATIONS -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm space-y-4">
+
+        <p class="text-xs text-primary">Autres informations</p>
+
+        <!-- Montant -->
+        <div>
+          <label class="text-xs opacity-70">Montant</label>
+          <ion-input
+            type="number"
+            formControlName="amount"
+            class="mt-1 border border-gray-200 dark:border-slate-600 rounded-xl px-3 py-2 bg-transparent"
+          ></ion-input>
+        </div>
+
+        <!-- Motif -->
+        <div>
+          <label class="text-xs opacity-70">Motif</label>
+          <ion-textarea
+            autoGrow="true"
+            formControlName="motif"
+            class="mt-1 border border-gray-200 dark:border-slate-600 rounded-xl px-3 py-2 bg-transparent"
+          ></ion-textarea>
+        </div>
+
+        <!-- Qui fait l'opération -->
+        <div>
+          <label class="text-xs opacity-70">Qui fait l'opération</label>
+          <ion-input
+            formControlName="operation_done_by"
+            class="mt-1 border border-gray-200 dark:border-slate-600 rounded-xl px-3 py-2 bg-transparent"
+          ></ion-input>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <label class="text-xs opacity-70">Contact</label>
+          <ion-input
+            formControlName="phone"
+            class="mt-1 border border-gray-200 dark:border-slate-600 rounded-xl px-3 py-2 bg-transparent"
+          ></ion-input>
+        </div>
+
+        <!-- Adresse -->
+        <div>
+          <label class="text-xs opacity-70">Adresse</label>
+          <ion-input
+            formControlName="adresse"
+            class="mt-1 border border-gray-200 dark:border-slate-600 rounded-xl px-3 py-2 bg-transparent"
+          ></ion-input>
+        </div>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</ion-content>
+
+
+
+<!-- FOOTER -->
+<ion-footer
+  *ngIf="(accountslist.length>0 && appserv.permissionFilter('transactions','deposit')) || (accountslist.length>0 && appserv.permissionFilter('transactions','withdraw'))"
+  class="p-4 bg-white dark:bg-slate-900"
+>
+
+  <ion-button
+    expand="block"
+    color="warning"
+    mode="ios"
+    class="rounded-2xl h-12 text-sm font-semibold"
+    [disabled]="!transactionform.valid"
+    (click)="validateoperation()"
+  >
+    Valider l'opération
+  </ion-button>
+
+</ion-footer>

@@ -1,0 +1,34 @@
+
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" class="margin-left-moins-15">
+      <ion-icon name="chevron-back" size="large" (click)="appserv.closemodal()" slot="start" color="primary"></ion-icon>
+      <ion-text slot="start" color="primary">Nouveau versement</ion-text>
+      <ion-chip color="primary" (click)="saveticketing()" slot="end" [disabled]="!newticketing.valid"><ion-icon name="checkmark-outline" size="large"></ion-icon></ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  
+   <!-- <ion-card class="bd-radius-10 ion-padding"  color="danger">
+    <ion-text class="font-size-13">Clôture terminée. Vous ne pouvez plus percevoir des versements</ion-text>
+  </ion-card> -->
+  
+  <form class="contentbody form" [formGroup]="newticketing">
+    <ion-card mode="ios">
+      <ion-item lines="full" class="font-size-12 contentbody">
+        <ion-label position="floating">Montant</ion-label>
+        <ion-input type="number" formControlName="amount"></ion-input>
+      </ion-item>
+      <ion-item lines="full" class="font-size-12 contentbody">
+
+        <ion-input placeholder="Note" type="text" formControlName="note"></ion-input>
+      </ion-item> 
+      <ion-item lines="none" class="font-size-12 contentbody">
+        <ion-input placeholder="Billetage" type="text" formControlName="ticketing"></ion-input>
+      </ion-item> 
+    </ion-card>
+  </form>
+
+</ion-content>

@@ -1,0 +1,22 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-text class="font-size-12" color="primary" (click)="closemodal()" slot="start">Annuler</ion-text>
+      <ion-text slot="start" class="font-bold-600 font-size-14">Ajouter un type de document</ion-text>
+      <ion-icon name="checkmark-outline" size="large" color="success" (click)="addnew()" slot="end"></ion-icon>
+    </ion-item>
+    <ion-progress-bar mode="ios" type="indeterminate" *ngIf="showprogress" ></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <form class="contentbody" [formGroup]="newdoc">
+    <ion-item lines="full" class="font-size-12 contentbody">
+      <ion-input placeholder="Nom du document" type="text" formControlName="name"></ion-input>
+    </ion-item>
+    
+    <ion-item lines="full" class="font-size-12 contentbody">
+      <ion-input placeholder="Décrivez le document" type="text" formControlName="description"></ion-input>
+    </ion-item>
+  </form>
+</ion-content>
+

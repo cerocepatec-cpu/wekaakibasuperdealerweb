@@ -1,0 +1,88 @@
+<ion-header class="ion-no-border ion-padding">
+  <ion-toolbar *ngIf="!groupvalidation">
+    <ion-row>
+      <ion-col (click)="appserv.closemodal()"><ion-text color="warning">Annuler</ion-text></ion-col>
+      <ion-col>
+        <ion-title>{{criteria==="employees"?"Ajouter des employés":"Ajouter des membres"}}</ion-title><br>
+        <ion-note style="padding-left: 100px!important;padding-top: -40px!important;position: relative;">{{selectedusers.length}}/{{listusers.length}}</ion-note>
+      </ion-col>
+      <ion-col *ngIf="selectedusers.length>0 && !groupvalidation" (click)="nextstep()"><ion-text color="warning">{{groupsent?'Ajouter':'Suivant'}}</ion-text></ion-col>
+    </ion-row>
+  </ion-toolbar>  
+  <ion-toolbar *ngIf="groupvalidation">
+    <ion-row>
+      <ion-col (click)="groupvalidation=!groupvalidation"><ion-text color="warning">Retour</ion-text></ion-col>
+      <ion-col>
+        <ion-title class="font-size-15">Nouveau groupe</ion-title>
+      </ion-col>
+      <ion-col *ngIf="selectedusers.length>0 && groupvalidation" (click)="validategroup()"><ion-text color="warning">Créer</ion-text></ion-col>
+    </ion-row>
+  </ion-toolbar>
+  <ion-toolbar *ngIf="!groupvalidation">
+    <ion-searchbar mode="ios" placeholder="Rechercher par un nom ou un code"  [(ngModel)]="search" #defaultinput (ionInput)="handlesearchchange($event)"></ion-searchbar>
+    <ion-card mode="ios" class="ion-padding-left" *ngIf="selectedusers.length>0">
+      <ion-buttons class="vertical-scroll">
+        <ion-tab-button class="chat-item" *ngFor="let selected of selectedusers">
+          <div class="avatar-container">
+            <img src="../../assets/wekaakibalight.png" alt="Avatar" class="avatar">
+            <button class="delete-btn" (click)="removefromlist(selected)">&#10005;</button>
+          </div>
+          <ion-label class="text-ellipsis">
+            {{(selected.full_name?selected.full_name:selected.user_name) | titlecase}}
+          </ion-label>
+        </ion-tab-button>
+      </ion-buttons>
+    </ion-card>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ng-container *ngIf="!groupvalidation">
+    <ion-card mode="ios" class="ion-padding" *ngIf="listusers.length>0">
+      <ion-item class="default-avatar-item" *ngFor="let user of listusers">
+        <ion-avatar slot="start">
+          <ion-icon name="person"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <p class="item-label-title">{{(user.full_name?user.full_name:user.user_name) | uppercase}}</p>
+          <p>{{user.uuid}}</p>
+        </ion-label>
+        <ion-checkbox [checked]="user.selected" slot="end" (ionChange)="handleselectuserchange($event,user)"></ion-checkbox>
+      </ion-item>
+    </ion-card>
+  </ng-container>
+  <ng-container *ngIf="groupvalidation">
+    <div class="ion-padding">
+      <ion-card mode="ios">
+        <ion-item lines="none" [class]="grouperror?'error-block':defaultgroupnameclass">
+          <ion-input [(ngModel)]="groupname" placeholder="Nom du groupe (*)" #groupinput (ionInput)="handlegroupenamechange($event)"  #name="ngModel"></ion-input>
+          <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert">
+              <div *ngIf="name.errors?.['required']">Name is required.</div>
+              <div *ngIf="name.errors?.['minlength']">
+                Name must be at least 4 characters long.
+              </div>
+              <div *ngIf="name.errors?.['forbiddenName']">
+                Name cannot be Bob.
+              </div>
+            </div>
+        </ion-item>
+      </ion-card>
+     
+      <ion-note class="ion-padding-start">MEMBRES: {{selectedusers.length}}</ion-note>
+      <ion-card mode="ios" class="ion-padding-left" *ngIf="selectedusers.length>0">
+        <ion-row>
+          <ion-col size="4" *ngFor="let selected of selectedusers">
+            <ion-tab-button class="chat-item">
+              <div class="avatar-container">
+                <img src="../../assets/wekaakibablack.png" alt="Avatar" class="avatar">
+                <button class="delete-btn" (click)="removefromlist(selected)">&#10005;</button>
+              </div>
+              <ion-label class="text-ellipsis">
+                {{(selected.full_name?selected.full_name:selected.user_name) | titlecase}}
+              </ion-label>
+            </ion-tab-button>
+          </ion-col>
+        </ion-row>
+      </ion-card>
+    </div>
+  </ng-container>
+</ion-content>

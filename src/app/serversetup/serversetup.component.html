@@ -1,0 +1,40 @@
+<ion-header *ngIf="type==='password'" class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" color="warning" size="large" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text class="font-size-16 font-bold">{{title?title:'Entrer le mot de passe'}}</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <br> <br>
+  
+  <ng-container *ngIf="showpasswordsetup">
+    <ion-card class="ion-text-center ion-padding border-radius-10" color="warning" lines="none" mode="ios">
+      <ion-note class="font-size-13" color="dark">Nous procédons à la vérification du mot de passe administrateur avant de passer à la configuration.</ion-note>
+    </ion-card>
+      <ion-item lines="none" class="font-size-11 bd-rounded ion-margin-bottom">
+        <ion-input type="password" [(ngModel)]="oldpassword" class="font-size-12" label="Entrer le mot de passe:" #defaultinput2 (ngModelChange)="passwordevent($event)" >
+        </ion-input>
+      </ion-item>
+      <ion-item lines="none" class="font-size-11 bd-rounded ion-margin-bottom" *ngIf="showsecondpassword">
+        <ion-input type="password" [(ngModel)]="passwordconfirmed" class="font-size-12" label="Confirme le mot de passe:" (ngModelChange)="confirmedpasswordevent($event)" >
+        </ion-input>
+      </ion-item>
+  </ng-container> 
+  
+  <ng-container *ngIf="showserversetup ">
+    <ion-card class="ion-text-center ion-padding border-radius-10" color="success" lines="none" mode="ios">
+      <ion-note class="font-size-13" color="dark">Veuillez nous fournir l'adresse du serveur pour finaliser avec la configuration. Il est à noter qu'en cas d'erreur, vous pouvez revenir sur cet écran pour la même cause.</ion-note>
+    </ion-card>
+      <ion-item lines="none" class="font-size-11 bd-rounded ion-margin-bottom">
+        <ion-input (keyup)="servervalidation($event)" type="text" [(ngModel)]="serveradress" class="font-size-12" label="Entrer l'adrese du serveur:" #serverdefaultinput>
+        </ion-input>
+      </ion-item>
+  </ng-container>
+</ion-content>
+<ion-footer *ngIf="showsaving && type==='password'" class="ion-padding ion-no-border">
+  <ion-button  (click)="validatepassword()" mode="ios"  expand="full" class="bd-radius-20" [color]="showserversetup?'success':'warning'">
+    <ion-icon [name]="showserversetup?'server-outline':'checkmark-circle-outline'"  size="large"></ion-icon>
+  </ion-button>
+</ion-footer>

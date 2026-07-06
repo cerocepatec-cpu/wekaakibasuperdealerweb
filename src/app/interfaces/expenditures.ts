@@ -1,0 +1,30 @@
+export interface Expenditures{
+    id?: number;
+    user_id?:  number;
+    user_name?:  string;
+    money_id?:  number;
+    money_name?: string;
+    ticket_office_id?:  number;
+    amount?:  number;
+    motif?:  string;
+    beneficiary_name?: string;
+    beneficiary?: number;
+    beneficiary_phone?: string;
+    beneficiary_mail?: string;
+    beneficiarydata?: any;
+    account_id?:  number;
+    account_name?:  string;
+    is_validate?: boolean;
+    type?:any;
+    uuid?:  string;
+    sync_status?:  string;
+    status?:  string;
+    enterprise_id?: number;
+    created_at?: string;
+    updated_at?: string;
+    done_at?: string;
+    abreviation?: string;
+    selected?:boolean;
+    fund_name?:string;
+    fund_id?:number;
+}

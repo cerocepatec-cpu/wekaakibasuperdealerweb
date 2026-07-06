@@ -1,0 +1,747 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="full" class="smalldevicehidden">
+      <ion-text slot="start" class="font-size-30 font-bold-600"
+        >Catalogue des produits ({{ listarticles.length }})</ion-text
+      >
+      <ion-icon
+        name="add-circle-outline"
+        size="large"
+        color="warning"
+        slot="end"
+        (click)="newservice()"
+        *ngIf="!showcheckbox && appserv.permissionFilter('produits', 'add')"
+      ></ion-icon>
+      <ion-icon
+        name="list-outline"
+        slot="end"
+        color="warning"
+        (click)="showcheckbox = !showcheckbox"
+        *ngIf="!showcheckbox"
+      ></ion-icon>
+      <ion-text
+        slot="start"
+        color="primary"
+        (click)="showcheckbox = !showcheckbox; listselectedarticles = []"
+        *ngIf="showcheckbox"
+        >Terminer</ion-text
+      >
+      <ion-icon
+        name="download-outline"
+        color="warning"
+        slot="end"
+        [matMenuTriggerFor]="menuexport"
+        *ngIf="!showcheckbox"
+        size="large"
+      ></ion-icon>
+    </ion-item>
+
+    <ion-item lines="full" class="largedevicehidden">
+      <ion-text slot="start" class="font-size-30 font-bold-600"
+        >Produits
+        <span class="font-size-10"
+          >(Page: {{ paginationOptions.current_page }})</span
+        ></ion-text
+      >
+      <ion-icon
+        name="add-circle-outline"
+        size="large"
+        color="warning"
+        slot="end"
+        (click)="newservice()"
+        *ngIf="!showcheckbox && appserv.permissionFilter('produits', 'add')"
+      ></ion-icon>
+      <ion-icon
+        name="list-outline"
+        slot="end"
+        color="warning"
+        (click)="showcheckbox = !showcheckbox"
+        *ngIf="!showcheckbox"
+      ></ion-icon>
+      <ion-text
+        slot="start"
+        color="warning"
+        (click)="showcheckbox = !showcheckbox; listselectedarticles = []"
+        *ngIf="showcheckbox"
+        >Terminer</ion-text
+      >
+      <ion-icon
+        name="download-outline"
+        color="warning"
+        slot="end"
+        [matMenuTriggerFor]="menuexport"
+        *ngIf="!showcheckbox"
+        size="large"
+      ></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar
+    type="indeterminate"
+    *ngIf="showdefaultprogress"
+    mode="ios"
+    color="primary"
+  ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody cartpreview-85">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données..."
+    >
+    </ion-refresher-content>
+  </ion-refresher>
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <ion-icon name="list-outline"></ion-icon> &nbsp; Catalogue
+      </ng-template>
+      <br />
+      <div class="content ion-padding bd-square">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-lg="6">
+              <ion-item lines="none" class="contentbody">
+                <ion-text
+                  *ngIf="appserv.permissionFilter('services categories', 'add')"
+                  slot="start"
+                  color="primary"
+                  (click)="newcategory()"
+                  class="font-size-16"
+                  >Catégories</ion-text
+                >
+                <ion-text
+                  *ngIf="appserv.permissionFilter('uom', 'add')"
+                  slot="end"
+                  color="primary"
+                  (click)="newunitofmeasure()"
+                  class="font-size-16"
+                  >Unités de mesure</ion-text
+                >
+              </ion-item>
+              <hr class="hr" />
+              <ion-item lines="none" class="contentbody">
+                <ion-searchbar
+                  class="font-size-11"
+                  mode="ios"
+                  placeholder="Recherche"
+                  [(ngModel)]="keyword"
+                  #searchinput
+                  (keyup)="serviceslookup($event)"
+                ></ion-searchbar>
+                <ion-icon
+                  name="filter-outline"
+                  slot="end"
+                  [matMenuTriggerFor]="animals2"
+                  color="primary"
+                ></ion-icon>
+                <mat-menu #animals2="matMenu">
+                  <button mat-menu-item (click)="deletingfilter()">
+                    <ion-text class="font-size-11" color="danger">
+                      Annuler le filtre</ion-text
+                    >
+                  </button>
+                  <button
+                    *ngIf="appserv.permissionFilter('produits', 'view')"
+                    mat-menu-item
+                    [matMenuTriggerFor]="menutypes"
+                  >
+                    <ion-text class="font-size-11">Type</ion-text>
+                  </button>
+                  <button
+                    *ngIf="
+                      appserv.permissionFilter('services categories', 'view')
+                    "
+                    mat-menu-item
+                    [matMenuTriggerFor]="menucategories"
+                  >
+                    <ion-text class="font-size-11">Catégorie</ion-text>
+                  </button>
+                  <button
+                    *ngIf="appserv.permissionFilter('uom', 'view')"
+                    mat-menu-item
+                    [matMenuTriggerFor]="menuUoms"
+                  >
+                    <ion-text class="font-size-11">Unité de mesure</ion-text>
+                  </button>
+                </mat-menu>
+                <mat-menu #menutypes="matMenu">
+                  <button mat-menu-item (click)="filterbytype('1')">
+                    <ion-text class="font-size-11">Article</ion-text>
+                  </button>
+                  <button mat-menu-item (click)="filterbytype('2')">
+                    <ion-text class="font-size-11">Service</ion-text>
+                  </button>
+                  <button mat-menu-item (click)="filterbytype('3')">
+                    <ion-text class="font-size-11">Accompagnement</ion-text>
+                  </button>
+                </mat-menu>
+
+                <mat-menu #menuexport="matMenu">
+                  <button mat-menu-item (click)="excelexport()">
+                    <ion-text class="font-size-11">Exporter en Excel</ion-text>
+                  </button>
+                  <button mat-menu-item (click)="pdfdownload()">
+                    <ion-text class="font-size-11">Exporter en PDF</ion-text>
+                  </button>
+                  <button mat-menu-item (click)="importcsvfile()">
+                    <ion-text class="font-size-11"
+                      >Importer un fichier</ion-text
+                    >
+                  </button>
+                </mat-menu>
+
+                <mat-menu #menucategories="matMenu">
+                  <button mat-menu-item (click)="filterbycategory()">
+                    <ion-text class="font-size-11">Aucune</ion-text>
+                  </button>
+                  <button
+                    mat-menu-item
+                    *ngFor="let category of listcategories"
+                    (click)="filterbycategory(category.category.id)"
+                  >
+                    <ion-text class="font-size-11">{{
+                      category.category.name | titlecase
+                    }}</ion-text>
+                  </button>
+                </mat-menu>
+
+                <mat-menu #menuUoms="matMenu">
+                  <button mat-menu-item (click)="filterbyuom()">
+                    <ion-text class="font-size-11">Aucune</ion-text>
+                  </button>
+                  <button
+                    mat-menu-item
+                    *ngFor="let uom of listunitofmeasure"
+                    (click)="filterbyuom(uom.id)"
+                  >
+                    <ion-text class="font-size-11">{{
+                      uom.name | titlecase
+                    }}</ion-text>
+                  </button>
+                </mat-menu>
+              </ion-item>
+            </ion-col>
+            <ion-col size="12" size-lg="6" class="smalldevicehidden">
+              <ion-item lines="none" class="ion-float-right contentbody">
+                <ion-text slot="start" class="font-size-12">
+                  {{ paginationOptions.from }} – {{ paginationOptions.to }} sur
+                  {{ paginationOptions.total }}
+                </ion-text>
+                <ion-chip
+                  (click)="PageEventHandled('first-page')"
+                  matTooltip="Première page"
+                  [disabled]="!paginationOptions.first_page_url"
+                  color="warning"
+                  ><ion-icon name="play-skip-back-outline"></ion-icon
+                ></ion-chip>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <ion-chip
+                  (click)="PageEventHandled('previous-page')"
+                  matTooltip="Page précédente"
+                  [disabled]="!paginationOptions.prev_page_url"
+                  color="warning"
+                  ><ion-icon name="play-back-outline"></ion-icon
+                ></ion-chip>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <ion-chip
+                  (click)="PageEventHandled('next-page')"
+                  matTooltip="Page suivante"
+                  [disabled]="!paginationOptions.next_page_url"
+                  color="warning"
+                  ><ion-icon name="play-forward-outline"></ion-icon
+                ></ion-chip>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <ion-chip
+                  (click)="PageEventHandled('last-page')"
+                  matTooltip="Dernière page"
+                  [disabled]="!paginationOptions.last_page_url"
+                  color="warning"
+                  ><ion-icon name="play-skip-forward-outline"></ion-icon
+                ></ion-chip>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        <ion-item
+          class="contentbody default-list-item"
+          *ngFor="let article of listarticles | filter : keyword"
+          (click)="articlemenu(article)"
+          lines="inset"
+          detail="true"
+        >
+          <ion-checkbox
+            slot="start"
+            *ngIf="showcheckbox"
+            mode="ios"
+            size="small"
+            aria-label="product"
+            [checked]="article.selected"
+          ></ion-checkbox>
+          <ion-avatar slot="start">
+            <ion-text class="ion-text-uppercase">{{
+              article.service.name | slice : 0 : 2
+            }}</ion-text>
+          </ion-avatar>
+          <ion-label>
+            <p class="item-label-title">
+              <ion-text>{{ article.service.name | titlecase }}</ion-text>
+            </p>
+            <p class="secondpara">
+              {{ article.service.description | titlecase }}
+            </p>
+            <p class="secondpara">
+              <span class="reqtotalprinted font-size-11"
+                ><span class="font-bold-600">Catég.</span>
+                {{ article.service.category_name | titlecase }}</span
+              >
+            </p>
+            <p class="secondpara">
+              <span class="reqtotalprinted font-size-11"
+                ><span class="font-bold-600">Unité de mesure:</span>
+                {{ article.service.uom_symbol | titlecase }}</span
+              >
+            </p>
+            <p class="secondpara largedevicehidden">
+              <ion-text
+                *ngFor="let price of article.prices"
+                class="cursor-pointer focused-primary text-ellipsis font-size-12 bg-dark ion-margin-end bd-rounded padding-5"
+                color="light"
+                >{{ price.price }} {{ price.abreviation }}</ion-text
+              >
+            </p>
+            <p class="secondpara" *ngIf="article.limits?.length">
+              <span class="reqtotalprinted font-size-11 font-bold-600">
+                Limites :
+              </span>
+
+              <ion-text
+                *ngFor="let limit of article.limits"
+                class="font-size-11 bg-light text-dark bd-rounded padding-3 ion-margin-end"
+              >
+                {{ limit.min_amount }} -
+                {{ limit.max_amount ? (limit.max_amount | number) : "∞" }}
+                {{ limit.money_abreviation }}
+              </ion-text>
+            </p>
+            <p class="secondpara largedevicehidden">
+              <ion-chip
+                *ngFor="let limit of article.limits"
+                color="medium"
+                class="font-size-10"
+              >
+                {{ limit.min_amount }} -
+                {{ limit.max_amount ? (limit.max_amount | number) : "∞" }}
+                {{ limit.money_abreviation }}
+              </ion-chip>
+            </p>
+          </ion-label>
+          <ion-chip
+            *ngFor="let price of article.prices"
+            slot="end"
+            class="font-size-10 smalldevicehidden"
+            >{{ price.label | titlecase }} : {{ price.price }}
+            {{ price.abreviation }}</ion-chip
+          >
+        </ion-item>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <ion-icon name="cart-outline"></ion-icon> &nbsp; Disponibilité
+      </ng-template>
+      <br />
+      <div class="content ion-padding bd-square">
+        <h6>Disponibles ({{ availableservices.length }})</h6>
+        <ion-item
+          class="contentbody default-list-item"
+          lines="full"
+          detail="true"
+          *ngFor="let article of availableservices"
+        >
+          <ion-icon
+            slot="start"
+            name="document"
+            mode="ios"
+            size="small"
+            color="secondary"
+          ></ion-icon>
+          <ion-label>
+            <p class="item-label-title">
+              <ion-text>{{ article.service.name | titlecase }}</ion-text>
+            </p>
+            <p class="secondpara">
+              {{ article.service.description | titlecase }}
+            </p>
+            <p class="secondpara">
+              <span class="reqtotalprinted font-size-11"
+                ><span class="font-bold-600">Catég.</span>
+                {{ article.service.category_name | titlecase }}</span
+              >
+            </p>
+            <p class="secondpara">
+              <span class="reqtotalprinted font-size-11"
+                ><span class="font-bold-600">Unité de mesure:</span>
+                {{ article.service.uom_symbol | titlecase }}</span
+              >
+            </p>
+            <p class="secondpara largedevicehidden">
+              <ion-text
+                *ngFor="let price of article.prices"
+                class="cursor-pointer focused-primary text-ellipsis font-size-12 bg-dark ion-margin-end bd-rounded padding-5"
+                color="light"
+                >{{ price.price | number }} {{ price.abreviation }}</ion-text
+              >
+            </p>
+          </ion-label>
+          <ion-chip
+            *ngFor="let price of article.prices"
+            slot="end"
+            class="font-size-10 smalldevicehidden"
+            >{{ price.label | titlecase }} : {{ price.price | number }}
+            {{ price.abreviation }}</ion-chip
+          >
+          <ion-icon
+            name="ellipsis-vertical"
+            size="small"
+            slot="end"
+            [matMenuTriggerFor]="menuavailables"
+          ></ion-icon>
+
+          <mat-menu #menuavailables="matMenu">
+            <button
+              mat-menu-item
+              (click)="changeservicestatus(article, 'unavailable')"
+            >
+              <ion-text class="font-size-11">Indisponible?</ion-text>
+            </button>
+            <button mat-menu-item (click)="newreservation(article)">
+              <ion-icon name="calendar" size="small" color="warning"></ion-icon>
+              &nbsp; <ion-text class="font-size-11">Réserver?</ion-text>
+            </button>
+          </mat-menu>
+        </ion-item>
+        <br />
+        <h6>Occupés ({{ unavailableservices.length }})</h6>
+        <ion-item
+          class="contentbody default-list-item"
+          lines="full"
+          detail="true"
+          *ngFor="let article of unavailableservices"
+        >
+          <ion-icon
+            slot="start"
+            name="document"
+            mode="ios"
+            size="small"
+            color="secondary"
+          ></ion-icon>
+          <ion-label>
+            <p class="item-label-title">
+              <ion-text>{{ article.service.name | titlecase }}</ion-text>
+            </p>
+            <p class="secondpara">
+              {{ article.service.description | titlecase }}
+            </p>
+            <p class="secondpara">
+              <span class="reqtotalprinted font-size-11"
+                ><span class="font-bold-600">Catég.</span>
+                {{ article.service.category_name | titlecase }}</span
+              >
+            </p>
+            <p class="secondpara">
+              <span class="reqtotalprinted font-size-11"
+                ><span class="font-bold-600">Unité de mesure:</span>
+                {{ article.service.uom_symbol | titlecase }}</span
+              >
+            </p>
+            <p class="secondpara largedevicehidden">
+              <ion-text
+                *ngFor="let price of article.prices"
+                class="cursor-pointer focused-primary text-ellipsis font-size-12 bg-dark ion-margin-end bd-rounded padding-5"
+                color="light"
+                >{{ price.price | number }} {{ price.abreviation }}</ion-text
+              >
+            </p>
+          </ion-label>
+          <ion-chip
+            *ngFor="let price of article.prices"
+            slot="end"
+            class="font-size-10 smalldevicehidden"
+            >{{ price.label | titlecase }} : {{ price.price | number }}
+            {{ price.abreviation }}</ion-chip
+          >
+          <ion-icon
+            name="ellipsis-vertical"
+            size="small"
+            slot="end"
+            [matMenuTriggerFor]="menuUnavailables"
+          ></ion-icon>
+
+          <mat-menu #menuUnavailables="matMenu">
+            <button
+              mat-menu-item
+              (click)="changeservicestatus(article, 'available')"
+            >
+              <ion-text class="font-size-11">Disponible?</ion-text>
+            </button>
+          </mat-menu>
+        </ion-item>
+      </div>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <ion-icon name="ellipsis-horizontal"></ion-icon> &nbsp; Réservations
+      </ng-template>
+      <br />
+      <div class="content ion-padding bd-square bd-radius-10">
+        <ion-searchbar
+          mode="ios"
+          placeholder="Recherche"
+          (keyup)="searchreservation()"
+          [(ngModel)]="keyreservation"
+        ></ion-searchbar>
+        <div class="ion-padding bd-square bd-radius-10">
+          <ion-chip
+            color="warning"
+            class="font-size-13"
+            (click)="reservationsfilter('pending')"
+          >
+            <ion-icon name="ellipsis-horizontal-circle" size="small"></ion-icon>
+            &nbsp; En attente</ion-chip
+          >
+          <ion-chip
+            color="danger"
+            class="font-size-13"
+            (click)="reservationsfilter('cancelled')"
+            ><ion-icon name="close-circle" size="small"></ion-icon> &nbsp;
+            Annulées</ion-chip
+          >
+          <ion-chip
+            color="secondary"
+            class="font-size-13"
+            (click)="reservationsfilter('confirmed')"
+            ><ion-icon name="checkmark-circle" size="small"></ion-icon> &nbsp;
+            Confirmées</ion-chip
+          >
+          <ion-chip
+            color="success"
+            class="font-size-13"
+            (click)="reservationsfilter('finished')"
+            ><ion-icon name="thumbs-up" size="small"></ion-icon> &nbsp;
+            Terminées</ion-chip
+          >
+        </div>
+        <ion-item
+          class="contentbody default-list-item"
+          lines="full"
+          detail="true"
+          *ngFor="let reservation of reservations | filter : keyreservation"
+        >
+          <ion-icon
+            slot="start"
+            name="person"
+            mode="ios"
+            size="small"
+            color="secondary"
+          ></ion-icon>
+          <ion-label>
+            <p class="item-label-title font-size-15">
+              <ion-text>{{
+                reservation.customer.customerName | titlecase
+              }}</ion-text>
+            </p>
+            <p class="secondpara font-bold-600 font-size-14">
+              Réservation de :
+              {{ reservation.service.service.name | titlecase }}
+            </p>
+            <p class="secondpara">
+              <span class="reqtotalprinted font-size-11"
+                ><span class="font-bold-600">Status.</span>
+                {{ reservation.status | titlecase }}</span
+              >
+            </p>
+            <p class="secondpara">
+              <span class="reqtotalprinted font-size-11"
+                ><span class="font-bold-600"
+                  >Du : {{ reservation.from | date }}</span
+                >
+                Au : {{ reservation.to | date }} ({{
+                  reservation.nbr_days
+                }}
+                Jrs)</span
+              >
+            </p>
+            <p class="secondpara smalldevicehidden">
+              <ion-text
+                class="cursor-pointer focused-primary text-ellipsis font-size-12 ion-margin-end bd-rounded ion-padding"
+              >
+                {{ reservation.price | number }} * {{ reservation.nbr_days }}Jrs
+                <span class="font-bold-600"></span> ({{
+                  reservation.total | number
+                }}
+                {{ appserv.getDefaultmoney().abreviation }})
+              </ion-text>
+              &nbsp; &nbsp;
+              <ion-text
+                class="cursor-pointer focused-primary text-ellipsis font-size-12 ion-margin-end bd-rounded ion-padding"
+              >
+                <span class="font-bold-600">Caution:</span> ({{
+                  reservation.caution | number
+                }}
+                {{ appserv.getDefaultmoney().abreviation }})
+              </ion-text>
+            </p>
+            <p class="secondpara largedevicehidden">
+              <ion-text
+                class="cursor-pointer focused-primary text-ellipsis font-size-12 bg-dark ion-margin-end bd-rounded padding-5"
+                color="light"
+              >
+                {{ reservation.price | number }} *
+                {{ reservation.nbr_days }} Jrs ({{
+                  reservation.total | number
+                }}
+                {{ appserv.defaultmoney.abreviation }})
+              </ion-text>
+              <ion-text
+                class="cursor-pointer focused-primary text-ellipsis font-size-12 ion-margin-end bd-rounded ion-padding"
+              >
+                <span class="font-bold-600">Caution:</span> ({{
+                  reservation.caution | number
+                }}
+                {{ appserv.getDefaultmoney().abreviation }})
+              </ion-text>
+            </p>
+          </ion-label>
+          <ion-icon
+            name="ellipsis-vertical"
+            size="small"
+            slot="end"
+            [matMenuTriggerFor]="menureservation"
+          ></ion-icon>
+          <mat-menu #menureservation="matMenu">
+            <div class="ion-padding">
+              <ion-text class="font-bold-600 font-size-13"
+                >Changer le statut</ion-text
+              >
+              <hr class="hr" />
+              <button
+                mat-menu-item
+                (click)="changereservationstatus(reservation, 'pending')"
+              >
+                <ion-icon
+                  name="ellipsis-vertical-circle"
+                  size="small"
+                  color="warning"
+                  class="ion-margin-top"
+                ></ion-icon
+                ><ion-label
+                  class="font-size-11"
+                  style="position: relative; top: -5px !important"
+                >
+                  En attente</ion-label
+                >
+              </button>
+              <button
+                mat-menu-item
+                (click)="changereservationstatus(reservation, 'confirmed')"
+              >
+                <ion-icon
+                  name="checkmark-circle"
+                  size="small"
+                  color="success"
+                ></ion-icon>
+                <ion-label
+                  class="font-size-11"
+                  style="position: relative; top: -5px !important"
+                >
+                  Confirmer</ion-label
+                >
+              </button>
+              <button
+                mat-menu-item
+                (click)="changereservationstatus(reservation, 'finished')"
+              >
+                <ion-icon
+                  name="thumbs-up"
+                  size="small"
+                  color="secondary"
+                ></ion-icon>
+                <ion-label
+                  class="font-size-11"
+                  style="position: relative; top: -5px !important"
+                >
+                  Terminer</ion-label
+                >
+              </button>
+              <button
+                mat-menu-item
+                (click)="changereservationstatus(reservation, 'cancelled')"
+              >
+                <ion-icon
+                  name="close-circle"
+                  size="small"
+                  color="danger"
+                ></ion-icon>
+                <ion-label
+                  class="font-size-11"
+                  style="position: relative; top: -5px !important"
+                >
+                  Annuler</ion-label
+                >
+              </button>
+            </div>
+          </mat-menu>
+        </ion-item>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <ion-fab
+    slot="fixed"
+    horizontal="center"
+    vertical="center"
+    class="largedevicehidden"
+  >
+    <ion-fab-button color="medium">
+      <ion-icon name="filter"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button
+        (click)="PageEventHandled('first-page')"
+        matTooltip="Première page"
+        [disabled]="!paginationOptions.first_page_url"
+      >
+        <ion-icon name="chevron-up"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+    <ion-fab-list side="end">
+      <ion-fab-button
+        (click)="PageEventHandled('next-page')"
+        matTooltip="Page suivante"
+      >
+        <ion-icon name="play-skip-forward-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+    <ion-fab-list side="bottom">
+      <ion-fab-button
+        (click)="PageEventHandled('last-page')"
+        matTooltip="Dernière page"
+        [disabled]="!paginationOptions.last_page_url"
+      >
+        <ion-icon name="chevron-down"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+    <ion-fab-list side="start">
+      <ion-fab-button
+        (click)="PageEventHandled('previous-page')"
+        matTooltip="Page précédente"
+        [disabled]="!paginationOptions.prev_page_url"
+      >
+        <ion-icon name="play-skip-back-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
+</ion-content>

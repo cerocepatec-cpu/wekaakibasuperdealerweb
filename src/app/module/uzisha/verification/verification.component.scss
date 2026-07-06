@@ -1,0 +1,621 @@
+.label-center{
+  text-align: center;
+}
+
+.example-accordion {
+  display: block;
+  max-width: 100%;
+}
+
+.example-accordion-item {
+  display: block;
+  border: solid 1px #ccc;
+}
+
+// .example-accordion-item + .example-accordion-item {
+//   border-top: none;
+// }
+
+.example-accordion-item-header,
+.example-accordion-item-body {
+  padding-top: none !important;
+}
+
+.example-accordion-item-description {
+  font-size: 0.85em;
+  color: #999;
+}
+
+.example-accordion-item-header:hover {
+  cursor: pointer;
+  background-color: #eee;
+}
+
+.example-accordion-item:first-child {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.example-accordion-item:last-child {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+
+.fonctionslist{
+    ion-chip{
+      padding: 15px!important;
+      border-radius: 5px!important;
+      ion-label{
+        font-size: small;
+      }
+      ion-badge{
+        font-size:8px!important;
+      }
+      ion-icon{
+        width: 10px!important;
+      }
+    }
+  }
+
+  .headerusersdivlist{
+    background-color: #e1d8d8;
+    width: 100%;
+    height: fit-content;
+  }
+
+  .listactions{
+    height: 500px!important;
+  }
+
+  .button-container {
+    position: relative;
+    display: flex;
+  }
+
+  .section{
+    position:absolute;
+    bottom:37px !important;
+    right: 30px !important;
+  }
+
+  .demo-section + .demo-section {
+    margin-top: 16px;
+  }
+
+  .leftmenuitem{
+    display: none;
+  }
+
+  .usersdivlist{
+    background: #ffff;
+    width: 100%;
+
+    .user-item-list{
+      ion-tab-button{
+        padding: 15px!important;
+        .leftmenuitem{
+          position:absolute;
+          margin-left:80px!important;
+          margin-top: -109px!important;
+        }
+        ion-label{
+          text-align: center;
+          font-size: small;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+          .secondpara2{
+            color: white;
+          }
+        }
+        ion-avatar{
+          margin-top: 10px;
+          width: 70px;
+          height: 70px;
+          justify-content: center;
+          display: flex;
+          align-items: center;
+          background:#D2DBFC;
+          color: rgb(0,0,0);
+          font-weight: 600;
+        }
+
+        .bg-success{
+          background-color: var(--ion-color-tertiary);
+          mat-icon{
+            color: var(--ion-color-light);
+          }
+        }
+      }
+
+      .center-section{
+        position:absolute;
+        bottom:80px !important;
+        right: 150px !important;
+      }
+    }
+
+    .user-item-list:hover{
+      .leftmenuitem{
+        display: block;
+      }
+    }
+  }
+
+  .item-agent-list{
+    ion-avatar{
+      background: #D2DBFC;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      ion-text{
+        font-size: small;
+        color: rgb(10, 10, 10);
+      }
+    }
+    ion-label{
+      .item-label-title{
+        color: blue;
+      }
+      .secondpara{
+        margin-top:-10px ;
+        color: rgb(237, 230, 230);
+      }
+    }
+  }
+
+  .searchinput{
+    font-size: 11px;
+    height: 40px;
+  }
+
+  .item-depart-list{
+    margin-left: -17px!important;
+    ion-avatar{
+      margin-right:7px!important;
+      background: #D2DBFC;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      ion-text{
+        font-size: small;
+        color: rgb(10, 10, 10);
+      }
+    }
+    ion-label{
+      .item-label-title{
+        font-weight: 600;
+        color: blue;
+      }
+      .secondpara{
+        margin-top:-10px ;
+        color: grey;
+      }
+    }
+  }
+
+  .secondpara2{
+    color: grey;
+  }
+
+  .add-new {
+    margin-left: -17px!important;
+    ion-avatar{
+      margin-right:7px!important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      ion-text{
+        font-size: small;
+        color: rgb(10, 10, 10);
+      }
+    }
+    ion-label{
+      .item-label-title{
+        font-weight: 600;
+        color: blue;
+      }
+      .secondpara{
+        margin-top:-10px ;
+        color: rgb(221, 213, 213);
+      }
+    }
+  }
+
+  ion-tab-button{
+    --background:linear-gradient(50deg, #f3f3f9 0%, #aaaae1 35%, #85dff1 100%);
+  }
+
+  .swiper{
+    --background:linear-gradient(50deg, #f3f3f9 0%, #aaaae1 35%, #85dff1 100%);
+    ion-label{
+      color: black;
+      font-weight: 600;
+    }
+
+    ion-text{
+      color: black;
+      font-weight: 400;
+    }
+  }
+
+  .header-title{
+    .item-label-title{
+      font-size: larger;
+      color: rgb(33, 109, 239);
+    }
+
+    .secondpara2{
+      font-size:small;
+      margin-top: -10px;
+    }
+  }
+
+  .number-bloc{
+
+    ion-chip{
+      background: #ffbf53;
+      color: #ffffff;
+    }
+
+    ion-avatar{
+      width: 80px;
+      height: 80px;
+
+      background: #ffbf53;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .member-number{
+        margin-right: 12px;
+        font-size: x-large;
+        font-weight: 800;
+        color: #ffffff;
+      }
+
+      .member-text{
+        text-align: center;
+        font-size: small;
+        color: white;
+      }
+    }
+  }
+
+  ion-skeleton-text {
+    --border-radius: 9999px;
+  }
+
+  /**
+  * From Detail department.css
+  */
+
+  .footeritem{
+    ion-label h2,h4{
+     margin:0px;
+    }
+  }
+
+  .list-item{
+    margin-bottom: 15px;
+        ion-avatar{
+          width: 35px;
+          height: 35px;
+          background-color: #50c8ff;
+          margin-right: 10px;
+          justify-content: center;
+          display: flex;
+          align-items: center;
+          ion-icon{
+            font-weight: 600;
+            color:white;
+          }
+        }
+        ion-label{
+          .secondpara{
+            margin-top: -20px !important;
+            font-size: 11px;
+            color: rgb(166, 163, 163);
+          }
+          .item-label-title{
+            font-size: 12px;
+            font-weight: 500;
+          }
+        }
+   }
+
+   .square-avatar-warning{
+    border:1px solid #72adcd;
+    border-radius: 5px!important;
+    background: #ffc409;
+    width: 30px;
+    height: 30px;
+    mat-icon{
+      color: #f4f5f8;
+    }
+    ion-icon{
+      color: #f4f5f8;
+    }
+   }
+
+   .square-avatar-primary{
+    border:1px solid hsl(284, 79%, 78%);
+    border-radius: 5px!important;
+    background: #3880ff;
+    width: 30px;
+    height: 30px;
+    mat-icon{
+      color: #f4f5f8;
+    }
+    ion-icon{
+      color: #f4f5f8;
+    }
+   }
+
+   .square-avatar-success{
+    border:1px solid #ef418f;
+    border-radius: 5px!important;
+    background: #28ba62;
+    width: 30px;
+    height: 30px;
+    mat-icon{
+      color: #f4f5f8;
+    }
+    ion-icon{
+      color: #f4f5f8;
+    }
+   }
+
+   .square-avatar-danger{
+    border:1px solid #504d4d;
+    border-radius: 5px!important;
+    background: #cf3c4f;
+    width: 30px;
+    height: 30px;
+    mat-icon{
+      color: #f4f5f8;
+    }
+    ion-icon{
+      color: #f4f5f8;
+    }
+   }
+
+   .description-bloc{
+    --background: rgb(96, 96, 96);
+   }
+
+   .new-item-design{
+    ion-avatar{
+      width: 30px;
+      height: 30px;
+      background:#383a3e;
+    }
+    ion-label{
+      margin-top: 24px;
+     color: #4b85e9;
+    }
+   }
+
+   ion-segment{
+    height: 35px;
+    width: 220px !important;
+    padding: 5px !important;
+    background-color: #daeaef !important;
+    border-radius: 20px !important;
+    ion-segment-button{
+      font-size: 11px;
+      top: 2.5px;
+      --border-radius: 40px !important;
+      color:rgb(73, 72, 72);
+    }
+  }
+
+  /* ======================= Cards ====================== */
+.cardBox {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 30px;
+}
+
+.cardBox .card {
+  position: relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+}
+
+.cardBox .card .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5rem;
+  color: var(--blue);
+}
+
+.cardBox .card .cardName {
+  color: var(--black2);
+  font-size: 1.1rem;
+  margin-top: 5px;
+}
+
+.cardBox .card .iconBx {
+  font-size: 3.5rem;
+  color: var(--black2);
+}
+
+.cardBox .card:hover {
+  background: var(--blue);
+}
+.cardBox .card:hover .numbers,
+.cardBox .card:hover .cardName,
+.cardBox .card:hover .iconBx {
+  color: var(--white);
+}
+
+//* ================== Order Details List ============== */
+.details {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  display: grid;
+  grid-gap: 30px;
+  /* margin-top: 10px; */
+}
+
+.details .recentOrders {
+  position: relative;
+  display: grid;
+  min-height: 500px;
+  background: var(--white);
+  padding: 20px;
+  box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+}
+
+.details .cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.cardHeader h2 {
+  font-weight: 600;
+  color: var(--blue);
+}
+.cardHeader .btn {
+  position: relative;
+  padding: 4px 4px;
+  background: var(--blue);
+  text-decoration: none;
+  color: var(--white);
+  border-radius: 6px;
+}
+
+.details table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0px !important;
+}
+.details table thead td {
+  font-weight: 600;
+}
+.details .recentOrders table tr {
+  color: var(--black1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+.details .recentOrders table tr:last-child {
+  border-bottom: none;
+}
+.details .recentOrders table tbody tr:hover {
+  background: var(--blue);
+  color: var(--white);
+}
+.details .recentOrders table tr td {
+  padding: 10px;
+}
+.compteName{
+  text-align: left !important;
+}
+.details .recentOrders table tr td:last-child {
+  text-align: end;
+}
+.details .recentOrders table tr td:nth-child(2) {
+  text-align: end;
+}
+.details .recentOrders table tr td:nth-child(3) {
+  text-align: center;
+}
+.status.delivered {
+  padding: 2px 4px;
+  background: #8de02c;
+  color: var(--white);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.status.pending {
+  padding: 2px 4px;
+  background: #e9b10a;
+  color: var(--white);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.status.return {
+  padding: 2px 4px;
+  background: #f00;
+  color: var(--white);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.status.inProgress {
+  padding: 2px 4px;
+  background: #1795ce;
+  color: var(--white);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.recentCustomers {
+  position: relative;
+  display: grid;
+  min-height: 500px;
+  padding: 20px;
+  background: var(--white);
+  box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+}
+.recentCustomers .imgBx {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  overflow: hidden;
+}
+.recentCustomers .imgBx img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.recentCustomers table tr td {
+  padding: 12px 10px;
+}
+.recentCustomers table tr td h4 {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2rem;
+}
+.recentCustomers table tr td h4 span {
+  font-size: 14px;
+  color: var(--black2);
+}
+.recentCustomers table tr:hover {
+  background: var(--blue);
+  color: var(--white);
+}
+.recentCustomers table tr:hover td h4 span {
+  color: var(--white);
+}
+
+.childCardBackground{
+  background: #4e5557a8 !important;
+  color: white;
+  text-align: left;
+}
+.childOfchildCardBackground{
+  background: #4e55572e !important;
+}
+.childOfchildCardContaint{
+  border-bottom: solid 1px #4e55572e !important;
+}

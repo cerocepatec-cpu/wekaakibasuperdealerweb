@@ -1,0 +1,122 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+     <ion-icon name="chevron-back-outline" color="primary" slot="start" (click)="appserv.closemodal()"></ion-icon>
+     <ion-text color="dark" slot="start">Infos sur Facture </ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <br>
+  <div class="userprofiltoedit ion-text-center">
+    <ion-avatar style="margin:auto;">
+      <ion-icon [name]="invoicesent.invoice.customer_name?'person':'grid-outline'" size="large"></ion-icon>
+    </ion-avatar>
+    <ion-note class="font-size-20 font-bold-600" color="dark">{{invoicesent.invoice.customer_name?invoicesent.invoice.customer_name:invoicesent.invoice.uuid | uppercase}}</ion-note>
+    <ion-note class="font-size-16" *ngIf="invoicesent.invoice.customer_name">OP.ID: {{invoicesent.invoice.uuid}}</ion-note> <br>
+    <ion-note class="font-size-16">Type. {{invoicesent.invoice.type_facture==='credit'?'crédit':invoicesent.invoice.type_facture | titlecase}}</ion-note> <br>
+    <ion-note class="font-size-16">Date Op: {{invoicesent.invoice.date_operation | date}}</ion-note>
+
+    <br>
+    <ion-note class="font-size-16 font-bold-600">Montant. {{invoicesent.invoice.netToPay | number}} {{invoicesent.invoice.abreviation}}</ion-note>
+  </div>
+
+  <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+    <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">TVA({{invoicesent.invoice.vat_percent}}%) </ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.vat_amount}} {{invoicesent.invoice.abreviation}}</ion-note>
+     </ion-item>
+     <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">Réduction</ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.discount}} {{invoicesent.invoice.abreviation}}</ion-note>
+     </ion-item>  
+     <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">Total HT</ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.total_ht}} {{invoicesent.invoice.abreviation}}</ion-note>
+     </ion-item> 
+     <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">Net à payer</ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.netToPay}} {{invoicesent.invoice.abreviation}}</ion-note>
+     </ion-item> 
+     <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">Retour</ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.back}} {{invoicesent.invoice.abreviation}}</ion-note>
+     </ion-item>
+     <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">Note</ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.note}}</ion-note>
+     </ion-item> 
+  </ion-card>
+  
+  <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+    <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">Membre</ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.customer_name}}</ion-note>
+     </ion-item>
+     <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">Collecteur</ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.collector_name}}</ion-note>
+     </ion-item>
+     <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">Montant en Espèces</ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.totalespeces}} {{invoicesent.invoice.abreviation}}</ion-note>
+     </ion-item> 
+     <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">Banque</ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.totalcreditcard}} {{invoicesent.invoice.abreviation}}</ion-note>
+     </ion-item>
+     <ion-item class="font-size-12" mode="ios" lines="full">
+        <ion-text slot="start">Mobile money</ion-text>
+        <ion-note slot="end" class="font-bold-600">{{invoicesent.invoice.totalmobilemoney}} {{invoicesent.invoice.abreviation}}</ion-note>
+     </ion-item> 
+  </ion-card>
+
+  <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+    <ion-item class="font-size-12 default-list-item2" mode="ios" lines="none" detail="true" *ngIf="invoicesent.invoice.type_facture==='credit'" (click)="gotopaymentsviewer()">
+      <ion-avatar slot="start" class="square-avatar-primary"><ion-icon name="cart"></ion-icon></ion-avatar> 
+      <ion-label>
+        <h2 class="font-size-12 item-label-title"><ion-text>Paiements</ion-text></h2>
+      </ion-label> 
+     </ion-item> 
+  </ion-card>
+ 
+  <ion-item lines="none" class="contentbody margin-btm-25 font-bold-500 smallavatar">
+    <ion-text slot="start" class="font-size-20">Détails facture ({{invoicesent.details.length}})</ion-text>
+  </ion-item>
+  <ion-card class="bd-radius-10" mode="ios">
+    <ion-item class="bd-radius-10" color="warning" *ngIf="invoicesent.details.length<=0" >
+     <ion-text class="font-size-13">Aucun détail disponible</ion-text>
+    </ion-item>
+    <ion-searchbar mode="ios" placeholder="Recherche" [(ngModel)]="search"  *ngIf="invoicesent.details.length>0"></ion-searchbar>
+      <ion-item mode="ios" class="default-list-item3"  lines="full" *ngFor="let detail of details | filter:search" >
+          <ion-icon name="checkbox-outline" slot="start" color="secondary" size="small"></ion-icon>
+          <ion-label>
+            <p class="item-label-title">
+              {{detail.service_name | titlecase}}
+              <span *ngIf="detail.subservices.length>0">,</span>
+                  <span *ngFor="let accomp of detail.subservices">{{accomp.service_name | titlecase}}<span *ngIf="detail.subservices.length>1">, </span></span>
+                  <br *ngIf="detail.subservices.length>0">
+            </p>
+            <p class="secondpara">Qté. {{detail.quantity}} {{detail.uom_symbol}} * {{detail.price}} {{invoicesent.invoice.abreviation}}</p>
+          </ion-label>
+        <ion-text slot="end" class="font-size-12">
+        Tot. {{detail.total}} {{invoicesent.invoice.abreviation}}
+        </ion-text>
+      </ion-item>
+      <!-- <ion-item mode="ios" lines="none" *ngIf="invoicesent.details.length>10">
+        <ion-note slot="start" class="font-size-12">
+          Tout voir
+        </ion-note>
+        <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+      </ion-item> -->
+  </ion-card>
+  <ion-item mode="ios" class="contentbody footeritem" lines="none">
+    <ion-label>
+      <h4 class="font-size-11"><ion-note>Créée le {{invoicesent.invoice.created_at | date}} par {{invoicesent.invoice.full_name?invoicesent.invoice.full_name:invoicesent.invoice.user_name | titlecase}}</ion-note></h4>
+      <h4 class="font-size-11"><ion-note>Dernière modification {{invoicesent.invoice.updated_at | date}} </ion-note></h4>
+    </ion-label>
+</ion-item>
+</ion-content>
+
+

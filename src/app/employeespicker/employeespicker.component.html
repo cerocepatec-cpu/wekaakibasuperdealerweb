@@ -1,0 +1,36 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" slot="start" (click)="appserv.closemodal()" size="large" color="primary"></ion-icon>
+      <ion-label>
+        <p slot="start" class="font-bold-600 font-size-14" *ngIf="selectedusers.length<=0">Sélectionner les agents</p>
+        <p><ion-text *ngIf="selectedusers.length>0">{{selectedusers.length}} Sélectionnés</ion-text></p>
+        <p><ion-note *ngFor="let agent of selectedusers" class="font-size-11">{{(agent.agent_fullname?agent.agent_fullname:agent.agent_username) | titlecase}},</ion-note></p>
+      </ion-label>
+      <ion-chip color="primary" *ngIf="criteria!=='multiple'" (click)="sendList()" slot="end">Valider</ion-chip>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+    <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-14" [(ngModel)]="search" #defaultinput (ionInput)="handlesearchchange($event)"></ion-searchbar>
+  <ion-list class="contentbody">
+    <ion-item class="default-list-item contentbody"  lines="inset" color="light" *ngFor="let agent of listusers | filter:search" (click)="selected(agent)">
+      <ion-avatar slot="start">
+        <ion-icon name="person-outline" size="small"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title font-size-15">{{agent.agent_fullname?agent.agent_fullname:agent.agent_username | uppercase}}</p>
+        <p class="secondpara font-size-12 font-bold">
+          <ion-text class="font-size-11" color="dark">Poste: {{agent.position_name}} </ion-text> <br *ngIf="agent.position_name">
+          <ion-text class="font-size-11" color="dark">{{agent.description}} </ion-text> <br *ngIf="agent.description">
+        </p>
+      </ion-label>
+      <ion-icon slot="end" *ngIf="agent.selected"  name="checkmark-circle-outline" color="success" size="small"></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<ion-footer class="ion-no-border contentbody ion-padding" *ngIf="selectedusers.length>0" >
+  <ion-button expand="block" class="box-big" color="secondary" mode="ios" (click)="sendselecteduser()">
+    <span>Sélectionner ({{selectedusers.length}})</span>
+  </ion-button>
+</ion-footer>

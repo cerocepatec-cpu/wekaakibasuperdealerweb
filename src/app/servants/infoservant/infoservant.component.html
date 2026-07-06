@@ -1,0 +1,91 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+     <ion-icon name="chevron-back-outline" color="primary" slot="start" (click)="appserv.closemodal()"></ion-icon>
+     <ion-text color="dark" slot="start">Infos sur {{servantsent.name}} </ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <br>
+  <div class="userprofiltoedit ion-text-center">
+    <!-- <ion-avatar style="margin:auto;">
+      <ion-icon name="image-outline" size="large"></ion-icon>
+    </ion-avatar> -->
+    <ion-note class="font-size-20 font-bold-600" color="dark">{{servantsent.name | titlecase}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">{{servantsent.description | titlecase}}</ion-note>
+    <br>
+    <ion-buttons>
+      <ion-tab-button class="bd-rounded box-big ion-padding-start" (click)="gotoedit()">
+        <ion-icon name="document-outline" size="small" color="primary"></ion-icon>
+        <ion-text class="font-size-12" color="primary">Modifier</ion-text>
+      </ion-tab-button> 
+      <ion-tab-button class="bd-rounded box-big" (click)="deletetable(servantsent)">
+        <ion-icon name="trash-outline" size="small" color="primary"></ion-icon>
+        <ion-text class="font-size-12" color="primary">Supprimer</ion-text>
+      </ion-tab-button> 
+      <ion-tab-button class="bd-rounded box-big" (click)="printgeneraldetail()">
+        <ion-icon name="print-outline" size="small" color="primary"></ion-icon>
+        <ion-text class="font-size-12" color="primary">Imprimer</ion-text>
+      </ion-tab-button>
+    </ion-buttons>
+  </div>
+
+  <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+    <ion-item class="font-size-12 default-list-item2" mode="ios" lines="none" detail="true" (click)="reportsales()">
+      <ion-avatar slot="start" class="square-avatar-primary"><ion-icon name="cart"></ion-icon></ion-avatar> 
+      <ion-label>
+        <h2 class="font-size-12 item-label-title"><ion-text>Ventes</ion-text></h2>
+      </ion-label> 
+     </ion-item> 
+  </ion-card>
+
+  <ion-item lines="none" class="contentbody margin-btm-25 font-bold-500 smallavatar">
+    <ion-text slot="start" class="font-size-14"> Vente{{mouvements.length>1?'s':''}} {{mouvements.length}}</ion-text>
+    <ion-segment mode="ios" slot="end" [(ngModel)]="typesale">
+      <ion-segment-button value="all">Toutes</ion-segment-button>
+      <ion-segment-button value="entry">Cash</ion-segment-button>
+      <ion-segment-button value="wayout">Crédits</ion-segment-button>
+    </ion-segment>
+    <ion-avatar slot="end"><ion-icon name="search-outline" size="small"></ion-icon></ion-avatar>
+  </ion-item>
+  <br>
+  <ion-item lines="none" class="contentbody">
+    <ion-label>
+      <p><ion-text class="font-size-13">Total Bonus obtenu:</ion-text></p>
+    </ion-label>
+  </ion-item>
+ 
+  <br>
+  <ion-card class="bd-radius-10 ion-padding" mode="ios">
+    <ion-item class="bd-radius-10" *ngIf="mouvements.length===0" lines="none">
+     <ion-text class="font-size-13">Aucune vente faite par le serveur</ion-text>
+    </ion-item>
+    <ion-item mode="ios" class="default-list-item3"  lines="inset" *ngFor="let mouv of mouvements | slice:0:10">
+      <ion-avatar slot="start"><ion-icon [name]="mouv.type_facture==='withdraw'?'arrow-up':'arrow-down'"></ion-icon></ion-avatar>
+      <ion-label>
+        <h2 class="item-label-title">{{mouv.created_at | date}}</h2>
+        <h4 class="secondpara font-size-11"><ion-note>{{mouv.note}}</ion-note></h4>
+      </ion-label>
+      <ion-chip slot="end" class="font-size-11 chipset" [color]="mouv.type_facture==='withdraw'?'danger':''">{{mouv.type_facture | titlecase}}</ion-chip>
+    </ion-item>
+    <ion-item mode="ios" lines="none" *ngIf="mouvements.length>10" >
+      <ion-note slot="start" class="font-size-12">
+        Tout voir
+      </ion-note>
+      <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+    </ion-item>
+  </ion-card>
+</ion-content>
+<ion-footer class="ion-no-border">
+  <ion-item mode="ios" class="contentbody footeritem" lines="none">
+    <ion-label>
+      <h4 class="font-size-11"><ion-note>Créée le {{servantsent.created_at | date}}</ion-note></h4>
+      <h4 class="font-size-11"><ion-note>Dernière modification {{servantsent.updated_at | date}} </ion-note></h4>
+    </ion-label>
+  </ion-item>
+</ion-footer>
+
+

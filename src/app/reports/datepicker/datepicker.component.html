@@ -1,0 +1,23 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" class="font-size-14">
+      <ion-icon name="chevron-back" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text slot="start" color="primary">Filtres de dates</ion-text>
+      <ion-button mode="ios" color="warning" slot="end" (click)="validate()">
+        <ion-icon name="checkmark-outline" color="light"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+    <ion-item lines="full" class="font-size-14">
+      <ion-text>Sélectionnez une période:</ion-text>
+    </ion-item>
+    <div class="ion-padding">
+        <br>
+        <ion-input class="font-size-12 bd-radius-10 box-big ion-padding-start ion-padding-end" type="date" [(ngModel)]="from"   presentation="date" label="Date début" (keyup)="handlevalidated($event)" #defaultinput></ion-input>
+        <br>
+        <ion-input class="font-size-12 bd-radius-10 box-big ion-padding-start ion-padding-end" type="date" [(ngModel)]="to"     presentation="date" label="Date de fin" (keyup)="handlevalidated($event)"></ion-input>
+    </div>
+      
+</ion-content>

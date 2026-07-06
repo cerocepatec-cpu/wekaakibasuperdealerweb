@@ -1,0 +1,122 @@
+
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="full">
+      <ion-text slot="start" class="font-size-30 font-bold-600" (click)="showcheckbox=!showcheckbox" *ngIf="!showcheckbox">Clients <span class="font-size-10">(Page: {{paginationOptions.current_page}})</span></ion-text>
+      <ion-icon *ngIf="appserv.permissionFilter('clients', 'add')" name="add-circle-outline" color="primary" size="large" (click)="newcustomer()" slot="end"></ion-icon>
+      <ion-text slot="start" color="primary" (click)="showcheckbox=!showcheckbox" *ngIf="!showcheckbox && listselectedcustomers.length>0">Sélectionner</ion-text>
+      <ion-text slot="start" color="primary" (click)="showcheckbox=!showcheckbox; listselectedcustomers=[];" *ngIf="showcheckbox">Terminer</ion-text>
+      <ion-icon name="share-outline" slot="end" color="success"  *ngIf="!showcheckbox" size="large" (click)="excelexport()"></ion-icon>
+      <ion-icon name="download-outline" color="primary" slot="end"  *ngIf="!showcheckbox" size="large" (click)="importcsvfile()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-toolbar class="contentbody">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-lg="6">
+          <ion-item lines="none" class="contentbody margin-left-moins-15">
+            <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche" [(ngModel)]="search" #defaultinput></ion-searchbar>
+            <ion-icon name="filter-outline" slot="end" [matMenuTriggerFor]="animals2" color="primary"></ion-icon>
+            <mat-menu #animals2="matMenu">
+              <button mat-menu-item> <ion-text class="font-size-11" color="danger">Annuler le filtre</ion-text></button>
+              <button *ngIf="appserv.permissionFilter('customers categories', 'view')" mat-menu-item [matMenuTriggerFor]="menutypes"> <ion-text class="font-size-11">Type</ion-text></button>
+              <button  mat-menu-item [matMenuTriggerFor]="menucategories"> <ion-text class="font-size-11">Catégorie</ion-text></button>
+            </mat-menu>
+            <mat-menu #menutypes="matMenu">
+              <button mat-menu-item > <ion-text class="font-size-11">Physique</ion-text></button>
+              <button mat-menu-item > <ion-text class="font-size-11">Moral</ion-text></button>
+            </mat-menu>
+        
+            <mat-menu #menuexport="matMenu">
+              <button mat-menu-item ><ion-text class="font-size-11">Exporter en Excel</ion-text></button>
+              <button mat-menu-item ><ion-text class="font-size-11">Exporter en PDF</ion-text></button>
+            </mat-menu>
+        
+            <mat-menu #menucategories="matMenu">
+              <button mat-menu-item *ngFor="let category of listcategories"> <ion-text class="font-size-11">{{category.name | titlecase}}</ion-text></button>
+            </mat-menu>
+        
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-lg="6" class="smalldevicehidden">
+          <ion-item lines="none" class="ion-float-right contentbody">
+            <ion-text slot="start" class="font-size-12">
+              {{paginationOptions.from}} – {{paginationOptions.to}} sur {{paginationOptions.total}}
+            </ion-text>
+            <ion-chip (click)="PageEventHandled('first-page')" matTooltip="Première page" [disabled]="!paginationOptions.first_page_url" color="warning"><ion-icon name="play-skip-back-outline"></ion-icon></ion-chip>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <ion-chip (click)="PageEventHandled('previous-page')" matTooltip="Page précédente" [disabled]="!paginationOptions.prev_page_url" color="warning"><ion-icon name="play-back-outline"></ion-icon></ion-chip> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <ion-chip (click)="PageEventHandled('next-page')" matTooltip="Page suivante" [disabled]="!paginationOptions.next_page_url" color="warning"><ion-icon name="play-forward-outline"></ion-icon></ion-chip> &nbsp;&nbsp;&nbsp;&nbsp;
+            <ion-chip (click)="PageEventHandled('last-page')" matTooltip="Dernière page" [disabled]="!paginationOptions.last_page_url" color="warning"><ion-icon name="play-skip-forward-outline"></ion-icon></ion-chip>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+   
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" *ngIf="showdefaultprogress" mode="ios"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody cartpreview-80">
+  <ion-item *ngIf="appserv.permissionFilter('customers categories', 'add')"  lines="none" class="contentbody">
+    <ion-text slot="start" color="primary" (click)="newcategory()">Catégories</ion-text>
+  </ion-item>
+  <hr class="hr">
+  <ion-item class="contentbody default-list-item" *ngFor="let customer of listcustomers | filter:search" (click)="customermenu(customer)" lines="inset" detail="true">
+    <ion-checkbox slot="start" *ngIf="showcheckbox" mode="ios" size="small"></ion-checkbox>
+    <ion-avatar slot="start">
+        <ion-img [src]="customer.photo?appserv.imgUrl+customer.photo:''" *ngIf="customer.photo"></ion-img>
+        <ion-icon [name]="customer.type==='physique'?'person':customer.type==='moral'?'people':'person'" size="large" *ngIf="!customer.photo"></ion-icon>
+    </ion-avatar>
+    <ion-label>
+      <p class="item-label-title">
+        <ion-text>{{customer.customerName| titlecase}}</ion-text>
+      </p>
+      <p class="secondpara">
+        <ion-text *ngIf="customer.type" >
+          <span class="font-bold-600">Type:</span>{{customer.type | titlecase}}
+        </ion-text>
+      </p>
+      <p class="secondpara">
+        <ion-text *ngIf="customer.category_name" >
+          <span class="font-bold-600">Catég:</span> {{customer.category_name}}
+        </ion-text>
+      </p>
+       <p class="secondpara">
+        <ion-text *ngIf="customer.mail" >
+          <span class="font-bold-600">Email:</span>{{customer.mail}}
+        </ion-text>
+      </p>
+      <p class="secondpara">
+        <ion-text *ngIf="customer.phone" >
+          <span class="font-bold-600">Phone:</span>{{customer.phone}}
+        </ion-text>
+      </p>
+    </ion-label>
+  </ion-item>
+  <ion-fab slot="fixed" horizontal="center" vertical="center" class="largedevicehidden">
+    <ion-fab-button color="medium">
+      <ion-icon name="filter"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button (click)="PageEventHandled('first-page')" matTooltip="Première page" [disabled]="!paginationOptions.first_page_url">
+        <ion-icon name="chevron-up"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+    <ion-fab-list side="end" >
+      <ion-fab-button (click)="PageEventHandled('next-page')" matTooltip="Page suivante">
+        <ion-icon name="play-skip-forward-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+    <ion-fab-list side="bottom">
+      <ion-fab-button (click)="PageEventHandled('last-page')" matTooltip="Dernière page" [disabled]="!paginationOptions.last_page_url">
+        <ion-icon name="chevron-down"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+    <ion-fab-list side="start">
+      <ion-fab-button (click)="PageEventHandled('previous-page')" matTooltip="Page précédente" [disabled]="!paginationOptions.prev_page_url">
+        <ion-icon name="play-skip-back-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
+</ion-content>
+
+

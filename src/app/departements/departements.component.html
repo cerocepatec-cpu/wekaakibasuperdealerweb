@@ -1,0 +1,115 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" sizeLg="8">
+           <ion-item lines="none" class="header-title">
+              <ion-label>
+                <p class="item-label-title font-size-20 font-bold-600">{{'departments' | titlecase}}</p>
+                <p class="secondpara2 font-size-11">{{'manage departments and agents affectations' | titlecase}}</p>
+              </ion-label>
+            </ion-item>
+        </ion-col>
+        <ion-col size="12" sizeLg="4">
+            <ion-searchbar placeholder="search" mode="ios" [(ngModel)]="searchdepart" #defaultinput></ion-searchbar>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen="true">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" sizeLg="8">
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="12">
+                    <ion-note class="font-size-12 totalfund">Total trouvé{{listdepartments.length>1?'s':''}} {{listdepartments.length}}</ion-note>
+                    <ion-card  *ngFor="let depart of listdepartments | filter:searchdepart; let i=index;" mode="ios" class="list-item ion-margin-bottom" (click)="gotodepartdetail(depart)">
+                      <ion-item lines="none"  >
+                        <ion-avatar slot="start"><ion-icon name="folder"></ion-icon></ion-avatar>
+                          <ion-label>
+                            <p class="item-label-title" style="margin-bottom: 5px;">
+                              <ion-text>{{depart.department_name |titlecase}}</ion-text> 
+                            </p>
+                            <p class="secondpara">
+                              <span class="reqtotalprinted">Sous départ</span><span class="point">.</span><span class="font-bold-500 font-size-12">{{depart.nbrsubdepart}}</span><span>Agents</span><span class="point">.</span><span class="font-bold-500 font-size-12">{{depart.nbragents}}</span><span class="point">.</span><span>Réquisitions</span><span class="point">.</span><span class="font-bold-500 font-size-12">{{depart.nbrRequests}}</span><br>
+                              <span class="font-size-11">{{depart.description | titlecase}}</span>
+                            </p>
+                          </ion-label>
+                      </ion-item>
+                    </ion-card>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-col>
+            <ion-col size="12" sizeLg="4">
+              <ion-card mode="ios">
+                <ion-card-title class="ion-padding-start">
+                  <ion-text class="font-size-12">Nouveau département</ion-text>
+                </ion-card-title>
+                <ion-card-content>
+                    <ion-item lines="none" class="default-list-item bd-square margin-btm-10">
+                      <ion-input placeholder="Entrer un nom..." class="font-size-12" [(ngModel)]="departname" type="text"></ion-input>
+                    </ion-item> 
+                    
+                    <ion-item lines="none" class="bd-square font-size-11">
+                      <ion-label position="floating">Description</ion-label>
+                      <ion-textarea autoGrow="true" [(ngModel)]="departdescription"></ion-textarea>
+                    </ion-item>
+                    <ion-list>
+                      <ion-item lines="none" class="cursor-pointer middle-icon" id="open-addparent-modal">
+                        <ion-text class="font-size-12" color="primary">Départ. Parent? </ion-text>
+                        <ion-note class="font-size-11">&nbsp; {{headerdepart?.department_name | titlecase}}</ion-note>
+                      </ion-item> 
+                      <ion-item lines="none" class="cursor-pointer middle-icon" (click)="showsubdepartlist=!showsubdepartlist">
+                        <ion-text class="font-size-12" color="primary" slot="start">Sous Départ.</ion-text>
+                        <ion-icon name="chevron-down-outline" slot="end" *ngIf="!showsubdepartlist" ></ion-icon>
+                        <ion-icon name="chevron-up-outline" slot="end" *ngIf="showsubdepartlist"></ion-icon>
+                      </ion-item>
+                      <div class="bd-square ion-padding" *ngIf="showsubdepartlist" >
+                        <ion-input [clearInput]="true" class="font-size-11 ion-padding-end bd-square bd-radius-10" placeholder="Rechercher..." [(ngModel)]="searchsubdepart" [(ngModel)]="searchsubdepart"></ion-input>
+                        <ion-chip *ngFor="let dep of listdepartments | filter:searchsubdepart" class="font-size-11" (click)="addsubdepart(dep)" [color]="dep.selected?'primary':''" [disabled]="dep.header_depart>0?true:dep.id===headerdepart?.id?true:false">{{dep.department_name | titlecase}}</ion-chip>
+                      </div>
+                    </ion-list>
+                    <div class="buttons-group ion-margin-bottom">
+                      <ion-chip class="submitbutton" *ngIf="showsaveprogress" >Enregistrement &nbsp; <ion-spinner name="dots"></ion-spinner></ion-chip>
+                      <ion-chip class="submitbutton" *ngIf="!showsaveprogress" (click)="savenewdepartement()">Ajouter</ion-chip>
+                    </div>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <ion-modal #modal trigger="open-addparent-modal" [initialBreakpoint]="0.40" [breakpoints]="[0.0, 0.25, 0.5, 0.75,1]" cssClass="modal-border-radius-20">
+          <ng-template>
+            <ion-header class="ion-no-border">
+              <ion-toolbar>
+                <ion-title>Département parent</ion-title>
+              </ion-toolbar>
+              <ion-toolbar>
+                <ion-searchbar mode="ios" placeholder="Recherche..." (click)="modal.setCurrentBreakpoint(0.5)" [(ngModel)]="searchparentdepart"></ion-searchbar>
+              </ion-toolbar>
+            </ion-header>
+            <ion-content class="margin-btm-5 ion-padding-start">
+              <ion-list>
+                <ion-item lines="none" mode="ios" (click)="headerdepart=null;appserv.modalCtrl.dismiss();" class="item-depart-list">
+                  <ion-avatar slot="start"><ion-icon name="trash"></ion-icon></ion-avatar>
+                  <ion-label>
+                    <p class="item-label-title font-size-12">Aucun</p>
+                  </ion-label>
+                </ion-item> 
+                <ion-item lines="none"  *ngFor="let depart of listdepartments | filter:searchparentdepart;" mode="ios" (click)="changeparent(depart)" class="item-depart-list">
+                  <ion-avatar slot="start"><ion-text>{{depart.department_name| slice:0:2}}</ion-text></ion-avatar>
+                  <ion-label>
+                    <p class="item-label-title font-size-12">{{depart.department_name}}</p>
+                    <p class="secondpara font-size-12">{{depart.description}}</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-content>
+          </ng-template>
+        </ion-modal>
+</ion-content>
+

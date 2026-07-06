@@ -1,0 +1,184 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-row>
+      <ion-col size="12" class="ion-text-left normal-contentbody">
+        <ion-text class="font-size-30 font-bold-600">AVANCES SUR SALAIRE</ion-text>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+  <ion-progress-bar *ngIf="showprogress" type="indeterminate" mode="ios"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [scrollY]="true" [scrollX]="true" style="height: fit-content!important;scrollbar-width: thin;" fullscreen="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données...">
+    </ion-refresher-content>
+  </ion-refresher>
+<ion-grid>
+  <ion-row>
+    <ion-col sizeLg="12">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" class="largedevicehidden bd-square">
+            <ion-chip class="font-bold cursor-pointer">
+               A valider ({{nbradvancestovalidate}})
+            </ion-chip> 
+            <ion-chip class="font-bold cursor-pointer">
+              Validées ({{nbradvancesvalidated}})
+            </ion-chip>
+            <ion-chip class="font-bold cursor-pointer">
+              Annulées ({{nbradvancescancelled}})
+            </ion-chip>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="!appserv.isMyDeviceConnected()">
+          <ion-col size="12">
+              <ion-card mode="ios" color="warning" class="ion-padding display-flex-center">
+                <ion-text color="light">
+                  Veuillez vous connecter à Internet pour récupérer les données de cette page!
+                </ion-text>
+              </ion-card>
+          </ion-col>
+        </ion-row>
+        <ion-row class="ion-padding-top">
+            <ion-col size="12" size-lg="2.5">
+              <ion-text class="font-size-20 font-bold-600">Dernières avances ({{advancesalarieslist.length}})</ion-text>
+              <br>
+              <ion-note class="font-size-10">Du {{from | date}} au {{to | date}}</ion-note>
+            </ion-col>
+            <ion-col size="2" class="smalldevicehidden">
+              <ion-button  style="height: 35px!important" color="medium" mode="ios" (click)="agentsfilter()">
+                <ion-text class="font-size-11">Filtre par agents</ion-text>
+              </ion-button> <br>
+              <ion-note *ngFor="let agent of selectedmembers" class="font-size-9">
+                {{(agent.agent_fullname?agent.agent_fullname:agent.agent_username) | titlecase}} <span *ngIf="selectedmembers.length>0">,</span>
+              </ion-note>
+            </ion-col> 
+            <ion-col size="2" class="ion-padding-end smalldevicehidden">
+              <ion-button  style="height: 35px!important" color="secondary" mode="ios" (click)="dashboardperiodfilter()">
+                <ion-text class="font-size-11">Filtre par date</ion-text>
+              </ion-button>
+            </ion-col>
+            <ion-col size="2" class="ion-padding-end smalldevicehidden">
+              <ion-item class="bd-square bd-radius-10 font-size-11" style="height: 35px!important;">
+                <ion-select label="Filtre par statut" style="margin-top: -13px!important;" (ionChange)="handletypechanged($event)">
+                  <ion-select-option value="pending">En attente</ion-select-option>
+                  <ion-select-option value="validated">Validées</ion-select-option>
+                  <ion-select-option value="cancelled">Annulées</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+            <ion-col size="10" size-lg="3" class="ion-padding-end">
+              <ion-item  lines="none" class="bd-square bd-radius-10" style="height: 35px!important">
+                <ion-icon name="search" size="small" slot="start" style="margin-top:2px!important;"></ion-icon>
+                <ion-input class="font-size-12" placeholder="Rechercher" mode="ios" #defaultinput [(ngModel)]="search" style="margin-top: -13px!important;"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="2" size-lg="0.5">
+              <ion-item  lines="none" class="bd-square bd-radius-10 cursor-pointer" style="height: 35px!important">
+                <ion-icon name="close-circle" size="large" color="danger" style="margin-top:-10px!important;" (click)="restoredata()"></ion-icon> 
+              </ion-item>
+            </ion-col>
+        </ion-row>
+        <ion-row class="ion-padding-top">
+            <ion-col size="12" size-lg="8" class="ion-padding-end">
+              <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" routerLink="/uzisha/salaries">
+                <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                  <ion-icon name="add-outline"></ion-icon>
+                </ion-avatar>
+                <ion-label>
+                  <p class="item-label-title font-size-12">Nouvelle avance sur salaire</p>
+                  <p class="secondpara font-size-11">Cliquez ici pour entrer une nouvelle avance sur salaire</p>
+                </ion-label>
+               </ion-item>
+               <hr class="hr">
+               <ion-row>
+                <ion-col><ion-checkbox type="checkbox" label="Tout" [checked]="buttonselectalltransactions" (ionChange)="selectalltransactions($event)"></ion-checkbox></ion-col>
+                <ion-col class="smalldevicehidden">Sélectionnées ({{selectedadvancesalarieslist.length}})</ion-col>
+                <ion-col>
+                  <ion-item class="bd-square bd-radius-10 font-size-11" style="height: 35px!important;">
+                    <ion-select label="Que voulez-vous faire?" style="margin-top: -13px!important;" (ionChange)="handleselectedadvanceschanged($event)">
+                      <ion-select-option value="validated">Valider</ion-select-option>
+                      <ion-select-option value="pending">Mettre en attente</ion-select-option>
+                      <ion-select-option value="cancelled">Annuler</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+               </ion-row>
+               <br>
+               <div *ngIf="loaded">
+                  <ion-list *ngFor="let item of [0,1,3,4]">
+                    <ion-list-header>
+                      <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+                    </ion-list-header>
+                    <ion-item>
+                      <ion-thumbnail slot="start">
+                        <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+                      </ion-thumbnail>
+                      <ion-label>
+                        <h3>
+                          <ion-skeleton-text [animated]="true" style="width: 80%;"></ion-skeleton-text>
+                        </h3>
+                        <p>
+                          <ion-skeleton-text [animated]="true" style="width: 60%;"></ion-skeleton-text>
+                        </p>
+                        <p>
+                          <ion-skeleton-text [animated]="true" style="width: 30%;"></ion-skeleton-text>
+                        </p>
+                      </ion-label>
+                    </ion-item>
+                  </ion-list>
+               </div>
+               
+               <ion-row *ngFor="let transaction of advancesalarieslist | filter:search">
+                <ion-col size="0.5">
+                  <ion-checkbox [checked]="transaction.selected" (ionChange)="handletransactionchange($event,transaction)" style="margin-top: 30px!important;"></ion-checkbox>
+                </ion-col>
+                <ion-col size="11.5">
+                  <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" (click)="menudavance(transaction)">
+                    <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                      <ion-icon [name]="transaction.type==='withdraw'?'arrow-up-outline':'arrow-down-outline'" [color]="transaction.type==='withdraw'?'danger':'success'"></ion-icon>
+                    </ion-avatar>
+                    <ion-label>
+                      <p class="item-label-title font-size-13">{{transaction.member_fullname | titlecase}} ({{transaction.member_uuid}})</p>
+                      <p class="secondpara font-size-12 font-bold">
+                        <ion-text class="font-bold-600 font-size-11" color="dark">{{transaction.amount | number}} {{transaction.abreviation}} </ion-text>
+                     </p>
+                      <p class="secondpara font-size-11"> {{transaction.done_at | date}} par  <ion-note class="font-bold-600">{{transaction.done_by_name | titlecase}}</ion-note></p>
+                      <p class="secondpara font-size-11">OP.ID: {{transaction.uuid}}</p>
+                      <p class="secondpara font-size-11">{{transaction.description}}</p>
+                    </ion-label>
+                    <ion-chip name="chevron-forward" size="small" slot="end" [class]="transaction.status==='validated'?'font-size-10 font-bold bg-sucess-tint-whitecolor':transaction.status==='pending'?'font-size-10 font-bold bg-warning-tint-whitecolor':'font-size-10 font-bold bg-warning-tint-dangercolor'">{{transaction.status | titlecase}}</ion-chip>
+                  </ion-item> 
+                </ion-col>
+              </ion-row>
+              
+            </ion-col>
+            <ion-col size="12" size-lg="4" class="smalldevicehidden">
+              <div class="bd-square bd-radius-5 ion-padding-start ion-padding-bottom ion-padding-end">
+                <h4>Autres opérations</h4>
+                <ion-note class="font-bold cursor-pointer" (click)="filteradvances('pending')">
+                  A valider ({{nbradvancestovalidate}})
+                </ion-note>
+                <br>
+                <br>
+                <ion-note class="font-bold cursor-pointer" (click)="filteradvances('validated')">
+                  Validées ({{nbradvancesvalidated}})
+                </ion-note>
+                <br> <br> 
+                <ion-note class="font-bold cursor-pointer" (click)="filteradvances('cancelled')">
+                  Annulées ({{nbradvancescancelled}})
+                </ion-note>
+              </div>
+            </ion-col>
+          </ion-row>
+      </ion-grid>
+    </ion-col>
+   
+  </ion-row>
+</ion-grid>
+    
+</ion-content>

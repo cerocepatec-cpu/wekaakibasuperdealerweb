@@ -1,0 +1,43 @@
+<ion-content class="login-content">
+  <!-- Fond animé -->
+  <div id="particle-bg"></div>
+
+  <ion-grid class="ion-padding full-height">
+    <ion-row class="ion-justify-content-center ion-align-items-center full-height">
+      <ion-col sizeLg="4" sizeMd="6" sizeSm="12" class="login-card animate__animated animate__fadeInUp">
+        <div class="ion-text-center ion-margin-bottom">
+          <ion-avatar class="login-logo">
+            <ion-img src="assets/wekaakibablack.png"></ion-img>
+          </ion-avatar>
+          <h2 class="font-size-22 font-bold-600 ion-margin-top text-gradient">WEKA AKIBA</h2>
+          <p class="text-light font-size-14">Votre solution de gestion microfinancière</p>
+        </div>
+        <form [formGroup]="credentials" class="form ion-margin-top">
+
+          <ion-item lines="none" class="input-field glass-input ion-margin-bottom">
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+            <ion-input type="text" placeholder="Nom d’utilisateur" formControlName="login"  #username autocomplete="false"></ion-input>
+          </ion-item>
+
+          <ion-item lines="none" class="input-field glass-input ion-margin-bottom">
+            <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+            <ion-input type="password" placeholder="Mot de passe" formControlName="password" autocomplete="false"></ion-input>
+          </ion-item>
+
+          <!-- <div class="ion-text-end ion-margin-bottom" routerLink="/login/forgetpassword">
+            <a class="text-link">Mot de passe oublié ?</a>
+          </div> -->
+          <ion-button expand="block" mode="ios" color="warning" shape="round"
+                      [disabled]="!credentials.valid || showprogress"
+                      (click)="login()" class="login-btn">
+            <ng-container *ngIf="!showprogress">Se connecter</ng-container>
+            <ng-container *ngIf="showprogress">
+              <ion-spinner name="crescent"></ion-spinner>&nbsp; Connexion...
+            </ng-container>
+          </ion-button>
+        </form>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+

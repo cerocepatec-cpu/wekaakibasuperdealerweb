@@ -1,0 +1,40 @@
+<ion-header translucent class="ion-no-border ion-no-padding">
+  <ion-toolbar>
+    <ion-title>Sélectionner une caisse</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-searchbar mode="ios" placeholder="Rechercher" [(ngModel)]="search" #defaultinput></ion-searchbar>
+  <ion-list class="ion-no-margin">
+    <ion-item
+      *ngFor="let account of filteredAccounts | filter:search"
+      (click)="select(account)"
+      button
+      class="account-item contentbody"
+      lines="none"
+    >
+      <ion-avatar slot="start" class="currency-avatar" [ngClass]="account.money_abreviation.toLowerCase()">
+        <ion-icon [name]="account.money_abreviation === 'USD' ? 'logo-usd' : 'logo-bitcoin'"></ion-icon>
+      </ion-avatar>
+
+      <ion-label>
+        <h3 class="account-title">
+          {{ account.description }}
+         
+        </h3>
+        <p>{{ account.user_name }} &bullet; {{ account.type }}</p>
+      </ion-label>
+       <ion-chip *ngIf="account.principal" color="success" class="principal-chip" slot="end">
+          <ion-label>Principal</ion-label>
+      </ion-chip>
+      <div class="amount">
+        {{ account.sold | number:'1.0-2' }} {{ account.money_abreviation }}
+      </div>
+    </ion-item>
+  </ion-list>
+</ion-content>

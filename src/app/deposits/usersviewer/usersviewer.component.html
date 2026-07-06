@@ -1,0 +1,35 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+      <ion-icon name="chevron-back-outline" size="large" slot="start" color="primary" (click)="appserv.closemodal()"></ion-icon>
+      <ion-icon name="print-outline" color="secondary" slot="end"></ion-icon>
+      <ion-icon name="download-outline" color="success" slot="end" [matMenuTriggerFor]="menuexport"></ion-icon>
+      <ion-icon name="share-outline" color="primary" slot="end"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <h2> <ion-text>Membres du dépôt</ion-text></h2>
+  <mat-menu #menuexport="matMenu">
+    <button mat-menu-item ><ion-text class="font-size-12">Exporter en Excel</ion-text></button>
+    <button mat-menu-item ><ion-text class="font-size-12">Exporter en PDF</ion-text></button>
+  </mat-menu>
+  <ion-searchbar mode="ios" placeholder="Recherche" [(ngModel)]="search"></ion-searchbar>
+    <ion-item class="default-list-item contentbody" detail="true" lines="inset" *ngFor="let user of listusers | filter:search" (click)="menuparticipant(user)">
+      <ion-avatar slot="start">
+        <ion-img [src]="user.avatar?appserv.imgUrl+user.avatar:''" *ngIf="user.avatar"></ion-img>
+        <ion-icon name="person-outline" size="small" *ngIf="!user.avatar"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title"><ion-text>{{(user.user_name?user.user_name:user.created_at)|titlecase }}</ion-text></p>
+        <p class="secondpara"><ion-text>{{user.note}}</ion-text></p>
+      </ion-label>
+      <ion-note  *ngIf="user.level==='chief'" class="level-status">Chef</ion-note>
+    </ion-item>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" (click)="pickusers()">
+    <ion-fab-button color="secondary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

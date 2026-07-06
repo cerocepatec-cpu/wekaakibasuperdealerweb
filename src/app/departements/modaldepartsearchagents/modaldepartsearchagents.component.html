@@ -1,0 +1,22 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" (click)="closemodal()" slot="start"></ion-icon>
+      <ion-text color="primary" slot="start">Recherche d'agents</ion-text>
+      <ion-badge slot="end" class="font-size-14">{{listagents.length}}</ion-badge>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+ <ion-searchbar placeholder="Recherche" mode="ios" [(ngModel)]="search" #defaultinput></ion-searchbar>
+  <ion-item mode="ios" class="list-item contentbody" *ngFor="let agent of listagents | filter:search" lines="inset">
+    <ion-avatar slot="start"><ion-img [src]="agent.avatar?imgUrl+agent.avatar:''" *ngIf="agent.avatar" ></ion-img> <ion-icon *ngIf="!agent.avatar" name="person-outline"></ion-icon></ion-avatar>
+    <ion-label>
+      <h2 class="item-label-title">{{(agent.full_name?agent.full_name: agent.user_name) | titlecase}}</h2>
+      <h4 class="secondpara">{{agent.note}}</h4>
+    </ion-label>
+    <ion-note slot="end" class="font-size-11">
+      {{agent.level==='chief'?'Chef':''}}
+    </ion-note>
+  </ion-item>
+</ion-content>

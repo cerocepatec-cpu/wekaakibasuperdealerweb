@@ -1,0 +1,53 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text slot="start">Nouveau rôle</ion-text>
+      <ion-chip color="primary" slot="end" (click)="sendDataToApi()"><ion-icon name="checkmark-outline" color="primary" size="large"></ion-icon></ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" type="indeterminate" color="primary" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+      <ion-card mode="ios" class="ion-padding-top">
+        <ion-text class="font-size-12" color="primary ion-padding-start">Informations sur le rôle</ion-text>
+        <ion-item lines="full" class="font-size-12">
+          <ion-input [(ngModel)]="title" placeholder="Nom (*)"></ion-input>
+        </ion-item>
+        <ion-item lines="none" class="font-size-12">
+          <ion-input [(ngModel)]="description"  placeholder="Déscription"></ion-input>
+        </ion-item>
+      </ion-card>
+      <div class="ion-padding-start ion-padding-end">
+        <ion-searchbar mode="ios" placeholder="Rechercher" [(ngModel)]="search"></ion-searchbar>
+        <table border="1" style="width:100% ;font-size: 12px;">
+          <caption class="font-size-16 font-bold-500">
+            Permission
+          </caption>
+          <tbody>
+            <tr>
+              <th class="font-size-14">
+                All
+              </th>
+              <th>
+                <ion-item lines="none" class="contentbody">
+                  <ion-checkbox (ionChange)="permissionChengeAll($event)" slot="end"></ion-checkbox>
+                </ion-item>
+              </th>
+            </tr>
+            <tr *ngFor="let permission of permissions | filter:search">
+              <th class="font-size-14">
+                {{permission.name  | uppercase}}
+              </th>
+              <th>
+                <ion-item *ngFor="let item of permission.action" lines="none" class="contentbody">
+                  <ion-note slot="start" class="font-size-13">{{item.french}}</ion-note>
+                  <ion-checkbox (ionChange)="permissionChenge($event,permission, item )" [checked]="item.value" slot="end"></ion-checkbox>
+                </ion-item>
+              </th>
+            </tr>
+          </tbody>
+          
+        </table>
+      </div>
+</ion-content>

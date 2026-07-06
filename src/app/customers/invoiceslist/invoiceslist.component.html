@@ -1,0 +1,129 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" class="default-list-item">
+      <ion-icon name="chevron-back-outline" color="warning" (click)="appserv.closemodal()" size="large"></ion-icon>
+      <ion-avatar>
+        <ion-img [src]="customersent.photo?appserv.imgUrl+customersent.photo:''" *ngIf="customersent.photo"></ion-img>
+        <ion-icon [name]="customersent.type==='physique'?'person':customersent.type==='moral'?'people':'person'" size="large" *ngIf="!customersent.photo"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title">{{customersent.customerName | titlecase}}</p>
+        <p class="secondpara" *ngIf="customersent.category_name">
+          <ion-note class="font-size-11">Catég. {{customersent.category_name | titlecase}}</ion-note>
+        </p> 
+        <p class="secondpara">
+          <ion-note class="font-size-13 font-bold-600">Total général. {{totalGeneral | number}}</ion-note>
+        </p>
+      </ion-label>
+      <ion-icon name="download-outline" color="warning" slot="end" [matMenuTriggerFor]="menuexport"></ion-icon>
+      <!-- <ion-icon name="share-outline" color="warning" slot="end"></ion-icon> -->
+      <ion-icon name="print-outline" slot="end"  size="small" color="warning" (click)="printlist()"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu" xPosition="before">
+      <button mat-menu-item ><ion-text class="font-size-11">Exporter en Excel</ion-text></button>
+      <!-- <button mat-menu-item ><ion-text class="font-size-11">Exporter en PDF</ion-text></button> -->
+    </mat-menu>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-list-header>
+      <h2 class="font-size-16" *ngIf="from===to">Factures du {{from | date}}</h2>
+      <h2 class="font-size-16" *ngIf="from!==to">Factures du {{from | date}} au {{to | date}}</h2>
+    </ion-list-header>
+    <ion-item lines="none" class="margin-left-moins-15">
+      <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche..." [(ngModel)]="search"></ion-searchbar>
+      <ion-icon name="calendar-outline" slot="end" color="warning" size="small" (click)="getdatesfilter()"></ion-icon>
+      <ion-icon name="filter-outline" slot="end"  size="small" [matMenuTriggerFor]="animals2" color="warning"></ion-icon>
+    
+      <mat-menu #animals2="matMenu" xPosition="before">
+        <button mat-menu-item><ion-text class="font-size-11" color="danger" (click)="DeleteFilterByType()">Annuler</ion-text></button>
+        <button mat-menu-item><ion-text class="font-size-11" (click)="filterByType('cash')">Cash</ion-text></button>
+        <button mat-menu-item><ion-text class="font-size-11" (click)="filterByType('credit')">Crédit</ion-text></button>
+        <button mat-menu-item><ion-text class="font-size-11" (click)="filterByType('proforma')">proforma</ion-text></button>
+      </mat-menu>
+      
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+      <ion-item mode="ios" class="default-list-item3 contentbody"  lines="inset" *ngFor="let invoice of listinvoices | filter:search" >
+        <ion-avatar slot="start">
+          <ion-icon name="cash-outline" size="small" [color]="invoice.invoice.type_facture==='credit'?'danger':''"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <p class="item-label-title"><ion-text class="font-bold-500">OP.ID: {{invoice.invoice.uuid | uppercase}}</ion-text></p>
+          <p class="secondpara"><ion-text>{{invoice.invoice.created_at | date}}</ion-text></p>
+          <p class="secondpara"><ion-text>{{(invoice.invoice.type_facture==='credit'?'crédit':invoice.invoice.type_facture) | titlecase}}</ion-text></p>
+        </ion-label>
+        <ion-text slot="end" [color]="invoice.invoice.type_facture==='credit'?'danger':''">{{invoice.invoice.netToPay | number}} {{invoice.invoice.abreviation}}</ion-text>
+      </ion-item>
+
+      <ion-card color="warning" mode="ios" class="ion-padding display-flex-center" *ngIf="listinvoices.length<=0" >
+        <ion-text>Aucune donnée à afficher</ion-text> &nbsp;
+        <ion-icon name="alert-circle-outline"></ion-icon>
+      </ion-card>
+        
+     
+          <div  #printer_content hidden>
+            <div class="font-size-12">
+              <ion-text class="font-size-20 font-bold-600" *ngIf="posprintoptions.name && appserv.getactualEse().name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br *ngIf="posprintoptions.name && appserv.getactualEse().name">
+              <ion-text *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">{{appserv.getactualEse().adresse}}</ion-text> <br *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">
+              <ion-text *ngIf="posprintoptions.description && appserv.getactualEse().description ">{{appserv.getactualEse().description}}</ion-text>
+              <ion-text *ngIf="posprintoptions.num_impot && appserv.getactualEse().num_impot ">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br *ngIf="posprintoptions.description && appserv.getactualEse().description ">
+              <ion-text *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">
+              <ion-text *ngIf="posprintoptions.rccm && appserv.getactualEse().rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+              <ion-text *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">
+            </div>
+            <hr class="hr">
+            <div class="suheader ion-no-padding">
+              <h2 class="font-bold-600 font-size-16">Client : {{customersent.customerName | titlecase}}</h2>
+              <h2 class="font-bold-600 font-size-16" *ngIf="from===to">Factures du {{from | date}}</h2>
+              <h2 class="font-size-16 font-bold-600" *ngIf="from!==to">Factures du {{from | date}} au {{to | date}}</h2>
+              <ion-text class="font-size-10 ion-float-end">Date impression le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+              <ion-text class="font-size-10 ion-float-end">Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+            </div>
+            <div class="body">
+              <table border="1" style="width:100% ;font-size: 12px;">
+                <thead>
+                  <tr>
+                    <th class="text-left">N°</th>
+                    <th class="text-left">OP.ID</th>
+                    <th class="text-left">Date</th>
+                    <th class="text-left">Type</th>
+                    <th class="text-left">Montant</th>
+                    <th class="text-left">TVA(%)</th>
+                    <th class="text-left">Total HT</th>
+                    <th class="text-left">Réduction</th>
+                    <th class="text-left">Retour</th>
+                    <th class="text-left">Tot. Espèces</th>
+                    <th class="text-left">Banque</th>
+                    <th class="text-left">Mobile Money</th>
+                  </tr>
+                </thead>
+                <tbody class="body">
+                  <tr *ngFor="let invoice of listinvoices; let i =index;">
+                      <td>{{i+1}}</td>
+                      <td>{{invoice.invoice.uuid | uppercase}}</td>
+                      <td>{{invoice.invoice.created_at | date}}</td>
+                      <td>{{(invoice.invoice.type_facture==='credit'?'crédit':invoice.invoice.type_facture) | titlecase}}</td>
+                      <td class="text-right">{{invoice.invoice.total?invoice.invoice.total:0 | number}} {{invoice.invoice.abreviation}}</td>
+                      <td class="text-right">({{invoice.invoice.vat_percent?invoice.invoice.vat_percent:0}}):{{invoice.invoice.vat_amount?invoice.invoice.vat_amount:0 | number}} {{invoice.invoice.abreviation}}</td>
+                      <td class="text-right">{{invoice.invoice.total_ht?invoice.invoice.total_ht:0 | number}} {{invoice.invoice.abreviation}}</td>
+                      <td class="text-right">{{invoice.invoice.reduction?invoice.invoice.reduction:0 | number}} {{invoice.invoice.abreviation}}</td>
+                      
+                      <td class="text-right">{{invoice.invoice.total-invoice.invoice.received | number}} {{invoice.invoice.abreviation}}</td>
+                      <td class="text-right">{{invoice.invoice.totalespeces?invoice.invoice.totalespeces:0 | number}} {{invoice.invoice.abreviation}}</td>
+                      <td class="text-right">{{invoice.invoice.totalcreditcard?invoice.invoice.totalcreditcard:0 | number}} {{invoice.invoice.abreviation}}</td>
+                      <td class="text-right">{{invoice.invoice.totalmobilemoney?invoice.invoice.totalmobilemoney:0}} {{invoice.invoice.abreviation}}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="9" class="font-size-16 font-bold-600">TOTAL GENERAL</th>
+                    <th colspan="3" class="font-size-16 font-bold-600 text-right">{{totalGeneral | number}} {{defaultmoney.abreviation | uppercase}}</th>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+  </ion-content>

@@ -1,0 +1,80 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none" class="default-list-item">
+      <ion-icon name="chevron-back-outline" (click)="appserv.closemodal()" color="warning" size="large"></ion-icon>
+      <ion-avatar (click)="editavatar()">
+        <ion-img [src]="enterpriseSent.logo?appserv.imgUrl+enterpriseSent.logo:''" *ngIf="enterpriseSent.logo"></ion-img>
+        <ion-icon name="person-outline" size="small" *ngIf="!enterpriseSent.logo"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title">{{(enterpriseSent.name?enterpriseSent.name:enterpriseSent.mail) | titlecase}}</p>
+        <p class="secondpara">
+          <ion-text class="font-size-11">{{enterpriseSent.description}}</ion-text>
+        </p>
+      </ion-label>
+      <ion-icon name="checkmark-outline" color="warning" size="large" slot="end" (click)="validationEditEse()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" fullscreen="true">
+    <ion-card color="warning" class="ion-padding font-size-12" mode="ios">Cliquez sur le logo pour le modifier! </ion-card>
+  <form [formGroup]="newenterprise" class="ion-text-center detailrequestheader">
+    <ion-card class="bd-radius-10 accept-use" mode="ios">
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="name" label="Nom" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item>
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="description" label="Description" labelPlacement="floating" class="font-size-11"></ion-input>
+    </ion-item>
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="mail" label="Adresse mail" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item>   
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="phone" label="Téléphone" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item>
+      <ion-item  mode="ios" lines="none" detail="false">
+        <ion-input formControlName="adresse" label="Adresse physique" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item> 
+    </ion-card>
+    <ion-card class="bd-radius-10 accept-use" mode="ios">
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="rccm" label="RCCM" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item>
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="national_identification" label="I.D NAT" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item>
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="num_impot" label="Numero Impôt" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item>   
+      <ion-item  mode="ios" lines="none" detail="false">
+        <ion-input formControlName="autorisation_fct" label="Autorisation de fonctionnement" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item> 
+    </ion-card>
+    
+    <ion-card class="bd-radius-10 accept-use" mode="ios">
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="website" label="Site web" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item>
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="facebook" label="Facebook" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item>
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="instagram" label="Instagram" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item>   
+      <ion-item  mode="ios" lines="none" detail="false">
+          <ion-input formControlName="linkdin" label="LinkedIn" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item> 
+    </ion-card>
+    
+    <ion-card class="bd-radius-10 accept-use" mode="ios">
+      <ion-item  mode="ios" lines="full" detail="false">
+        <ion-input formControlName="vat_rate" label="Taux de calcul TVA (%)" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item> 
+      <ion-item  mode="ios" lines="none" detail="false">
+        <ion-input formControlName="invoicefooter" label="Message de pied de page" labelPlacement="floating" class="font-size-11"></ion-input>
+      </ion-item>
+    </ion-card>
+</form>
+</ion-content>
+

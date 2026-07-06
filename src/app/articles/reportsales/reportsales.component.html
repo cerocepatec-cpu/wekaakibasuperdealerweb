@@ -1,0 +1,44 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item  lines="none">
+      <ion-icon name="chevron-back" slot="start" (click)="closemodal()"></ion-icon>
+      <ion-text slot="start">{{servicesent.service.name}}</ion-text>
+      <ion-icon name="download-outline" color="success" slot="end" [matMenuTriggerFor]="menuexport"></ion-icon>
+      <ion-icon name="share-outline" color="primary" slot="end"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item >Exporter en Excel</button>
+      <button mat-menu-item >Exporter en PDF</button>
+    </mat-menu>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-item lines="none" class="contentbody margin-left-moins-15">
+    <ion-searchbar class="font-size-11"  mode="ios" placeholder="Rechercher..."></ion-searchbar>
+    <ion-icon name="calendar-outline" slot="end" color="primary" size="small" (click)="appserv.getdatesfilter()"></ion-icon>
+    <ion-icon name="filter-outline" slot="end"  size="small" [matMenuTriggerFor]="animals2" color="primary"></ion-icon>
+  
+
+    <mat-menu #animals2="matMenu">
+      <button mat-menu-item>Cash</button>
+      <button mat-menu-item>Crédit</button>
+      <button mat-menu-item (click)="pickcustomers()">Clients</button>
+      <button mat-menu-item (click)="depositpicker()">Dépôts</button>
+    </mat-menu>
+    
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item >Exporter en Excel</button>
+      <button mat-menu-item >Exporter en PDF</button>
+    </mat-menu>
+  
+  </ion-item>
+    <ion-list class="contentbody">
+      <ion-list-header>
+        <h2>Situation des Ventes </h2>
+      </ion-list-header>
+      
+    </ion-list>
+  </ion-content>
+<ion-footer>
+
+</ion-footer>

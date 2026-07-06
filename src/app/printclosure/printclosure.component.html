@@ -1,0 +1,104 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-icon name="chevron-back-outline" size="large" slot="start" color="warning" (click)="appserv.closemodal()"></ion-icon>
+      <ion-segment [(ngModel)]="format" slot="start">
+          <ion-segment-button value="a4">A4</ion-segment-button>
+          <ion-segment-button value="ticket">Ticket</ion-segment-button>
+      </ion-segment>
+      <ion-buttons slot="end">
+          <ion-button mode="ios" size="small" color="warning" (click)="printPage()">
+            <ion-icon name="print-outline" size="small"></ion-icon>
+          </ion-button>
+      </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content id="printable">
+  <div [ngClass]="format === 'a4' ? 'a4-container' : 'ticket-container'">
+    <div class="closure-card">
+      <!-- HEADER -->
+      <div class="header-banner">
+        <div class="enterprise-info">
+          <div class="enterprise-name">{{ closure.enterprise?.name }}</div>
+          <div>{{ closure.enterprise?.adresse }}</div>
+          <div>Tél : {{ closure.enterprise?.phone }}</div>
+          <div>Email : {{ closure.enterprise?.mail }}</div>
+        </div>
+        <div class="meta-info">
+          <div><strong>RAPPORT #{{ closure.closure?.id }}</strong></div>
+          <div>Imprimé le : {{ closure?.date }}</div>
+          <div>Par : {{ closure.connected?.name }}</div>
+          <div>Statut : <b>{{ closure.closure?.status | titlecase }}</b></div>
+        </div>
+      </div>
+
+      <!-- TITLE -->
+      <div class="title" *ngIf="format === 'a4'">Rapport de clôture de caisse</div>
+      <div class="title" *ngIf="format === 'ticket'">Ticket de clôture</div>
+
+      <!-- SUMMARY -->
+      <div class="summary">
+        <h3>Résumé de la clôture</h3>
+        <table class="summary-table">
+          <tr>
+            <td class="summary-label">Montant total :</td>
+            <td class="summary-value">{{ closure.closure?.total_amount | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td class="summary-label">Devise :</td>
+            <td class="summary-value">{{ closure.currency?.abreviation }}</td>
+          </tr>
+          <tr>
+            <td class="summary-label">Caissier(ere) :</td>
+            <td class="summary-value">{{ closure.user?.name }}</td>
+          </tr>
+          <tr>
+            <td class="summary-label">Caisse :</td>
+            <td class="summary-value">{{ closure.fund?.description }}</td>
+          </tr>
+          <tr>
+            <td class="summary-label">Date de clôture :</td>
+            <td class="summary-value">{{ closure.closure?.closed_at | date}}</td>
+          </tr>
+          <tr>
+            <td class="summary-label">Note :</td>
+            <td class="summary-value">{{ closure.closure?.closure_note || '-' }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- DETAILS BILLETS -->
+      <div class="section">
+        <h3 class="section-title">🧾 Détail des billets</h3>
+        <table class="table billages-table">
+          <thead>
+            <tr>
+              <th>Billet de</th>
+              <th>Qté</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let b of closure.closure?.billages">
+              <td>{{ b.nominal | number:'1.0-0' }} {{ closure.currency?.abreviation }}</td>
+              <td>{{ b.quantity | number}}</td>
+              <td>{{ (b.nominal*b.quantity) | number:'1.2-2' }}</td>
+            </tr>
+            <tr *ngIf="!closure.closure?.billages.length">
+              <td colspan="3" class="text-center">Aucun détail de billets</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="footer" *ngIf="format === 'ticket'">
+        <p>Merci pour votre confiance 💳</p>
+      </div>
+      <div class="footer" *ngIf="format === 'a4'">
+        Rapport généré automatiquement — {{ closure.enterprise?.name || '---' }} © {{ currentYear }}<br>
+        <small>Confidentiel — Ne pas distribuer sans autorisation</small>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

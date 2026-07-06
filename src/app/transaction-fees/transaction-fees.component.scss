@@ -1,0 +1,10 @@
+.fee-modal::part(content) {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .fee-modal::part(content) {
+    border-radius: 0;
+  }
+}

@@ -1,0 +1,38 @@
+<ion-header class="ion-padding ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" color="warning" size="large" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text>Sélection accompagnements ({{listselected.length}})</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-searchbar placeholder="Rechercher" #defaultinput [(ngModel)]="keyword" mode="ios"></ion-searchbar>
+
+  <ion-item class="contentbody default-list-item" *ngFor="let article of listarticles |filter:keyword" lines="inset">
+    <ion-avatar slot="start" (click)="selected(article)">
+      <ion-text class="ion-text-uppercase">{{article.service.name | slice:0:2}}</ion-text>
+    </ion-avatar>
+    <ion-label>
+      <p class="item-label-title" (click)="selected(article)">
+        <ion-text>{{article.service.name | titlecase}}</ion-text>
+      </p>
+      <p class="secondpara" (click)="selected(article)">
+        {{article.service.description | titlecase}}
+      </p>
+      <p class="secondpara" (click)="selected(article)">
+        <span class="reqtotalprinted font-size-11"> <span class="font-bold-600">Catég.</span> {{article.service.category_name | titlecase}} | <span class="font-bold-600">U.M.</span>{{article.service.uom_symbol | titlecase}}</span>
+      </p> 
+      <p class="bd-radius-10 bd-square">
+        <ion-input class="ion-padding-start"  type="number" label="Qté." value="1" [(ngModel)]="article.quantity"></ion-input>
+      </p>
+    </ion-label>
+    <!-- <input slot="end" type="checkbox" [checked]="article.selected" (click)="selectitem(article,$event)"> -->
+    <ion-icon name="checkmark-circle" color="warning" slot="end" *ngIf="article.selected"></ion-icon>
+  </ion-item>
+</ion-content>
+<ion-footer class="ion-padding ion-no-border">
+  <ion-button expand="block" slot="start" size="small" class="box-big" color="warning" mode="ios" [disabled]="listselected.length<=0" (click)="validation()">
+    <span class="font-size-11">Valider ({{listselected.length}})</span>
+  </ion-button>
+</ion-footer>

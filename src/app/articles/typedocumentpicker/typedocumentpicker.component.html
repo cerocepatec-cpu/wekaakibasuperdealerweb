@@ -1,0 +1,19 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <h4 slot="start" class="font-bold-600 font-size-14">Sélectionner un type de document</h4>
+      <ion-icon name="add" size="large" color="primary" (click)="addnewdocument()" slot="end"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+    <ion-searchbar mode="ios" placeholder="Rechercher..." class="font-size-12"></ion-searchbar>
+  <ion-list class="contentbody">
+    <ion-item lines="full" *ngFor="let doc of listdocuments" (click)="selected(doc)" class="font-size-12 contentbody">
+      <ion-text slot="start">{{doc.name}}</ion-text>
+      <ion-icon slot="end" *ngIf="doc.selected"  name="checkmark-circle-outline" color="success" size="small"></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>
+

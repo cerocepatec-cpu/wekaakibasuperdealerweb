@@ -1,0 +1,64 @@
+/* Style pour le chat item */
+.chat-item {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    padding: 10px;
+    background-color: #fff;
+    ion-label{
+        font-style:italic;
+        top: -10px!important;
+    }
+}
+
+.avatar-container {
+    position: relative;
+    margin-right: 15px;
+}
+
+/* Style pour l'avatar */
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #eee;
+}
+
+/* Style pour le bouton de suppression */
+.delete-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #f44336; /* Rouge */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Style pour les informations de chat */
+.chat-info {
+    flex-grow: 1;
+}
+
+.username {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.message {
+    font-size: 14px;
+    color: #555;
+}

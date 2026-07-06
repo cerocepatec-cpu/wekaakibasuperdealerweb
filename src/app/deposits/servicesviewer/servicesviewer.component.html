@@ -1,0 +1,94 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none" class="margin-left-moins-15 contentbody">
+      <ion-icon slot="start" name="chevron-back-outline" color="primary" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text slot="start" color="primary" (click)="multipleselect=!multipleselect" *ngIf="!multipleselect">Sélectionner</ion-text>
+      <ion-text slot="start" color="primary" (click)="multipleselect=!multipleselect; listselectedarticles=[];" *ngIf="multipleselect">Terminer</ion-text>
+      <!-- <input type="checkbox" slot="end" (ionChange)="selectionChange($event)"> -->
+    </ion-item>
+  </ion-toolbar>
+  <ion-toolbar class="contentbody">
+    <h1 class="font-bold-600 font-size-30 ion-padding-start">Catalogue des produits</h1>
+    <h1 class="font-bold-600 font-size-20 ion-padding-start">{{depositsent.name | titlecase}}</h1>
+      <ion-item lines="none" class="contentbody margin-left-moins-15">
+        <ion-searchbar class="font-size-11"  mode="ios" [(ngModel)]="search" placeholder="Recherche" #defaultinput></ion-searchbar>
+        <ion-icon name="filter-outline" slot="end" [matMenuTriggerFor]="animals2" color="primary"></ion-icon>
+        <mat-menu #animals2="matMenu">
+          <button mat-menu-item (click)="deletingfilter()"> <ion-text class="font-size-11" color="danger"> Annuler le filtre</ion-text></button>
+          <button mat-menu-item [matMenuTriggerFor]="menutypes"> <ion-text class="font-size-11">Type</ion-text></button>
+          <button mat-menu-item [matMenuTriggerFor]="menucategories"><ion-text class="font-size-11">Catégorie</ion-text></button>
+          <button mat-menu-item [matMenuTriggerFor]="menuUoms"> <ion-text class="font-size-11">Unité de mesure</ion-text></button>
+        </mat-menu>
+        <mat-menu #menutypes="matMenu">
+          <button mat-menu-item (click)="filterbytype('1')" ><ion-text class="font-size-11">Article</ion-text></button>
+          <button mat-menu-item (click)="filterbytype('2')"><ion-text class="font-size-11">Service</ion-text></button>
+        </mat-menu>
+        
+        <mat-menu #menuexport="matMenu">
+          <button mat-menu-item > <ion-text class="font-size-11">Exporter en Excel</ion-text></button>
+          <button mat-menu-item > <ion-text class="font-size-11">Exporter en PDF</ion-text></button>
+        </mat-menu>
+        
+        <mat-menu #menucategories="matMenu">
+          <button mat-menu-item (click)="filterbycategory()"><ion-text class="font-size-11">Aucune</ion-text></button>
+          <button mat-menu-item *ngFor="let category of listcategories" (click)="filterbycategory(category.category.id)"><ion-text class="font-size-11">{{category.category.name | titlecase}}</ion-text></button>
+        </mat-menu>
+        
+        <mat-menu #menuUoms="matMenu">
+          <button mat-menu-item (click)="filterbyuom()"><ion-text class="font-size-11">Aucune</ion-text></button>
+          <button mat-menu-item *ngFor="let uom of listunitofmeasure" (click)="filterbyuom(uom.id)"><ion-text class="font-size-11">{{uom.name | titlecase}}</ion-text> </button>
+        </mat-menu>
+      </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" *ngIf="showdefaultprogress" mode="ios" color="primary"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <ion-item lines="none" class="contentbody">
+    <h1 class="font-bold-600 font-size-20">{{listselectedarticles.length===0?' Produits ('+listarticles.length+')':listselectedarticles.length>1?listselectedarticles.length + ' sélectionnés':listselectedarticles.length + ' sélectionné'}}</h1>
+  </ion-item>
+  <hr class="hr">
+  <ion-item class="contentbody default-list-item" *ngFor="let article of listarticles  |filter:search" (click)="articlemenu(article)" lines="inset">
+    <ion-avatar slot="start">
+      <ion-text>{{article.service.type==='1'?'A':'S'}}</ion-text>
+    </ion-avatar>
+    <ion-label>
+      <p class="item-label-title">
+        <ion-text>{{article.service.name | titlecase}}</ion-text> 
+      </p>
+      <p class="secondpara">
+        <span class="reqtotalprinted font-size-11">{{article.prices.length>0?article.prices[0].price:'Aucun prix'}} {{article.prices.length>0?article.prices[0].abreviation:''}} | Catég. {{article.service.category_name | titlecase}}</span>
+      </p>
+      <p class="secondpara">
+        {{article.service.description | titlecase}}
+      </p> 
+    </ion-label>
+    <ion-text class="font-size-13" *ngIf="article.service.type==='1'" >Qté. {{(article.service.available_qte!==null?article.service.available_qte:'0')| number}} {{article.service.uom_symbol}}</ion-text>
+    <ion-icon name="checkmark-outline" color="success" size="small" slot="end" *ngIf="article.selected && multipleselect"></ion-icon>
+    <ion-icon name="radio-button-on-outline" color="warning" slot="end" size="small" class="unreadbutton" *ngIf="article.sync_status==='0'" ></ion-icon>
+  </ion-item>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" (click)="newservice()" *ngIf="!showcheckbox && !multipleselect">
+    <ion-fab-button color="secondary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+<ion-footer class="ion-no-border" [translucent]="true" >
+  <ion-toolbar *ngIf="multipleselect && listselectedarticles.length>0 && depositsent.id" class="default-box">
+    <ion-item lines="none" class="font-size-14">
+      <ion-text slot="start" color="danger" (click)="multipledelete()">Supprimer</ion-text>
+      <ion-text slot="end" color="secondary" (click)="stockhistory()">Stock(entrée/sortie)</ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-toolbar *ngIf="multipleselect && listselectedarticles.length>0 && !depositsent.id" class="ion-padding-start ion-padding-end">
+    <ion-button (click)="sendselected()" type="button" class="box-big" expand="block" color="secondary" mode="ios" *ngIf="multipleselect" >Valider le choix ({{listselectedarticles.length}})</ion-button>
+  </ion-toolbar>
+</ion-footer>

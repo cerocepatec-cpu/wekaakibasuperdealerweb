@@ -1,0 +1,194 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-text class="font-size-30 font-bold-600">Gestion des <ion-note color="warning" class="font-size-30 font-bold-600">salaires</ion-note></ion-text>
+  </ion-toolbar>
+  <ion-progress-bar *ngIf="showprogress" type="indeterminate" mode="ios"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [scrollY]="true" [scrollX]="true" style="height: fit-content!important;scrollbar-width: thin;" fullscreen="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données...">
+    </ion-refresher-content>
+  </ion-refresher>
+<ion-grid>
+  <ion-row>
+    <ion-col sizeLg="12">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" class="largedevicehidden bd-square">
+            <ion-chip class="font-bold cursor-pointer font-size-12" *ngFor="let position of positionslist" (click)="togglePositionsChange(position)">
+              {{position.name?position.name:position.description | uppercase}} ({{position.totalagents}})
+            </ion-chip>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="!appserv.isMyDeviceConnected()">
+          <ion-col size="12">
+              <ion-card mode="ios" color="warning" class="ion-padding display-flex-center">
+                <ion-text color="light">
+                  Veuillez vous connecter à Internet pour récupérer les données de cette page!
+                </ion-text>
+              </ion-card>
+          </ion-col>
+        </ion-row>
+        <ion-row class="ion-padding-top">
+          <ion-col size="12" size-lg="6" class="ion-padding-end">
+            <ion-item  lines="none" class="bd-square bd-radius-10" style="height: 35px!important">
+              <ion-icon name="search" size="small" slot="start" style="margin-top:2px!important;"></ion-icon>
+              <ion-input class="font-size-12" placeholder="Rechercher" mode="ios" #defaultsearchinput [(ngModel)]="search" style="margin-top: -13px!important;"></ion-input>
+            </ion-item>
+          </ion-col> 
+          <ion-col size="12" size-lg="2" class="ion-padding-end" routerLink="/uzisha/fichesalaires" *ngIf="appserv.permissionFilter('agents','fichespaie')">
+            <ion-text color="secondary" class="font-size-20 font-bold-600 cursor-pointer">Fiches de paie</ion-text>
+          </ion-col>
+            <ion-col size="12" size-lg="4">
+              <ion-text class="font-size-20 font-bold-600">Total ({{agentslist.length}})</ion-text>
+            </ion-col>
+        </ion-row>
+        <ion-row class="ion-padding-top">
+            <ion-col size="12" size-lg="8" class="ion-padding-end">
+              <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" (click)="newsetting()" *ngIf="appserv.permissionFilter('agents','newsalary')">
+                <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                  <ion-icon name="add-outline"></ion-icon>
+                </ion-avatar>
+                <ion-label>
+                  <p class="item-label-title font-size-12">Nouveaux salariés</p>
+                  <p class="secondpara font-size-11">Cliquez ici pour ajouter des salariés</p>
+                </ion-label>
+               </ion-item>
+             
+               <div *ngIf="loaded">
+                  <ion-list *ngFor="let item of [0,1,3,4]">
+                    <ion-list-header>
+                      <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+                    </ion-list-header>
+                    <ion-item>
+                      <ion-thumbnail slot="start">
+                        <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+                      </ion-thumbnail>
+                      <ion-label>
+                        <h3>
+                          <ion-skeleton-text [animated]="true" style="width: 80%;"></ion-skeleton-text>
+                        </h3>
+                        <p>
+                          <ion-skeleton-text [animated]="true" style="width: 60%;"></ion-skeleton-text>
+                        </p>
+                        <p>
+                          <ion-skeleton-text [animated]="true" style="width: 30%;"></ion-skeleton-text>
+                        </p>
+                      </ion-label>
+                    </ion-item>
+                  </ion-list>
+               </div>
+               
+               <ion-accordion-group #accordionGroup>
+                <ion-accordion [value]="agent.id" *ngFor="let agent of agentslist | filter:search" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom" (click)="agent.activated=!agent.activated; handleopenaccordion(agent)">
+                  <ion-item slot="header" color="light">
+                    <ion-label>
+                      <p class="item-label-title font-size-15">{{agent.agent_fullname?agent.agent_fullname:agent.agent_username | uppercase}}</p>
+                      <p class="secondpara font-size-12 font-bold">
+                        <ion-text class="font-size-11" color="dark">Poste: {{agent.position_name}} </ion-text> <br *ngIf="agent.position_name">
+                        <ion-text class="font-size-11" color="dark">{{agent.description}} </ion-text> <br *ngIf="agent.description">
+                      </p>
+                    </ion-label>
+                  </ion-item>
+                  <div class="ion-padding" slot="content">
+                    <ion-row>
+                      <ion-col size="12" size-lg="4" class="ion-padding-end" *ngIf="appserv.permissionFilter('agents','editsalary')">
+                        <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" (click)="editemployee(agent)">
+                          <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                            <ion-icon name="document-outline"></ion-icon>
+                          </ion-avatar>
+                          <ion-label>
+                            <p class="item-label-title font-size-12">Modifier</p>
+                            <p class="secondpara font-size-11">Modifier la fiche de paie</p>
+                          </ion-label>
+                         </ion-item>
+                      </ion-col>
+                      <ion-col size="12" size-lg="4" class="ion-padding-end" *ngIf="appserv.permissionFilter('agents','addadvancesalary')">
+                        <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" (click)="addsalaryadvance(agent)">
+                          <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                            <ion-icon name="add-outline"></ion-icon>
+                          </ion-avatar>
+                          <ion-label>
+                            <p class="item-label-title font-size-12">Avances sur salaire</p>
+                            <p class="secondpara font-size-11">Entrer les avances sur salaire</p>
+                          </ion-label>
+                         </ion-item>
+                      </ion-col>
+                      <ion-col size="12" size-lg="4" *ngIf="appserv.permissionFilter('agents','printfichepaie')">
+                        <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" (click)="gotopayslips(agent)">
+                          <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                            <ion-icon name="print-outline"></ion-icon>
+                          </ion-avatar>
+                          <ion-label>
+                            <p class="item-label-title font-size-12">Fiche de paie</p>
+                            <p class="secondpara font-size-11">Imprimer la fiche de paie</p>
+                          </ion-label>
+                         </ion-item>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row>
+                      <ion-col size="12">
+                          <ion-item class="font-size-12 default-list-item2" mode="ios" lines="full" >
+                            <ion-text slot="start">Méthode de calcul</ion-text>
+                              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{agent.method_of_calculation==="percentage"?'Pourcentage':"Montant fixe" | titlecase}}</ion-text></h2>
+                          </ion-item>
+                      
+                          <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+                            <ion-text slot="start">Montant</ion-text> 
+                              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{(agent.salary_amount?agent.salary_amount:0) | number}} {{appserv.getDefaultmoney().abreviation}}</ion-text></h2>
+                          </ion-item>
+                          
+                          <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+                            <ion-text slot="start">Pourcentage</ion-text> 
+                              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{(agent.salary_percentage?agent.salary_percentage:0) | number}}%</ion-text></h2>
+                          </ion-item> 
+                          
+                          <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+                            <ion-text slot="start">Taux de participation du calcul de pourcentage</ion-text> 
+                              <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{(agent.participation_rate?agent.participation_rate:0) | number}}%</ion-text></h2>
+                          </ion-item>
+            
+                        <ion-item mode="ios" class="contentbody footeritem" lines="none">
+                            <h4 class="font-size-11"><ion-note>Effectué le {{agent.created_at | date}}</ion-note></h4> <br> <br>
+                            <h4 class="font-size-11"><ion-note> &nbsp; par {{agent.done_by_fullname?agent.done_by_fullname:agent.done_by_username | titlecase}} </ion-note></h4>
+                            <ion-icon name="settings-outline" slot="end" size="small" color="warning" class="cursor-pointer" [matMenuTriggerFor]="filter_menu" *ngIf="appserv.permissionFilter('agents','deletesalary')"></ion-icon>
+                            <mat-menu #filter_menu="matMenu">
+                              <button mat-menu-item (click)="deleteemployee(agent)"> <ion-text class="font-size-11" color="danger">Supprimer</ion-text></button>
+                            </mat-menu>
+                      </ion-item>
+                      </ion-col>
+                    </ion-row>
+                  </div>
+                </ion-accordion>
+              </ion-accordion-group>
+            </ion-col>
+            <ion-col size="12" size-lg="4" class="smalldevicehidden">
+              <div class="bd-square bd-radius-5 ion-padding-start ion-padding-bottom ion-padding-end">
+                <h4>Postes ({{positionslist.length}})</h4>
+                <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" (click)="newposition()" *ngIf="appserv.permissionFilter('agents','addposition')">
+                  <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                    <ion-icon name="add-outline"></ion-icon>
+                  </ion-avatar>
+                  <ion-label>
+                    <p class="item-label-title font-size-12">Nouveau poste</p>
+                    <p class="secondpara font-size-11">Cliquez ici pour ajouter un poste</p>
+                  </ion-label>
+                 </ion-item>
+                <ion-note class="font-bold cursor-pointer ion-margin-bottom" *ngFor="let position of positionslist" (click)="togglePositionsChange(position)">
+                  {{position.name?position.name:position.description | uppercase}} ({{position.totalagents}})
+                 <br> <br>
+                </ion-note>
+              </div>
+            </ion-col>
+          </ion-row>
+      </ion-grid>
+    </ion-col>
+   
+  </ion-row>
+</ion-grid>
+    
+</ion-content>

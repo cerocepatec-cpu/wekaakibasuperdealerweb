@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Valider le crédit</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="close()">✕</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="p-4 bg-gray-50 dark:bg-gray-900">
+
+  <div
+    class="bg-white dark:bg-gray-800 rounded-xl p-4 space-y-4 max-w-md mx-auto">
+
+    <!-- ERROR -->
+    <div
+      *ngIf="error"
+      class="text-red-600 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded">
+      {{ error }}
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="text-sm space-y-1">
+      <div><b>Membre :</b> {{ credit.beneficiary?.name }}</div>
+      <div>
+        <b>Montant demandé :</b>
+        {{ credit.principal_amount_requested }}
+        {{ credit.money?.code }}
+      </div>
+    </div>
+
+    <hr class="dark:border-gray-700">
+
+    <!-- APPROVED AMOUNT -->
+    <ion-input
+      label="Montant validé"
+      type="number"
+      [(ngModel)]="approvedAmount"
+      [max]="credit.principal_amount_requested">
+    </ion-input>
+
+    <div class="text-xs text-gray-500">
+      💡 Vous pouvez valider un montant inférieur au montant demandé.
+    </div>
+
+    <!-- ACTION -->
+    <ion-button
+      expand="block"
+      color="primary"
+      [disabled]="loading"
+      (click)="confirm()">
+      {{ loading ? 'Validation...' : 'Valider le crédit' }}
+    </ion-button>
+
+  </div>
+
+</ion-content>

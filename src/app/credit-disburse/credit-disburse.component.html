@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Servir le crédit</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="close()">✕</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gray-50 dark:bg-gray-900">
+
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-4 space-y-4 max-w-md mx-auto">
+
+    <!-- ERROR -->
+    <div *ngIf="error"
+      class="text-red-600 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded">
+      {{ error }}
+    </div>
+
+    <!-- CREDIT SUMMARY -->
+    <div class="text-sm space-y-1">
+      <div><b>Membre :</b> {{ credit.beneficiary?.name }}</div>
+      <div><b>Demandé :</b> {{ credit.principal_amount_requested }}</div>
+      <div><b>Validé :</b> {{ credit.principal_amount_approved }}</div>
+      <div><b>Déjà servi :</b> {{ alreadyDisbursed }}</div>
+      <div class="text-green-600">
+        <b>Reste à servir :</b> {{ remainingAmount }}
+      </div>
+    </div>
+
+    <hr class="dark:border-gray-700">
+
+    <!-- FUND -->
+  <ion-select
+  label="Caisse de service"
+  [(ngModel)]="selectedFundId"
+  required>
+  <ion-select-option
+    *ngFor="let fund of funds"
+    [value]="fund.id">
+    {{ fund.description }} — {{ fund.money_abreviation }}
+  </ion-select-option>
+</ion-select>
+
+
+    <!-- AMOUNT -->
+    <ion-input
+      label="Montant à servir maintenant"
+      type="number"
+      [(ngModel)]="disburseAmount"
+      [max]="remainingAmount">
+    </ion-input>
+
+    <!-- CONFIRM -->
+    <ion-button
+      expand="block"
+      color="primary"
+      [disabled]="loading"
+      (click)="confirm()">
+      {{ loading ? 'Traitement...' : 'Confirmer le service' }}
+    </ion-button>
+
+  </div>
+
+</ion-content>

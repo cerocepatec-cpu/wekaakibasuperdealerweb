@@ -1,0 +1,159 @@
+<ion-header class="ion-no-border contentbody">
+  <ion-toolbar class="contentbody">
+    <ion-title class="font-size-40">
+      <ion-text>Paramètres</ion-text>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody"> 
+
+  <!--MODALS WINDOWS -->
+  <ion-modal trigger="open-modal">
+    <ng-template>
+      <ion-content class="contentbody">
+        <ion-item class="contentbody" lines="none">
+          <ion-searchbar placeholder="Recherche" mode="ios" (ionInput)="searchmenu($event)"></ion-searchbar>
+          <ion-icon name="close-circle-outline" slot="end" (click)="closemodal()" size="small"></ion-icon>
+        </ion-item>
+          <ion-item lines="inset" *ngFor="let menu of menus" class="contentbody default-list-item2" (click)="closemodal(menu.router)">
+            <ion-avatar [class]="menu.avatar_class" slot="start">
+              <ion-img [src]="menu.imgSrc" *ngIf="menu.imgSrc"></ion-img>
+              <ion-icon [name]="menu.icon" size="large" *ngIf="menu.icon"></ion-icon>
+            </ion-avatar>
+            <ion-text class="font-size-14">
+              {{menu.title}}
+            </ion-text>
+          </ion-item>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+    <ion-searchbar mode="ios" placeholder="Recherche" id="open-modal"></ion-searchbar>
+    <ion-card class="bd-radius-10 margin-btm-15 ion-padding" mode="ios" (click)="gotoinfosagent()">
+      <ion-item lines="inset" detail="true" class="font-size-14 default-avatar-item">
+        <ion-avatar slot="start">
+          <ion-img [src]="actualuser.avatar?imgUrl+actualuser.avatar:''" *ngIf="actualuser.avatar"></ion-img>
+          <ion-icon name="person" size="large" *ngIf="!actualuser.avatar"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2>{{actualuser.user_name | titlecase}}</h2>
+          <ion-note class="font-size-12">{{actualuser.note | titlecase}}</ion-note>
+        </ion-label>
+      </ion-item>
+      <ion-item lines="none" detail=true>
+        <ion-text class="font-size-13">Cliquer ici pour configurer votre compte</ion-text>
+      </ion-item>
+    </ion-card>
+    <ion-card class="bd-radius-10 margin-btm-15" mode="ios">
+      <ion-item class="default-list-item2" lines="inset" mode="ios" detail="true" routerLink="/articles/services-categories">
+        <ion-avatar slot="start" class="square-avatar-warning"><ion-icon name="grid"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Catégories</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Configuration catégories Services/Articles</ion-note></h4>
+        </ion-label> 
+       </ion-item> 
+       <ion-item class="default-list-item2" mode="ios" lines="inset" detail="true"  routerLink="/articles/uom">
+        <ion-avatar slot="start" class="square-avatar-secondary"><ion-icon name="git-network"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Unités de mesure</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Utiliser par exemple :Kg, Piece, Boîte,...</ion-note></h4>
+        </ion-label> 
+       </ion-item>
+       <ion-item  class="default-list-item2" mode="ios" detail="true" routerLink="/articles" lines="none">
+        <ion-avatar slot="start" class="square-avatar-danger"><ion-icon name="create"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Articles/Services</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Ajouter des articles ou Services</ion-note></h4>
+        </ion-label> 
+       </ion-item>
+    </ion-card>
+
+    <ion-card class="bd-radius-10 margin-btm-15" mode="ios">
+      <ion-item class="default-list-item2" mode="ios" lines="inset" detail="true" routerLink="/articles/customers-categories">
+        <ion-avatar slot="start" class="square-avatar-danger"><ion-icon name="people"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Catégories</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Catégoriser vos clients</ion-note></h4>
+        </ion-label> 
+       </ion-item> 
+
+       <ion-item  class="default-list-item2" mode="ios" lines="none" detail="true" routerLink="/customers">
+        <ion-avatar slot="start" class="square-avatar-primary"><ion-icon name="person-add"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Clients</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Ajouter des clients</ion-note></h4>
+        </ion-label> 
+       </ion-item>
+    </ion-card> 
+    
+    <ion-card class="bd-radius-10 margin-btm-15" mode="ios">
+      <ion-item class="default-list-item2" mode="ios" lines="inset" detail="true" routerLink="/stock/deposits">
+        <ion-avatar slot="start" class="square-avatar-success"><ion-icon name="storefront"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Dépots</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Création de plusieurs dépôts pour une gestion éfficace</ion-note></h4>
+        </ion-label> 
+       </ion-item> 
+
+       <ion-item lines="none" class="default-list-item2" mode="ios" lines="none" detail="true" routerLink="/stock/story">
+        <ion-avatar slot="start" class="square-avatar-warning"><ion-icon name="swap-vertical"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Mouvements Stock (Entrées/Sorties)</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Approvisionner votre stock en ajoutant ou en soustreant des nouvelles quantités</ion-note></h4>
+        </ion-label> 
+       </ion-item>
+    </ion-card>
+
+    <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+      <ion-item class="default-list-item2" mode="ios" lines="inset" detail="true" routerLink="/finances/invoices">
+        <ion-avatar slot="start" class="square-avatar-primary"><ion-icon name="cart"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Factures</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Lister, rechercher, payer, annuler les factures</ion-note></h4>
+        </ion-label> 
+       </ion-item> 
+
+       <ion-item lines="none" class="default-list-item2" mode="ios" lines="none" detail="true" routerLink="/finances/expenditures">
+        <ion-avatar slot="start" class="square-avatar-danger"><ion-icon name="swap-horizontal"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Dépenses</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Entrer vos dépenses </ion-note></h4>
+        </ion-label> 
+       </ion-item>
+    </ion-card>
+    
+    <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+      <ion-item lines="none" class="default-list-item2" mode="ios" detail="true" routerLink="/fences">
+        <ion-avatar slot="start" class="square-avatar-warning"><ion-icon name="power"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Clôtures</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Nouvelle clôture et historique des clôtures</ion-note></h4>
+        </ion-label> 
+       </ion-item> 
+    </ion-card> 
+    
+    <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+      <ion-item lines="none" class="default-list-item2" mode="ios" detail="true" (click)="gotobluetoothpage()">
+        <ion-avatar slot="start" class="square-avatar-primary"><ion-icon name="print-outline"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Imprimantes</ion-text></h2>
+          <h4 class="font-size-11 secondpara"><ion-note>Ajouter ou supprimer une imprimante</ion-note></h4>
+        </ion-label> 
+       </ion-item> 
+    </ion-card>  
+    <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+      <ion-item lines="none" class="default-list-item2" mode="ios" detail="true" (click)="shareapp()">
+        <ion-avatar slot="start" class="square-avatar-success"><ion-icon name="share-outline"></ion-icon></ion-avatar> 
+        <ion-label>
+          <h2 class="font-size-14 item-label-title"><ion-text>Partager l'application</ion-text></h2>
+        </ion-label> 
+       </ion-item> 
+    </ion-card> 
+
+    <ion-card mode="ios" color="medium" (click)="disconect()">
+      <ion-item lines="none" class="ion-text-center">
+        <ion-avatar slot="start" class="square-avatar-danger"><ion-icon name="log-out"></ion-icon></ion-avatar>
+        <ion-text class="font-size-14">Déconnexion</ion-text>
+      </ion-item>
+    </ion-card>
+
+</ion-content>

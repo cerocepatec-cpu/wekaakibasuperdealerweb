@@ -1,0 +1,433 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon color="medium" name="chevron-back-outline" size="large" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-title style="text-align:center;" slot="start" class="smalldevicehidden">Aperçu avant impréssion</ion-title>
+      <ion-icon name="print-outline" slot="end" (click)="print()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding" [scrollY]="true" [scrollX]="true" style="height: fit-content!important;scrollbar-width: thin;" fullscreen="true">
+  <div id="header-bloc" hidden>
+    <div class="header">
+      <ion-text class="font-size-20 font-bold-600" *ngIf="posprintoptions.name && appserv.getactualEse().name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br *ngIf="posprintoptions.name && appserv.getactualEse().name">
+      <ion-text *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">{{appserv.getactualEse().adresse}}</ion-text> <br *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">
+      <ion-text *ngIf="posprintoptions.description && appserv.getactualEse().description ">{{appserv.getactualEse().description}}</ion-text>
+      <ion-text *ngIf="posprintoptions.num_impot && appserv.getactualEse().num_impot ">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br *ngIf="posprintoptions.description && appserv.getactualEse().description ">
+      <ion-text *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">
+      <ion-text *ngIf="posprintoptions.rccm && appserv.getactualEse().rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+      <ion-text *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">
+    </div>
+    <div class="suheader ion-no-padding">
+      <ion-text>Imprimé le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+      <ion-text>Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+    </div>
+  </div>
+
+  <ng-container *ngIf="criteria==='specificCustomers'">
+    <div id="specificCustomers" class="content ion-padding">
+      <h2 *ngIf="datasent.from!==datasent.to">Rapport des crédits par clients {{appserv.frdate(datasent.from)}} au {{appserv.frdate(datasent.to)}}</h2>
+      <h2 *ngIf="datasent.from===datasent.to">Rapport des crédits clients du {{appserv.frdate(datasent.from)}}</h2>
+      <hr class="hr">
+      <h4>CUMUL</h4>
+      <table border="1" class="table" style="width:100% ;font-size: 12px;">
+        <thead>
+          <tr>
+            <th class="text-left font-size-15">N°</th>
+            <th class="text-left font-size-15">Client</th>
+            <th class="text-left font-size-15">Contacts</th>
+            <th class="text-right font-size-15">Crédit</th>
+            <th class="text-right font-size-15">Avance</th>
+            <th class="text-right font-size-15">Solde brut</th>
+            <th class="text-right font-size-15">Solde net</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let credit of datasent.data; let i=index;">
+            <td>{{i+1}}</td>
+            <td class="text-wrapped">{{credit.customerName | uppercase}}</td>
+            <td class="text-left text-wrapped">
+             <span>{{credit.phone}}</span> <br> 
+             <span>{{credit.mail}}</span>
+            </td>
+            <td class="text-right font-size-14">{{credit.total | number}} {{datasent.money.abreviation}}</td>
+            <td class="text-right font-size-14">{{credit.totalpayed | number}} {{datasent.money.abreviation}}</td>
+            <td class="text-right font-size-14">{{credit.sold | number}} {{datasent.money.abreviation}}</td>
+            <td class="text-right font-size-14">{{credit.soldnet | number}} {{datasent.money.abreviation}}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" class="font-size-20 text-right">Total crédits</th>
+            <th class="text-right font-size-20 text-right">{{datasent.total_general | number}} {{datasent.money.abreviation}}</th>
+            <th class="text-right font-size-20 text-right">{{datasent.totalgeneralpayed | number}} {{datasent.money.abreviation}}</th>
+            <th class="text-right font-size-20 text-right">{{datasent.totalgeneralsold | number}} {{datasent.money.abreviation}}</th>
+            <th class="text-right font-size-20 text-right">{{datasent.totalgeneralsoldnet | number}} {{datasent.money.abreviation}}</th>
+          </tr> 
+        </tfoot>
+      </table>
+      <h4>DETAILS <span *ngIf="datasent.data.length>1">PAR CLIENT</span> <span class="ion-float-right font-size-10">Afficher détails</span></h4>
+      <div class="sells-body" *ngFor="let credit of datasent.data">
+          <h6 class="bg-medium-clean font-bold-500 font-size-15">{{credit.customerName | uppercase}}</h6>
+          <table border="1" style="width:100% ;font-size: 12px;" class="table">
+            <thead>
+              <tr>
+                <th class="text-left">N°</th>
+                <th class="text-left">Date</th>
+                <th class="text-left">Réf. Facture</th>
+                <th class="text-right">Dette</th>
+                <th class="text-right">Payé</th>
+                <th class="text-right">Solde</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let debt of credit.debts; let c=index;">
+                <td class="text-left">{{c+1}}</td>
+                <td class="text-left">{{debt.created_at | date}}</td>
+                <td class="text-left text-wrapped">
+                  {{debt.uuid}} ({{debt.total_invoice | number}} {{datasent.money.abreviation}})
+                  <hr class="hr" *ngIf="debt.details.length>0">
+                  <div class="details-invoice">
+                      <ion-text *ngFor="let detail of debt.details" class="details-invoice-tr full-width">
+                        <span class="font-size-10 text-left text-wrapped">{{detail.name | titlecase}} :</span>
+                        <span class="font-size-10 text-right"> {{detail.quantity | number}} ({{detail.symbol}})</span>
+                        <span class="font-size-10 text-right"> {{detail.total | number}} {{datasent.money.abreviation}}</span>
+                      </ion-text>
+                  </div>
+                </td>
+                <td class="text-right">{{debt.amount | number}}</td>
+                <td class="text-right">{{debt.already_payed | number}}</td>
+                <td class="text-right">{{debt.sold | number}} {{datasent.money.abreviation}}</td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="criteria==='sellreportagents'">
+    <div id="sellreportagents">
+      <h2 *ngIf="datasent.from!==datasent.to" class="font-size-20">Rapport de vente par agents pour la période du {{appserv.frdate(datasent.from)}} au {{appserv.frdate(datasent.to)}}</h2>
+      <h2 *ngIf="datasent.from===datasent.to" class="font-size-20">Rapport de vente par agents du {{appserv.frdate(datasent.from)}}</h2>
+      <h2>
+        <ion-text class="font-size-16 font-bold-600">{{datasent.data.length>1?"Pour les agents:":"Agent:"}}</ion-text>
+        <ion-text color="primary" class="font-size-16 font-bold-600" *ngFor="let agent of datasent.data">
+        {{agent.user_name | titlecase}},
+      </ion-text>
+      </h2>
+       <!-- <br *ngIf="datasent.data.length>1"> -->
+       <ion-text class="font-bolder-600 font-size-16">
+        Quantité totale vendue: {{datasent.totalquantities | number}} <br>
+        Montant total vendu: {{datasent.totalsells | number}} {{datasent.money.abreviation}}<br>
+       </ion-text>
+       <br>
+      <ion-text class="font-size-15 font-bold-600" *ngIf="datasent.data.length>1">Détails par agents</ion-text>
+      <br *ngIf="datasent.data.length>1"> <br *ngIf="datasent.data.length>1">
+      <div class="list-deposits" *ngFor="let agent of datasent.data">
+        <ion-text color="primary" class="font-size-16 font-bold-600" *ngIf="datasent.data.length>1">
+          {{agent.user_name | titlecase}}
+          <br>
+        </ion-text>
+        <table border="1" style="width:100% ;font-size: 12px;">
+          <thead>
+            <tr>
+              <th class="text-left font-size-14">N°</th>
+              <th class="text-left font-size-14">Désignation</th>
+              <th class="text-left font-size-14">Catégorie</th>
+              <th class="text-right font-size-14">Quantité</th>
+              <th class="text-right font-size-14">Total</th>
+            </tr>
+          </thead>
+          <tbody class="body">
+            <tr *ngFor="let service of agent.services; let i =index;">
+                <td>{{i+1}}</td>
+                <td>{{service.name | titlecase}}</td>
+                <td>{{service.category_name | titlecase}}</td>
+                <td class="text-right">{{service.total_quantity | number}} <span *ngIf="service.uom_symbol">({{service.uom_symbol}})</span></td>
+                <td class="text-right">{{service.total_sell | number}} <span>({{datasent.money.abreviation}})</span> </td>
+            </tr>
+            <tr>
+              <th colspan="3" class="font-size-16 text-right">Sous totaux</th>
+              <th class="text-right font-size-16">{{agent.total_quantities | number}}</th>
+              <th class="text-right font-size-16">{{agent.total_sells | number}} {{datasent.money.abreviation}}</th>
+            </tr>
+          </tbody>
+        </table>
+        <br>
+      </div>
+      <br>
+        <div class="bg-medium-clean-proforma ion-padding text-center bd-radius-10 footer">
+          <span class="text-center font-size-10 font-bold-600 text-italic">{{appserv.version}}</span>
+        </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="criteria==='sellreportdepositsarticles'">
+    <div id="sellreportdepositsarticles">
+      <h2 *ngIf="datasent.from!==datasent.to" class="font-size-20">Rapport de vente par dépôts pour la période du {{appserv.frdate(datasent.from)}} au {{appserv.frdate(datasent.to)}}</h2>
+      <h2 *ngIf="datasent.from===datasent.to" class="font-size-20">Rapport de vente par dépôts du {{appserv.frdate(datasent.from)}}</h2>
+      <h2>
+        <ion-text class="font-size-16 font-bold-600">{{datasent.data.length>1?"Pour les dépôts:":"Dépôt:"}}</ion-text>
+        <ion-text color="primary" class="font-size-16 font-bold-600" *ngFor="let depot of datasent.data">
+        {{depot.name | titlecase}},
+      </ion-text>
+      </h2>
+       <!-- <br *ngIf="datasent.data.length>1"> -->
+       <ion-text class="font-bolder-600 font-size-16">
+        Quantité totale vendue: {{datasent.totalquantities | number}} <br>
+        Montant total vendu: {{datasent.totalsells | number}} {{datasent.money.abreviation}}<br>
+       </ion-text>
+       <br>
+      <ion-text class="font-size-15 font-bold-600" *ngIf="datasent.data.length>1">Détails par Dépôts</ion-text>
+      <br *ngIf="datasent.data.length>1"> <br *ngIf="datasent.data.length>1">
+      <div class="list-deposits" *ngFor="let depot of datasent.data">
+        <ion-text color="primary" class="font-size-16 font-bold-600" *ngIf="datasent.data.length>1">
+          {{depot.name | titlecase}}
+          <br>
+        </ion-text>
+        <table border="1" style="width:100% ;font-size: 12px;">
+          <thead>
+            <tr>
+              <th class="text-left font-size-14">N°</th>
+              <th class="text-left font-size-14">Désignation</th>
+              <th class="text-left font-size-14">Catégorie</th>
+              <th class="text-right font-size-14">Quantité</th>
+              <th class="text-right font-size-14">Total</th>
+            </tr>
+          </thead>
+          <tbody class="body">
+            <tr *ngFor="let service of depot.services; let i =index;">
+                <td>{{i+1}}</td>
+                <td>{{service.name | titlecase}}</td>
+                <td>{{service.category_name | titlecase}}</td>
+                <td class="text-right">{{service.total_quantity | number}} <span *ngIf="service.uom_symbol">({{service.uom_symbol}})</span></td>
+                <td class="text-right">{{service.total_sell | number}} <span>({{datasent.money.abreviation}})</span> </td>
+            </tr>
+            <tr>
+              <th colspan="3" class="font-size-16 text-right">Sous totaux</th>
+              <th class="text-right font-size-16">{{depot.total_quantities | number}}</th>
+              <th class="text-right font-size-16">{{depot.total_sells | number}} {{datasent.money.abreviation}}</th>
+            </tr>
+          </tbody>
+        </table>
+        <br>
+      </div>
+      <br>
+        <div class="bg-medium-clean-proforma ion-padding text-center bd-radius-10 footer">
+          <span class="text-center font-size-10 font-bold-600 text-italic">{{appserv.version}}</span>
+        </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="criteria==='sellreportbyarticles'">
+    <div id="sellreportbyarticles">
+      <h2 *ngIf="datasent.from!==datasent.to">Rapport de vente par articles pour la période du {{appserv.frdate(datasent.from)}} au {{appserv.frdate(datasent.to)}}</h2>
+      <h2 *ngIf="datasent.from===datasent.to">Rapport de vente par articles du {{appserv.frdate(datasent.from)}}</h2>
+      <h2>
+        <ion-text class="font-size-16 font-bold-600">{{datasent.data.length>1?"Pour les articles:":"Article:"}}</ion-text>
+        <ion-text color="primary" class="font-size-16 font-bold-600" *ngFor="let service of datasent.data">
+        {{service.name | titlecase}},
+      </ion-text>
+      </h2>
+      <table border="1" style="width:100% ;font-size: 12px;">
+        <thead>
+          <tr>
+            <th class="text-left font-size-14">N°</th>
+            <th class="text-left font-size-14">Désignation</th>
+            <th class="text-left font-size-14">Catégorie</th>
+            <th class="text-right font-size-14">Quantité</th>
+            <th class="text-right font-size-14">Total</th>
+          </tr>
+        </thead>
+        <tbody class="body">
+          <tr *ngFor="let service of datasent.data; let i =index;">
+              <td>{{i+1}}</td>
+              <td>{{service.name | titlecase}}</td>
+              <td>{{service.category_name | titlecase}}</td>
+              <td class="text-right">{{service.total_quantity | number}} <span *ngIf="service.uom_symbol">({{service.uom_symbol}})</span></td>
+              <td class="text-right">{{service.total_sell | number}} <span>({{datasent.money.abreviation}})</span> </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" class="font-size-16 text-right">Sous totaux</th>
+            <th class="text-right font-size-16">{{datasent.totalquantities | number}}</th>
+            <th class="text-right font-size-16">{{datasent.totalsells | number}} {{datasent.money.abreviation}}</th>
+          </tr>
+        </tfoot>
+      </table>
+      <br>
+        <div class="bg-medium-clean-proforma ion-padding text-center bd-radius-10 footer">
+          <span class="text-center font-size-10 font-bold-600 text-italic">{{appserv.version}}</span>
+        </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="criteria==='stockbyarticles'">
+    <div id="stockbyarticles">
+      <h2 *ngIf="datasent.from!==datasent.to">Rapport de stock pour la période du {{appserv.frdate(datasent.from)}} au {{appserv.frdate(datasent.to)}}</h2>
+      <h2 *ngIf="datasent.from===datasent.to">Rapport de stock du {{appserv.frdate(datasent.from)}}</h2>
+      <h2>
+        <ion-text class="font-size-16 font-bold-600">{{datasent.stockmouvements.length>1?"Pour les articles:":"Article:"}}</ion-text>
+        <ion-text color="primary" class="font-size-16 font-bold-600" *ngFor="let service of datasent.stockmouvements">
+        {{service.name | titlecase}},
+      </ion-text>
+      </h2>
+      <table border="1" style="width:100% ;font-size: 12px;">
+        <thead>
+          <tr>
+            <th class="text-left font-size-14">N°</th>
+            <th class="text-left font-size-14">Désignation</th>
+            <th class="text-left font-size-14">Catégorie</th>
+            <th class="text-right font-size-14">Tot. Entrées</th>
+            <th class="text-right font-size-14">Tot. Sorties</th>
+            <th class="text-right font-size-14">Solde</th>
+          </tr>
+        </thead>
+        <tbody class="body">
+          <tr *ngFor="let mouv of datasent.stockmouvements; let i =index;">
+              <td>{{i+1}}</td>
+              <td>{{mouv.name | titlecase}}</td>
+              <td>{{mouv.category_name | titlecase}}</td>
+              <td class="text-right">{{mouv.total_entries?mouv.total_entries:0 | number}} <span *ngIf="mouv.uom_symbol">({{mouv.uom_symbol}})</span></td>
+              <td class="text-right">{{mouv.total_withdraw?mouv.total_withdraw:0 | number}} <span *ngIf="mouv.uom_symbol">({{mouv.uom_symbol}})</span> </td>
+              <td class="text-right">{{mouv.sold?mouv.sold:0 | number}} <span *ngIf="mouv.uom_symbol">({{mouv.uom_symbol}})</span></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" class="font-size-16 text-right">Sous totaux</th>
+            <th class="text-right font-size-16">{{datasent.totalEntriesStock | number}}</th>
+            <th class="text-right font-size-16">{{datasent.totalWithdrawStock | number}}</th>
+            <th class="text-right font-size-16">{{datasent.totalSoldStock | number}}</th>
+          </tr>
+        </tfoot>
+      </table>
+      <h6>DETAILS PAR ARTICLE</h6>
+      <div *ngFor="let article of datasent.stockmouvements">
+          <span class="font-size-15 bg-medium-clean font-bold-500 bd-radius-10 ion-padding-start ion-padding-end">{{article.name | titlecase}}</span> <br> <br>
+          <table border="1" style="width:100% ;font-size: 12px;" class="ion-padding-start">
+            <thead>
+              <tr>
+                <th class="text-left font-size-14">N°</th>
+                <th class="text-left font-size-14">Date</th>
+                <th class="text-left font-size-14">Lib.</th>
+                <th class="text-left font-size-14">Dépôt</th>
+                <th class="text-left font-size-14">Type Op.</th>
+                <th class="text-right font-size-14">Stock init.</th>
+                <th class="text-right font-size-14">Qté</th>
+                <th class="text-right font-size-14">P.U</th>
+                <th class="text-right font-size-14">Total</th>
+                <th class="text-left font-size-14">Par</th>
+                <th class="text-left font-size-14">Obs</th>
+              </tr>
+            </thead>
+            <tbody class="body">
+              <tr *ngFor="let mouv of article.details; let i =index;">
+                  <td>{{i+1}}</td>
+                  <td>{{mouv.done_at | date}}</td>
+                  <td>{{mouv.motif | titlecase}}</td>
+                  <td>{{mouv.deposit_name | titlecase}}</td>
+                  <td>{{(mouv.type==='entry'?'Entrée':'Sortie') | titlecase}}</td>
+                  <td class="text-right">{{mouv.quantity_before | number}} {{mouv.uom_symbol}}</td>
+                  <td class="text-right">{{mouv.quantity | number}} {{mouv.uom_symbol}}</td>
+                  <td class="text-right">{{(mouv.price?mouv.price:0) | number}} <span class="font-size-9">{{appserv.getDefaultmoney().abreviation}}</span> </td>
+                  <td class="text-right">{{(mouv.quantity *mouv.price) | number}} <span class="font-size-9">{{appserv.getDefaultmoney().abreviation}}</span></td>
+                  <td>{{mouv.done_by_name | titlecase}}</td>
+                  <td>{{mouv.note | titlecase}}</td>
+                </tr>
+            </tbody>
+          </table>
+          <br>  
+      </div>
+      <br>
+        <div class="bg-medium-clean-proforma ion-padding text-center bd-radius-10 footer">
+          <span class="text-center font-size-10 font-bold-600 text-italic">{{appserv.version}}</span>
+        </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="criteria==='deposits'">
+    <div id="deposits">
+      <h2 *ngIf="datasent.from!==datasent.to">Rapport de stock groupé par dépôts pour la période du {{appserv.frdate(datasent.from)}} au {{appserv.frdate(datasent.to)}}</h2>
+      <h2 *ngIf="datasent.from===datasent.to">Rapport de stock groupé par dépôts du {{appserv.frdate(datasent.from)}}</h2>
+      <h2>
+        <ion-text class="font-size-16 font-bold-600">{{datasent.data.length>1?"Dépôts:":"Dépôt: "}}</ion-text>
+        <ion-text color="primary" class="font-size-12 font-bold-600" *ngFor="let deposit of datasent.data">
+        {{deposit.name | titlecase}},
+      </ion-text>
+      </h2>
+      <div *ngFor="let deposit of datasent.data">
+        <ion-text color="primary" class="font-size-16 font-bold-600" *ngIf="datasent.data.length>1">
+          {{deposit.name | titlecase}}
+          <br>
+        </ion-text>
+        <br *ngIf="datasent.data.length>1">
+        <table border="1" style="width:100% ;font-size: 12px;">
+          <thead>
+            <tr>
+              <th class="text-left font-size-14">N°</th>
+              <th class="text-left font-size-14">Désignation</th>
+              <th class="text-left font-size-14">Catégorie</th>
+              <th class="text-right font-size-14">Tot. Entrées</th>
+              <th class="text-right font-size-14">Tot. Sorties</th>
+              <th class="text-right font-size-14">Solde</th>
+            </tr>
+          </thead>
+          <tbody class="body">
+            <tr *ngFor="let mouv of deposit.services; let i =index;">
+                <td>{{i+1}}</td>
+                <td>{{mouv.name | titlecase}}</td>
+                <td>{{mouv.category_name | titlecase}}</td>
+                <td class="text-right">{{mouv.total_entries?mouv.total_entries:0 | number}} <span *ngIf="mouv.uom_symbol">({{mouv.uom_symbol}})</span></td>
+                <td class="text-right">{{mouv.total_withdraw?mouv.total_withdraw:0 | number}} <span *ngIf="mouv.uom_symbol">({{mouv.uom_symbol}})</span> </td>
+                <td class="text-right">{{mouv.sold?mouv.sold:0 | number}} <span *ngIf="mouv.uom_symbol">({{mouv.uom_symbol}})</span></td>
+            </tr>
+            <tr>
+              <th colspan="3" class="font-size-16 text-right">Sous totaux</th>
+              <th class="text-right font-size-16">{{deposit.total_entries | number}}</th>
+              <th class="text-right font-size-16">{{deposit.total_withdraw | number}}</th>
+              <th class="text-right font-size-16">{{deposit.total_sold | number}}</th>
+            </tr>
+          </tbody>
+        </table>
+        <br>
+        <h6 class="font-size-15">DETAILS</h6>
+        <table border="1" style="width:100% ;font-size: 12px;" class="ion-padding-start">
+          <thead>
+            <tr>
+              <th class="text-left font-size-14">N°</th>
+              <th class="text-left font-size-14">Date</th>
+              <th class="text-left font-size-14">Lib.</th>
+              <th class="text-left font-size-14">Désignation</th>
+              <th class="text-left font-size-14">Type Op.</th>
+              <th class="text-right font-size-14">Stock init.</th>
+              <th class="text-right font-size-14">Qté</th>
+              <th class="text-right font-size-14">P.U</th>
+              <th class="text-right font-size-14">Total</th>
+              <th class="text-left font-size-14">Par</th>
+              <th class="text-left font-size-14">Obs</th>
+            </tr>
+          </thead>
+          <tbody class="body">
+            <tr *ngFor="let mouv of deposit.details; let i =index;">
+                <td>{{i+1}}</td>
+                <td>{{mouv.done_at | date}}</td>
+                <td>{{mouv.motif | titlecase}}</td>
+                <td>{{mouv.service_name | titlecase}}</td>
+                <td>{{(mouv.type==='entry'?'Entrée':'Sortie') | titlecase}}</td>
+                <td class="text-right">{{mouv.quantity_before | number}} {{mouv.uom_symbol}}</td>
+                <td class="text-right">{{mouv.quantity | number}} {{mouv.uom_symbol}}</td>
+                <td class="text-right">{{(mouv.price?mouv.price:0) | number}} <span class="font-size-9">{{appserv.getDefaultmoney().abreviation}}</span> </td>
+                <td class="text-right">{{(mouv.quantity *mouv.price) | number}} <span class="font-size-9">{{appserv.getDefaultmoney().abreviation}}</span></td>
+                <td>{{mouv.done_by_name | titlecase}}</td>
+                <td>{{mouv.note | titlecase}}</td>
+              </tr>
+          </tbody>
+        </table>  
+        <br>
+      </div>
+      <div class="bg-medium-clean-proforma ion-padding text-center bd-radius-10 footer">
+        <span class="text-center font-size-10 font-bold-600 text-italic">{{appserv.version}}</span>
+      </div>
+    </div>
+  </ng-container>
+</ion-content>

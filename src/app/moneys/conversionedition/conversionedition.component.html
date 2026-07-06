@@ -1,0 +1,19 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item>
+      <ion-note class="font-size-12">{{conversionsent.name1 | titlecase}} => {{conversionsent.name2 |titlecase}}</ion-note>
+      <div class="buttons-group"  slot="end">
+        <ion-chip class="submitbutton font-size-11" *ngIf="!showsaveprogress" (click)="editconversion()">Modifier</ion-chip>
+      </div>
+    </ion-item>
+    <ion-progress-bar type="indeterminate" *ngIf="showprogress" ></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="content-body ion-padding">
+  <form [formGroup]="conversionform">
+    <ion-item class="bd-square font-size-11 ion-margin-end" lines="none">
+      <ion-label>Taux actuel</ion-label>
+      <ion-input formControlName="rate"></ion-input>
+    </ion-item>
+  </form>
+</ion-content>

@@ -1,0 +1,112 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" class="default-list-item">
+      <ion-icon name="chevron-back-outline" (click)="appserv.closemodal()" color="primary" size="large"></ion-icon>
+      <ion-avatar>
+        <ion-img [src]="usersent.avatar?appserv.imgUrl+usersent.avatar:''" *ngIf="usersent.avatar"></ion-img>
+        <ion-icon name="person-outline" size="small" *ngIf="!usersent.avatar"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title">{{usersent.full_name | uppercase}}</p>
+        <p class="secondpara">
+          {{(usersent.user_name?usersent.user_name:usersent.user_mail) | titlecase}}
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" (click)="newmemberaccount()" *ngIf="appserv.permissionFilter('comptes','add')">
+    <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-avatar>
+    <ion-label>
+      <p class="item-label-title font-size-12">Nouveau compte</p>
+      <p class="secondpara font-size-11">Cliquez ici pour créer un nouveau compte pour le membre</p>
+    </ion-label>
+   </ion-item>
+  
+   <ng-container  *ngIf="editionmode">      
+    <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+          
+          <ion-item>
+            <ion-label position="floating">Description</ion-label>
+            <ion-input type="text" formControlName="description"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Type</ion-label>
+            <ion-select formControlName="type">
+              <ion-select-option value="internal">Interne</ion-select-option>
+              <ion-select-option value="blocked">Bloqué</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Statut du compte</ion-label>
+            <ion-select formControlName="account_status">
+              <ion-select-option value="enabled">Activé</ion-select-option>
+              <ion-select-option value="disabled">Désactivé</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Monnaies</ion-label>
+            <ion-select formControlName="money_id">
+              <ion-select-option [value]="money.id" *ngFor="let money of moneys">{{money.abreviation?money.abreviation:money.money_name}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Numéro du compte</ion-label>
+            <ion-input type="text" formControlName="account_number"></ion-input>
+          </ion-item>
+          
+          <ion-item lines="none">
+            <ion-grid class="ion-no-margin ion-no-padding">
+              <ion-row class="ion-align-items-center ion-no-margin ion-no-padding">
+                <ion-col size="4" class="ion-no-margin ion-no-padding">
+                  <ion-label>Bloqué pendant</ion-label>
+                </ion-col>
+                <ion-col size="4" class="ion-no-margin ion-no-padding">
+                  <ion-input
+                    type="number"
+                    formControlName="blocked_step"
+                    inputmode="numeric"
+                  ></ion-input>
+                </ion-col>
+                <ion-col size="4" class="ion-no-margin ion-no-padding">
+                  <ion-select formControlName="blocked_periocity" interface="popover">
+                    <ion-select-option value="year">An(s)</ion-select-option>
+                    <ion-select-option value="month">Mois</ion-select-option>
+                  </ion-select>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+
+
+          <div class="ion-padding-top" *ngIf="appserv.permissionFilter('agents','create_account')">
+            <ion-button expand="block" type="submit" color="warning" mode="ios" size="small" [disabled]="accountForm.invalid">
+              Enregistrer
+            </ion-button>
+          </div>
+
+        </form>
+   </ng-container>
+   
+   <ng-container  *ngIf="!editionmode">
+      <ion-item mode="ios" detail="true" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" *ngFor="let account of accountslist" (click)="detailaccount(account)">
+        <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+          <ion-icon name="book-outline"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <p class="item-label-title font-size-14">{{account.description}}</p>
+          <p class="secondpara font-size-12">{{account.account_number}}</p>
+        </ion-label>
+        <ion-chip slot="end" color="secondary" *ngIf="appserv.permissionFilter('agents','see_account_sold')">Solde {{account.sold | number}} {{account.money_abreviation}}</ion-chip>
+   </ion-item>
+   </ng-container>
+  
+</ion-content>

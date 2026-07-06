@@ -1,0 +1,98 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+      <ion-item lines="none">
+          <ion-icon name="arrow-back-outline" slot="start" (click)="appserv.closemodal()"></ion-icon>
+          <ion-text>Nouvelle clôture</ion-text>
+      </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <div #printer_content>
+    <div class="header" id="header" hidden>
+      <ion-text class="font-size-20 font-bold-600" *ngIf="posprintoptions.name && appserv.getactualEse().name">{{appserv.getactualEse().name | uppercase}}</ion-text> <br *ngIf="posprintoptions.name && appserv.getactualEse().name">
+      <ion-text *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">{{appserv.getactualEse().adresse}}</ion-text> <br *ngIf="posprintoptions.adresse && appserv.getactualEse().adresse ">
+      <ion-text *ngIf="posprintoptions.description && appserv.getactualEse().description ">{{appserv.getactualEse().description}}</ion-text> <br *ngIf="posprintoptions.description">
+      <ion-text *ngIf="posprintoptions.num_impot && appserv.getactualEse().num_impot ">NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br *ngIf="posprintoptions.description && appserv.getactualEse().description ">
+      <ion-text *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br *ngIf="posprintoptions.national_identification && appserv.getactualEse().national_identification">
+      <ion-text *ngIf="posprintoptions.rccm && appserv.getactualEse().rccm">RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br *ngIf="posprintoptions.rccm">
+      <ion-text *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br *ngIf="posprintoptions.phone && appserv.getactualEse().phone ">
+    </div>
+    <div class="suheader ion-no-padding" id="subheader" hidden>
+      <h2 class="font-bold-600 font-size-20">Clôture du {{datefiltered | date}}</h2>
+      <ion-text>Imprimée le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+      <ion-text>Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+    </div>
+  <h2 class="font-bold-600 font-size-20">Clôture du {{datefiltered | date}}</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="text-left">TOTAL VENDU</th>
+        <th class="text-right">{{fence.totalsell | number}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="text-left">Ventes cash</td>
+        <td class="text-right">{{fence.totalcash | number}}</td>
+      </tr> 
+      <tr>
+        <td class="text-left">Ventes crédit</td>
+        <td class="text-right">{{fence.totalcredits}}</td>
+      </tr>
+      <tr>
+        <td class="text-left">Ventes bonus</td>
+        <td class="text-right">{{fence.totalbonus | number}}</td>
+      </tr> 
+      <tr>
+        <td class="text-left">Ventes caution</td>
+        <td class="text-right">{{fence.totalcautions | number}}</td>
+      </tr> 
+      <tr>
+        <td>Ventes points</td>
+        <td>{{fence.totalpoints | number}}</td>
+      </tr>
+      <tr>
+        <td class="text-left">Paiement dettes</td>
+        <td class="text-right">{{fence.totaldebts | number}}</td>
+      </tr>
+      <tr>
+        <td class="text-left">Dépôts caution</td>
+        <td class="text-right">{{fence.depositcautions | number}}</td>
+      </tr>
+      <tr>
+        <td class="text-left">Dépenses</td>
+        <td class="text-right">{{fence.totalexpenditures | number}}</td>
+      </tr> 
+      <tr>
+        <td class="text-left">Entrées</td>
+        <td class="text-right">{{fence.totalentries | number}}</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th class="text-left">TOTAL A VERSER</th>
+        <th class="text-right">{{fence.sold | number}} {{appserv.defaultmoney.abreviation}}</th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+</ion-content>
+<ion-footer>
+  <ion-grid class="contentbody">
+    <ion-row>
+      <ion-col size="6">
+        <ion-chip  [disabled]="!shouldfencing" color="tertiary" mode="ios" (click)=" fencing(true)">Clôturer et imprimer</ion-chip>
+      </ion-col>  
+      <ion-col size="6">
+        <ion-chip  [disabled]="!shouldfencing" color="success"  mode="ios" (click)="fencing(false)">Clôturer sans imprimer</ion-chip>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ion-input type="date" [(ngModel)]="datefiltered" (ngModelChange)="lookup()" label="Choisissez une date" class="font-size-12"></ion-input>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-item class=""></ion-item>
+</ion-footer>

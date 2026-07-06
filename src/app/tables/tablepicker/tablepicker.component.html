@@ -1,0 +1,19 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back" size="large" color="secondary" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <h4 slot="start" class="font-bold-600 font-size-14">Sélectionner une table</h4>
+      <ion-icon *ngIf="appserv.permissionFilter('tables', 'add')" name="add-outline" slot="end" color="primary" (click)="addnewtable()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+    <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-14" #inputSearch [(ngModel)]="search"></ion-searchbar>
+  <ion-list class="contentbody">
+    <ion-item lines="full" *ngFor="let table of listables | filter:search" (click)="selected(table)" class="font-size-14 contentbody">
+      <ion-text slot="start">{{table.name | titlecase}}</ion-text>
+      <ion-icon slot="end" *ngIf="table.selected"  name="checkmark-circle-outline" color="success" size="small"></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>

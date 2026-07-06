@@ -1,0 +1,125 @@
+
+.footeritem{
+    ion-label h2,h4{
+     margin:0px;
+    }
+  }
+  
+  .list-item{
+    margin-bottom: 15px;
+        ion-avatar{
+          width: 35px;
+          height: 35px;
+          background-color: #50c8ff;
+          margin-right: 10px;
+          justify-content: center;
+          display: flex;
+          align-items: center;
+          ion-icon{
+            font-weight: 600;
+            color:white;
+          }
+        }
+        ion-label{
+          .secondpara{
+            margin-top: -20px !important;
+            font-size: 11px;
+            color: rgb(166, 163, 163);
+          }
+          .item-label-title{
+            font-size: 12px;
+            font-weight: 500;
+          }
+        }
+   }
+  
+   .square-avatar-warning{
+    border:1px solid #72adcd;
+    border-radius: 5px!important;
+    background: #ffc409;
+    width: 30px;
+    height: 30px;
+    mat-icon{
+      color: #f4f5f8;
+    }
+    ion-icon{
+      color: #f4f5f8;
+    }
+   }
+  
+   .square-avatar-primary{
+    border:1px solid hsl(284, 79%, 78%);
+    border-radius: 5px!important;
+    background: #3880ff;
+    width: 30px;
+    height: 30px;
+    mat-icon{
+      color: #f4f5f8;
+    }
+    ion-icon{
+      color: #f4f5f8;
+    }
+   }
+   
+   .square-avatar-success{
+    border:1px solid #ef418f;
+    border-radius: 5px!important;
+    background: #28ba62;
+    width: 30px;
+    height: 30px;
+    mat-icon{
+      color: #f4f5f8;
+    }
+    ion-icon{
+      color: #f4f5f8;
+    }
+   } 
+   
+   .square-avatar-danger{
+    border:1px solid #504d4d;
+    border-radius: 5px!important;
+    background: #cf3c4f;
+    width: 30px;
+    height: 30px;
+    mat-icon{
+      color: #f4f5f8;
+    }
+    ion-icon{
+      color: #f4f5f8;
+    }
+   }
+  
+   .description-bloc{
+    --background: rgb(96, 96, 96);
+   }
+  
+   .new-item-design{
+    ion-avatar{
+      width: 30px;
+      height: 30px;
+      background:#383a3e;
+    }
+    ion-label{
+      margin-top: 24px;
+     color: #4b85e9;
+    }
+   }
+   ion-segment{
+    height: 35px;
+    width: 280px !important;
+    padding: 5px !important;
+    background-color: #e3ecef !important;
+    border-radius: 20px !important;
+    ion-segment-button{
+      font-size: 11px;
+      top: 2.5px;
+      --border-radius: 40px !important;
+      color:rgb(73, 72, 72);
+    }
+  }
+
+  .chipset{
+    padding-top: 2px!important;
+    padding-bottom: 2px!important;
+  }
+   

@@ -1,0 +1,70 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+      <ion-icon name="chevron-back-outline" slot="start" color="primary" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text >Détail transfert</ion-text>
+      <ion-chip class="font-size-13" type="button" mode="ios" fill="clear" color="secondary" expand="block" (click)="validatetransfert()" *ngIf="transfertsent.status==='pending'" slot="end">Réceptionner</ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <div class="userprofiltoedit ion-text-center">
+    <ion-avatar style="margin:auto;">
+      <ion-text color="light" class="font-bold-500 font-size-40">{{transfertsent.service_name | slice:0:2}}</ion-text>
+    </ion-avatar>
+    <ion-note class="font-size-20 font-bold-600" color="dark">{{transfertsent.service_name | titlecase}}</ion-note>
+    <br>
+    <ion-note class="font-size-12" color="secondary">TransID. {{transfertsent.id}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">Status. {{transfertsent.status==='0'?'en attente':'reçu' | titlecase}}</ion-note>
+  </div>
+
+  <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+    <ion-item class="font-size-12 default-list-item2" mode="ios" lines="full">
+      <ion-text slot="start">Qté envoyée</ion-text>
+        <ion-note slot="end" class="font-size-12 item-label-title">{{transfertsent.quantity_sent | number}} {{transfertsent.uom_symbol}}</ion-note>
+     </ion-item> 
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+      <ion-text slot="start">Qté reçue</ion-text> 
+      <ion-input [(ngModel)]="transfertsent.quantity_received" slot="end"></ion-input>
+      <ion-text slot="end">{{transfertsent.uom_symbol}}</ion-text>  
+     </ion-item> 
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+      <ion-text slot="start">Note</ion-text>
+        <ion-note slot="end" class="font-size-12 item-label-title">{{transfertsent.note}}</ion-note>
+     </ion-item> 
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="none" >
+        <ion-textarea [(ngModel)]="comment" label="Ajouter un commentaire" autoGrow="true"></ion-textarea>
+     </ion-item>
+  </ion-card>
+
+  <ion-card mode="ios">
+    <ion-item class="font-size-12 default-list-item2" mode="ios" lines="full" >
+      <ion-text slot="start">Dépôt expéditeur</ion-text>
+        <ion-note slot="end" class="font-size-12 item-label-title"><ion-text>{{transfertsent.deposit_sender_name}}</ion-text></ion-note>
+     </ion-item>
+
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+      <ion-text slot="start">Dépôt destinataire</ion-text> 
+        <ion-note slot="end" class="font-size-12 item-label-title"><ion-text>{{transfertsent.deposit_receiver_name}}</ion-text></ion-note>
+     </ion-item>
+
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="none">
+      <ion-text slot="start">Réçu par </ion-text>
+        <ion-note slot="end" class="font-size-12 item-label-title">{{transfertsent.receiver_name | titlecase}}</ion-note>
+     </ion-item>
+  </ion-card>
+  <ion-item mode="ios" class="contentbody footeritem" lines="none">
+      <h4 class="font-size-11"><ion-note>Effectué le {{transfertsent.created_at | date}}</ion-note></h4> <br> <br>
+      <h4 class="font-size-11"><ion-note> &nbsp; par {{transfertsent.sender_name | titlecase}} </ion-note></h4>
+</ion-item>
+<br>
+</ion-content>
+
+<ion-footer class="ion-padding">
+  <ion-item class="buttons-group" lines="none">
+    
+    <!-- <ion-button class="submitbutton" type="button" mode="ios" fill="clear" expand="block" (click)="canceltransfert()" *ngIf="transfertsent.status==='0' && appserv.getactualuser().id===transfertsent.sender_id">Annuler</ion-button> -->
+  </ion-item>
+</ion-footer>

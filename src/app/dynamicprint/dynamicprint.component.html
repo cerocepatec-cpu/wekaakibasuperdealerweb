@@ -1,0 +1,64 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon color="medium" name="chevron-back-outline" size="large" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-title style="text-align:center;" slot="start">Impression des groupes</ion-title>
+      <ion-icon name="print-outline"  (click)="print('groups-bloc')" slot="end">Imprimer</ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding" [scrollY]="true" [scrollX]="true">
+      <ng-container *ngIf="criteria === 'groups'">
+        <div class="groups-bloc" id="groups-bloc">
+          <div class="header">
+            <div class="grid">
+              <table>
+                <tr>
+                  <td>
+                    <ion-text *ngIf="posprintoptions.description" class="font-bold-600 font-size-12">{{appserv.getactualEse().description |titlecase}}</ion-text> <br>
+                    <ion-text *ngIf="posprintoptions.adresse" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().adresse}}</ion-text> <br>
+                    <ion-text *ngIf="posprintoptions.num_impot" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().num_impot}}</ion-text> <br>
+                    <ion-text *ngIf="posprintoptions.national_identification" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().national_identification}}</ion-text> <br>
+                    <ion-text *ngIf="posprintoptions.rccm" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().rccm}}</ion-text> <br>
+                    <ion-text *ngIf="posprintoptions.phone" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().phone}}</ion-text>
+                  </td>
+                </tr>
+              </table>
+              <br>
+              <hr class="hr">
+              <h4 class="font-bold-600 font-size-16">LISTE DES GROUPES ET LEURS MEMBRES</h4>
+              <br>
+              <div *ngFor="let group of groupsSent">
+                  <ion-text class="font-bold-600 font-size-15 bg-medium-clean">{{group.name | uppercase}}</ion-text>
+                  <table class="table" border="1">
+                    <caption>Total membres: {{group.members.length |number}}</caption>
+                    <thead>
+                      <tr>
+                        <th class="text-left">N°</th>
+                        <th class="text-right">Membre</th>
+                        <th class="text-right">Phone</th>
+                        <th class="text-right">Email</th>
+                        <th class="text-right">UUID</th>
+                        <th class="text-right">Niveau</th>
+                        <th class="text-right">Observation</th>
+                      </tr>
+                    </thead>
+                   <tbody>
+                      <tr *ngFor="let member of group.members;let i=index">
+                        <td>{{i+1}}</td>
+                        <td>{{member.full_name}}</td>
+                        <td>{{member.user_phone}}</td>
+                        <td>{{member.user_mail}}</td>
+                        <td>{{member.uuid}}</td>
+                        <td>{{member.level}}</td>
+                        <td></td>
+                      </tr>
+                   </tbody>
+                  </table>
+                  <br>
+              </div> 
+            </div>
+          </div>
+        </div>
+      </ng-container>
+  </ion-content>

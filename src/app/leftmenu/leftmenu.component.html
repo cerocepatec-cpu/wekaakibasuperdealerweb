@@ -1,0 +1,11 @@
+<ion-content>
+    <ion-tab-button class="ion-text-center ion-padding-bottom" [routerLink]="item.router" *ngFor="let item of results">
+      <ion-avatar class="dashboard-avatar">
+        <ion-img [src]="item.imgSrc" *ngIf="item.imgSrc"></ion-img>
+        <ion-icon [name]="item.icon" size="large" *ngIf="!item.imgSrc" ></ion-icon> 
+      </ion-avatar>
+      <ion-label color="dark" class="font-bold-600 font-size-11" *ngIf="showmenutext" >
+        <ion-text>{{item.title | titlecase}}</ion-text>
+      </ion-label>
+    </ion-tab-button>
+</ion-content>

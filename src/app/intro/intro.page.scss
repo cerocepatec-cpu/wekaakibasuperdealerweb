@@ -1,0 +1,60 @@
+.contentbody {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background: #0b0b0f; // fond très sombre
+  color: #fff;
+
+  #particle-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .scallable-content {
+    position: relative;
+    z-index: 2;
+    padding: 1rem;
+  }
+
+  .feature-card {
+    background: rgba(20, 20, 30, 0.6); // sombre et semi-transparent
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+
+    .card-item {
+      --background: rgba(20, 20, 30, 0.0); // item transparent pour suivre le card
+      --ion-item-background: rgba(20, 20, 30, 0.0);
+      --color: #fff;
+
+      ion-label h2, ion-label p {
+        color: #fff;
+      }
+    }
+
+    .feature-icon {
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2rem;
+      color: #ffc107;
+      background: rgba(255, 193, 7, 0.2);
+    }
+  }
+
+  .text-gradient {
+    background: linear-gradient(90deg, #ffc107, #ff9800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .animate__animated {
+    animation-duration: 1s;
+  }
+}

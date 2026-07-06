@@ -1,0 +1,23 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" class="default-list-item">
+      <ion-icon name="chevron-back-outline" (click)="appserv.closemodal()" color="primary" size="large"></ion-icon>
+      <ion-label>
+        <p class="item-label-title">Infos rôle</p>
+        <p class="secondpara">
+          <ion-chip slot="end">{{roleSent.title}}</ion-chip>
+        </p>
+      </ion-label>
+    </ion-item>
+</ion-toolbar>
+<ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content>
+  <div class="contentbody ion-padding" *ngFor="let permission of roleSent.permissions">
+    <ion-text color="light" class="bg-dark font-size-12 bd-radius-10 ion-padding-end ion-padding-start">{{permission.name  | uppercase}}</ion-text> <br>
+    <ion-chip *ngFor="let item of permission.action" class="font-size-10">
+      <ion-icon [name]="item.value===true?'checkmark-outline':'close-outline'" [color]="item.value===true?'success':'danger'" size="small"></ion-icon> &nbsp;
+      {{item.action}} 
+    </ion-chip>
+  </div>
+</ion-content>

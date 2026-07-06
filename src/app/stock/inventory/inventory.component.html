@@ -1,0 +1,559 @@
+<ion-header class="inventory-header ion-no-border">
+  <ion-toolbar class="toolbar-main">
+    <ion-item lines="none" class="header-row">
+      <ion-avatar class="back-avatar" slot="start" routerLink="/uzisha/stock">
+        <ion-icon
+          color="light"
+          name="chevron-back-outline"
+          size="large"
+        ></ion-icon>
+      </ion-avatar>
+
+      <ion-label class="header-label">
+        <h1 class="page-title">Inventaire</h1>
+        <p class="page-subtitle">
+          Consultez les articles disponibles et leurs numéros de série
+        </p>
+      </ion-label>
+
+      <div class="header-actions" slot="end">
+        <ion-button
+  fill="clear"
+  id="print-menu-trigger"
+>
+  <ion-icon name="print-outline" color="secondary"></ion-icon>
+</ion-button>
+
+<ion-popover
+  trigger="print-menu-trigger"
+  triggerAction="click"
+  side="bottom"
+  alignment="end"
+>
+  <ng-template>
+    <ion-content>
+      <ion-list lines="none">
+        <ion-item button (click)="printInventoryReport()">
+          <ion-icon
+            name="document-text-outline"
+            slot="start"
+            color="primary"
+          ></ion-icon>
+          <ion-label>Rapport d'inventaire</ion-label>
+        </ion-item>
+
+        <ion-item button (click)="printCarnetsFile()">
+          <ion-icon
+            name="albums-outline"
+            slot="start"
+            color="success"
+          ></ion-icon>
+          <ion-label>Fichier des carnets</ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
+
+        <ion-button fill="clear" (click)="exportExcel()">
+          <ion-icon name="share-outline" color="success"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-item>
+  </ion-toolbar>
+
+  <ion-toolbar class="toolbar-summary">
+    <div class="summary-card contentbody">
+      <div class="summary-left">
+        <h2>Etat du stock</h2>
+        <p>En date du {{ appserv.today | date : "fullDate" }}</p>
+      </div>
+
+      <div class="summary-right">
+        <div class="summary-chip">
+          <span>Dépôts</span>
+          <strong>{{ listarticles.length }}</strong>
+        </div>
+
+        <div class="summary-chip">
+          <span>Articles</span>
+          <strong>{{ totalArticles }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <ion-item lines="none" class="search-row contentbody">
+      <ion-searchbar
+        class="inventory-search"
+        mode="ios"
+        placeholder="Rechercher un article ou une description"
+        [(ngModel)]="search"
+        debounce="300"
+      ></ion-searchbar>
+    </ion-item>
+  </ion-toolbar>
+
+  <ion-progress-bar
+    type="indeterminate"
+    mode="ios"
+    *ngIf="showprogress"
+  ></ion-progress-bar>
+</ion-header>
+
+<ion-content class="inventory-content contentbody ion-padding" fullscreen>
+  <div *ngIf="listarticles.length === 0" class="empty-state">
+    <ion-icon name="cube-outline"></ion-icon>
+    <h3>Aucune donnée disponible</h3>
+    <p>Les dépôts ou les articles ne sont pas encore disponibles.</p>
+  </div>
+
+  <div class="deposit-wrapper" *ngFor="let depot of listarticles">
+    <div *ngIf="!depot.selected" class="deposit-card">
+      <div class="deposit-header">
+        <div class="deposit-title-box">
+          <div class="deposit-icon">
+            <ion-icon name="business-outline"></ion-icon>
+          </div>
+
+          <div>
+            <h3>{{ depot.deposit.name | titlecase }}</h3>
+            <p>
+              {{ (depot.services | filter : search)?.length || 0 }} article(s)
+            </p>
+          </div>
+        </div>
+
+        <ion-spinner name="lines-small" *ngIf="depot.inloading"></ion-spinner>
+      </div>
+
+      <div class="articles-list">
+        <div
+          class="article-card"
+          *ngFor="let article of depot.services | filter : search"
+          [class.expanded]="article.isExpanded"
+        >
+          <div class="article-main-row" (click)="toggleArticle(depot, article)">
+            <div class="article-avatar">
+              {{ article?.service?.name | slice : 0 : 2 }}
+            </div>
+
+            <div class="article-content">
+              <div class="article-top-line">
+                <h4>{{ article?.service?.name | titlecase }}</h4>
+
+                <div class="article-right-badges">
+                  <span
+                    class="status-badge warning"
+                    *ngIf="article?.service?.sync_status === '0'"
+                  >
+                    Non sync
+                  </span>
+
+                  <span
+                    class="qty-badge"
+                    *ngIf="article?.service?.type === '1'"
+                  >
+                    Qté.
+                    {{
+                      article?.service?.available_qte !== null
+                        ? article?.service?.available_qte
+                        : "0"
+                    }}
+                    {{ article?.service?.uom_symbol }}
+                  </span>
+                </div>
+              </div>
+
+              <p class="article-description">
+                {{
+                  article?.service?.description ||
+                    "Aucune description disponible"
+                }}
+              </p>
+
+              <p class="article-hint">
+                Touchez pour afficher les numéros de série disponibles
+              </p>
+            </div>
+
+            <div class="expand-holder">
+              <ion-icon
+                [name]="
+                  article.isExpanded
+                    ? 'chevron-up-outline'
+                    : 'chevron-down-outline'
+                "
+              ></ion-icon>
+            </div>
+          </div>
+
+          <div
+            class="article-expand-zone"
+            *ngIf="article.isExpanded"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="serials-preview-card">
+              <div class="serials-preview-head">
+                <div class="serials-head-left">
+                  <span>
+                    Numéros de série disponibles
+                    <small class="serials-subtitle">
+                      {{ article?.service?.name }}
+                    </small>
+                  </span>
+                </div>
+
+                <div class="serials-head-actions">
+                  <ion-button
+                    mode="ios"
+                    fill="clear"
+                    size="small"
+                    class="icon-only-btn"
+                    (click)="togglePdfPanel(article)"
+                  >
+                    <ion-icon name="options-outline"></ion-icon>
+                  </ion-button>
+
+                  <ion-button
+                    mode="ios"
+                    fill="clear"
+                    size="small"
+                    class="icon-only-btn"
+                    (click)="downloadSerialsPdf(article)"
+                  >
+                    <ion-icon name="download-outline"></ion-icon>
+                  </ion-button>
+
+                  <strong class="serial-total">
+                    {{ article?.serialNumbers?.total || 0 }}
+                  </strong>
+                </div>
+              </div>
+
+              <div class="pdf-config-panel" *ngIf="article.showPdfPanel">
+                <div class="pdf-panel-title">Paramètres PDF</div>
+
+                <div class="pdf-presets">
+                  <ion-button
+                    mode="ios"
+                    size="small"
+                    fill="outline"
+                    (click)="applyPdfPreset('compact')"
+                  >
+                    Compact
+                  </ion-button>
+
+                  <ion-button
+                    mode="ios"
+                    size="small"
+                    fill="outline"
+                    (click)="applyPdfPreset('standard')"
+                  >
+                    Standard
+                  </ion-button>
+
+                  <ion-button
+                    mode="ios"
+                    size="small"
+                    fill="outline"
+                    (click)="applyPdfPreset('large')"
+                  >
+                    Large
+                  </ion-button>
+                </div>
+
+                <div class="pdf-config-grid">
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Papier</ion-label>
+                    <ion-select
+                      [(ngModel)]="pdfConfig.paper"
+                      interface="popover"
+                    >
+                      <ion-select-option value="A4">A4</ion-select-option>
+                      <ion-select-option value="A5">A5</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Orientation</ion-label>
+                    <ion-select
+                      [(ngModel)]="pdfConfig.orientation"
+                      interface="popover"
+                    >
+                      <ion-select-option value="P">Portrait</ion-select-option>
+                      <ion-select-option value="L">Paysage</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Colonnes</ion-label>
+                    <ion-input
+                      type="number"
+                      inputmode="numeric"
+                      [(ngModel)]="pdfConfig.columns"
+                    ></ion-input>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Hauteur</ion-label>
+                    <ion-input
+                      type="number"
+                      inputmode="numeric"
+                      [(ngModel)]="pdfConfig.label_height"
+                    ></ion-input>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Police</ion-label>
+                    <ion-input
+                      type="number"
+                      inputmode="numeric"
+                      [(ngModel)]="pdfConfig.font_size"
+                    ></ion-input>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Espace X</ion-label>
+                    <ion-input
+                      type="number"
+                      inputmode="numeric"
+                      [(ngModel)]="pdfConfig.gap_x"
+                    ></ion-input>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Espace Y</ion-label>
+                    <ion-input
+                      type="number"
+                      inputmode="numeric"
+                      [(ngModel)]="pdfConfig.gap_y"
+                    ></ion-input>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Marge gauche</ion-label>
+                    <ion-input
+                      type="number"
+                      inputmode="numeric"
+                      [(ngModel)]="pdfConfig.margin_left"
+                    ></ion-input>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Marge droite</ion-label>
+                    <ion-input
+                      type="number"
+                      inputmode="numeric"
+                      [(ngModel)]="pdfConfig.margin_right"
+                    ></ion-input>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Marge haut</ion-label>
+                    <ion-input
+                      type="number"
+                      inputmode="numeric"
+                      [(ngModel)]="pdfConfig.margin_top"
+                    ></ion-input>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item">
+                    <ion-label position="stacked">Marge bas</ion-label>
+                    <ion-input
+                      type="number"
+                      inputmode="numeric"
+                      [(ngModel)]="pdfConfig.margin_bottom"
+                    ></ion-input>
+                  </ion-item>
+
+                  <ion-item lines="none" class="pdf-config-item toggle-item">
+                    <ion-label>Afficher le titre article</ion-label>
+                    <ion-toggle
+                      [(ngModel)]="pdfConfig.show_group_title"
+                    ></ion-toggle>
+                  </ion-item>
+                </div>
+
+                <div class="pdf-config-actions">
+                  <ion-button
+                    mode="ios"
+                    expand="block"
+                    color="success"
+                    (click)="downloadSerialsPdf(article)"
+                  >
+                    <ion-icon name="download-outline" slot="start"></ion-icon>
+                    Télécharger le PDF
+                  </ion-button>
+                </div>
+              </div>
+
+              <div class="serials-loading" *ngIf="article.loadingSerials">
+                <ion-spinner name="crescent"></ion-spinner>
+                <span>Chargement des numéros de série...</span>
+              </div>
+
+              <div class="serials-error" *ngIf="article.serialsError">
+                {{ article.serialsError }}
+              </div>
+
+              <div
+                class="serials-meta"
+                *ngIf="
+                  !article.loadingSerials &&
+                  !article.serialsError &&
+                  article?.serialNumbers?.total > 0
+                "
+              >
+                <span class="margin-start">
+                  Affichage de
+                  {{ article?.serialNumbers?.from || 0 }}
+                  à
+                  {{ article?.serialNumbers?.to || 0 }}
+                  sur
+                  {{ article?.serialNumbers?.total || 0 }}
+                </span>
+
+                <span>
+                  Page {{ article?.serialNumbers?.current_page || 1 }} /
+                  {{ article?.serialNumbers?.last_page || 1 }}
+                </span>
+              </div>
+
+              <div
+                class="serials-list"
+                *ngIf="
+                  !article.loadingSerials &&
+                    !article.serialsError &&
+                    article?.serialNumbers?.data?.length > 0;
+                  else noSerialBlockItem
+                "
+              >
+                <div
+                  class="serial-badge"
+                  *ngFor="
+                    let serial of article?.serialNumbers?.data;
+                    let i = index
+                  "
+                >
+                  <div class="serial-index">
+                    #{{ getSerialDisplayIndex(article, i) }}
+                  </div>
+                  <div class="serial-value">
+                    {{ serial?.serial_number || serial }}
+                  </div>
+                </div>
+              </div>
+
+              <ng-template #noSerialBlockItem>
+                <div
+                  class="no-serials"
+                  *ngIf="!article.loadingSerials && !article.serialsError"
+                >
+                  Aucun numéro de série disponible pour cet article.
+                </div>
+              </ng-template>
+
+              <div
+                class="serials-pagination"
+                *ngIf="
+                  !article.loadingSerials &&
+                  !article.serialsError &&
+                  article?.serialNumbers?.last_page > 1
+                "
+              >
+                <ion-button
+                  mode="ios"
+                  size="small"
+                  fill="outline"
+                  (click)="goToFirstSerialsPage(article)"
+                  [disabled]="
+                    !article?.serialNumbers?.first_page_url ||
+                    article?.serialNumbers?.current_page === 1
+                  "
+                >
+                  Début
+                </ion-button>
+
+                <ion-button
+                  mode="ios"
+                  size="small"
+                  fill="outline"
+                  (click)="goToPrevSerialsPage(article)"
+                  [disabled]="!article?.serialNumbers?.prev_page_url"
+                >
+                  Précédent
+                </ion-button>
+
+                <ion-button
+                  mode="ios"
+                  size="small"
+                  *ngFor="let page of getVisibleSerialPageNumbers(article)"
+                  [fill]="
+                    page === article?.serialNumbers?.current_page
+                      ? 'solid'
+                      : 'outline'
+                  "
+                  [color]="
+                    page === article?.serialNumbers?.current_page
+                      ? 'primary'
+                      : 'medium'
+                  "
+                  (click)="goToSerialsPageNumber(article, page)"
+                >
+                  {{ page }}
+                </ion-button>
+
+                <ion-button
+                  mode="ios"
+                  size="small"
+                  fill="outline"
+                  (click)="goToNextSerialsPage(article)"
+                  [disabled]="!article?.serialNumbers?.next_page_url"
+                >
+                  Suivant
+                </ion-button>
+
+                <ion-button
+                  mode="ios"
+                  size="small"
+                  fill="outline"
+                  (click)="goToLastSerialsPage(article)"
+                  [disabled]="
+                    !article?.serialNumbers?.last_page_url ||
+                    article?.serialNumbers?.current_page ===
+                      article?.serialNumbers?.last_page
+                  "
+                >
+                  Fin
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="article-expanded-actions">
+              <ion-button
+                mode="ios"
+                fill="outline"
+                size="small"
+                color="primary"
+                (click)="refreshArticleSerials(depot, article)"
+              >
+                <ion-icon name="refresh-outline" slot="start"></ion-icon>
+                Actualiser
+              </ion-button>
+
+              <ion-button
+                mode="ios"
+                fill="clear"
+                size="small"
+                color="medium"
+                (click)="closeArticle(article)"
+              >
+                Fermer
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

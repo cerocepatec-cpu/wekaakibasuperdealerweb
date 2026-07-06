@@ -1,0 +1,44 @@
+export interface Users{
+       department_name?: string;
+       department_id?: number;
+       id?:number;
+       name?: string;
+       user_name?: string;
+       user_mail?: string;
+       email?: string;
+       full_name?:string;
+       email_verified_at?: string;
+       user_phone?: string;
+       user_password?: string;
+       user_type?: string;
+       status?: string;
+       permissions?: number;
+       note?: string;
+       avatar?: string;
+       adress?:string;
+       enterprise_id?: number;
+       remember_token?: string;
+       created_at?: string;
+       updated_at?: string;
+       level?: string;
+       role_title?: string;
+       role_description?: string;
+       selected?: boolean;
+       affectation_id?: number
+       __zone_symbol__value?:any;
+       sync_status?: string;
+       loading?: boolean;
+       role_permissions?: any;
+       uuid?: any;
+       description?: any;
+       accounts?:any;
+       collector?:boolean;
+       collection_percentage?:number;
+       mobile_access?: boolean;
+       can_withdraw_on_mobile?: boolean;
+       can_withdraw_by_agent?: boolean;
+       affectation_depart_id?: number;
+       pin?:any;
+       weak_pin?:any;
+       pin_set?:boolean;
+}

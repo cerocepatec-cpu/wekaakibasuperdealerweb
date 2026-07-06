@@ -1,0 +1,65 @@
+.account-detail-page {
+  --ion-background-color: #f4f6f9;
+
+  .account-summary {
+    ion-card {
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+
+      .balance-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+
+        .label {
+          font-size: 14px;
+          color: #666;
+        }
+
+        .amount {
+          font-size: 24px;
+          font-weight: bold;
+          color: #1e1e1e;
+        }
+      }
+
+      .actions {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 20px;
+
+        ion-button {
+          flex: 1;
+        }
+      }
+    }
+  }
+
+  .transaction-filter {
+    ion-item {
+      --background: transparent;
+    }
+
+    ion-button {
+      margin-top: 10px;
+    }
+  }
+
+  .transactions-list {
+    ion-item {
+      --background: #fff;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      --padding-start: 16px;
+      --inner-padding-end: 16px;
+    }
+
+    ion-chip {
+      height: 22px;
+      font-size: 12px;
+    }
+  }
+}

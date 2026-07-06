@@ -1,0 +1,46 @@
+<ion-content class="refresh-container">
+   <canvas #particlesCanvas id="securityParticles"></canvas>
+
+  <div class="security-overlay">
+    <div class="security-frame animate__animated animate__fadeInDown">
+      <div class="security-logo">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+      </div>
+
+      <h2 class="title">Authentification PIN</h2>
+      <p class="subtitle">
+        Veuillez entrer votre code PIN à 4 chiffres pour confirmer cette opération.
+      </p>
+
+      <form (ngSubmit)="verifyPin()">
+        <div class="pin-inputs">
+          <ion-input
+            *ngFor="let d of [0,1,2,3]; let i = index"
+            maxlength="1"
+            type="password"
+            inputmode="numeric"
+            [(ngModel)]="pinDigits[i]"
+            name="pin{{i}}"
+            (ionInput)="onInput($event, i)"
+            class="pin-digit"
+            required
+          ></ion-input>
+        </div>
+
+        <ion-button
+          expand="block"
+          shape="round"
+          class="btn-validate"
+          type="submit"
+        >
+          Valider
+        </ion-button>
+      </form>
+
+      <div class="security-footer" (click)="appserv.closemodal()">
+        <ion-icon name="close-outline"></ion-icon>
+        <span>Annuler</span>
+      </div>
+    </div>
+  </div>
+</ion-content>

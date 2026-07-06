@@ -1,0 +1,1186 @@
+<ion-header class="ion-no-border premium-header">
+  <ion-toolbar>
+    <ion-title>
+      <div class="title-wrap">
+        <span>Premières mises</span>
+        <small>Retenue, suivi et commissions collecteurs</small>
+      </div>
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="dashboardperiodfilter()">
+        <ion-icon name="calendar-outline" slot="start"></ion-icon>
+        Période
+      </ion-button>
+
+      <ion-button
+        fill="clear"
+        (click)="loadEligibleAccounts(); firstentrieshistories(); loadCommissions(); loadPaymentHistory()"
+      >
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-progress-bar
+    mode="ios"
+    type="indeterminate"
+    *ngIf="showprogress"
+  ></ion-progress-bar>
+
+  <ion-toolbar class="segment-toolbar">
+    <ion-segment
+      mode="ios"
+      [value]="activeTab"
+      (ionChange)="segmentChanged($event)"
+    >
+      <ion-segment-button value="reserve">
+        <ion-label>Réservation</ion-label>
+      </ion-segment-button>
+
+      <ion-segment-button value="history">
+        <ion-label>Historique</ion-label>
+      </ion-segment-button>
+
+      <ion-segment-button value="commissions">
+        <ion-label>Commissions</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+
+  <ion-toolbar class="money-filter-toolbar">
+    <div class="money-chip-bar">
+      <ion-button
+        size="small"
+        mode="ios"
+        [fill]="!selectedMoneyId ? 'solid' : 'outline'"
+        [color]="!selectedMoneyId ? 'dark' : 'medium'"
+        (click)="selectedMoneyId=''; onMoneyFilterChange()"
+      >
+        Toutes
+      </ion-button>
+
+      <ion-button
+        size="small"
+        mode="ios"
+        *ngFor="let money of moneysList"
+        [fill]="selectedMoneyId === money.id ? 'solid' : 'outline'"
+        [color]="selectedMoneyId === money.id ? 'warning' : 'medium'"
+        (click)="selectedMoneyId=money.id; onMoneyFilterChange()"
+      >
+        {{ money.abreviation || money.money_name || money.name }}
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen class="firstentries-page">
+  <!-- RÉSERVATION -->
+  <section *ngIf="activeTab === 'reserve'" class="page-section">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-lg="4">
+          <div class="panel-card sticky-card">
+            <div class="panel-title">
+              <div>
+                <h2>Configuration</h2>
+                <p>{{ selectedAccounts.length }} compte(s) sélectionné(s)</p>
+              </div>
+            </div>
+
+            <ion-item lines="none" class="premium-input">
+              <ion-label position="stacked">Description</ion-label>
+              <ion-input
+                [(ngModel)]="reservation.description"
+                placeholder="Première mise réservée virtuellement"
+              ></ion-input>
+            </ion-item>
+
+            <div
+              class="empty-selection"
+              *ngIf="selectedTotalsByMoney.length === 0"
+            >
+              <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+              <h3>Aucune sélection</h3>
+              <p>Sélectionnez les comptes à réserver.</p>
+            </div>
+
+            <div
+              class="money-total-card"
+              *ngFor="let total of selectedTotalsByMoney"
+            >
+              <div class="money-total-head">
+                <div>
+                  <strong>{{ total.money }}</strong>
+                  <span>{{ total.count }} compte(s)</span>
+                </div>
+
+                <ion-badge color="dark">
+                  {{ total.total | number }} {{ total.money }}
+                </ion-badge>
+              </div>
+
+              <div class="mini-split">
+                <span>
+                  35% : {{ total.collectorFund | number }} {{ total.money }}
+                </span>
+                <span>
+                  65% : {{ total.generalFund | number }} {{ total.money }}
+                </span>
+              </div>
+            </div>
+
+            <ion-button
+              expand="block"
+              mode="ios"
+              color="danger"
+              [disabled]="selectedAccounts.length === 0"
+              (click)="reserveSelectedAccounts()"
+            >
+              <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+              Réserver les comptes sélectionnés
+            </ion-button>
+
+            <ion-button
+              expand="block"
+              mode="ios"
+              fill="clear"
+              color="medium"
+              [disabled]="selectedAccounts.length === 0"
+              (click)="clearSelection()"
+            >
+              Effacer sélection
+            </ion-button>
+          </div>
+        </ion-col>
+
+        <ion-col size="12" size-lg="8">
+          <div class="panel-card">
+            <div class="panel-title">
+              <div>
+                <h2>Comptes disponibles</h2>
+                <p>
+                  {{ eligibleAccountsList.length }} compte(s) disponible(s) —
+                  {{ reservationTree.length }} année(s)
+                </p>
+              </div>
+
+              <div class="header-actions">
+                <ion-button
+                  size="small"
+                  mode="ios"
+                  fill="outline"
+                  (click)="selectAllVisible()"
+                >
+                  Tout sélectionner
+                </ion-button>
+
+                <ion-button
+                  size="small"
+                  mode="ios"
+                  fill="clear"
+                  color="medium"
+                  (click)="clearSelection()"
+                >
+                  Vider
+                </ion-button>
+              </div>
+            </div>
+
+            <ion-grid class="filter-grid">
+              <ion-row>
+                <ion-col size="12" size-md="5">
+                  <ion-searchbar
+                    mode="ios"
+                    placeholder="Nom, téléphone, compte..."
+                    [(ngModel)]="filters.member_search"
+                    (keyup.enter)="loadEligibleAccounts()"
+                    #defaultinput
+                  ></ion-searchbar>
+                </ion-col>
+
+                <ion-col size="6" size-md="3">
+                  <ion-select
+                    interface="popover"
+                    placeholder="Carnet"
+                    [(ngModel)]="filters.nature"
+                    (ionChange)="loadEligibleAccounts()"
+                  >
+                    <ion-select-option value="">Tous</ion-select-option>
+                    <ion-select-option value="rouge">Rouge</ion-select-option>
+                    <ion-select-option value="vert">Vert</ion-select-option>
+                  </ion-select>
+                </ion-col>
+
+                <ion-col size="6" size-md="2">
+                  <ion-item lines="none" class="toggle-line">
+                    <ion-label>Sans retenue</ion-label>
+                    <ion-toggle
+                      [(ngModel)]="filters.only_without_retention"
+                      (ionChange)="loadEligibleAccounts()"
+                    ></ion-toggle>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="12" size-md="2">
+                  <ion-button
+                    expand="block"
+                    mode="ios"
+                    color="warning"
+                    (click)="loadEligibleAccounts()"
+                  >
+                    Filtrer
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
+            <div class="group-list reservation-tree">
+              <div
+                class="empty-state"
+                *ngIf="!showprogress && (!reservationTree || reservationTree.length === 0)"
+              >
+                <ion-icon name="file-tray-outline"></ion-icon>
+                <h3>Aucune première mise disponible</h3>
+                <p>Aucune ligne non réservée pour les filtres sélectionnés.</p>
+              </div>
+
+              <div class="year-card" *ngFor="let year of reservationTree">
+                <div class="tree-header year-header" (click)="toggleYear(year)">
+                  <div>
+                    <h2>{{ year.year }}</h2>
+                    <p>{{ year.count }} ligne(s) — {{ year.total | number }}</p>
+                  </div>
+
+                  <div class="tree-actions">
+                    <ion-badge color="danger" *ngIf="isYearSelected(year)">
+                      Sélectionnée
+                    </ion-badge>
+
+                    <ion-button
+                      size="small"
+                      mode="ios"
+                      color="danger"
+                      (click)="$event.stopPropagation(); reserveYear(year)"
+                    >
+                      Réserver année
+                    </ion-button>
+
+                    <ion-icon
+                      [name]="expandedYears[year.year] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                    ></ion-icon>
+                  </div>
+                </div>
+
+                <div class="month-list" *ngIf="expandedYears[year.year]">
+                  <div class="month-card" *ngFor="let month of year.months">
+                    <div
+                      class="tree-header month-header"
+                      (click)="toggleMonth(month)"
+                    >
+                      <div>
+                        <h3>{{ month.label }}</h3>
+                        <p>
+                          {{ month.count }} ligne(s) —
+                          {{ month.total | number }}
+                        </p>
+                      </div>
+
+                      <div class="tree-actions">
+                        <ion-badge color="warning" *ngIf="isMonthSelected(month)">
+                          Sélectionné
+                        </ion-badge>
+
+                        <ion-button
+                          size="small"
+                          mode="ios"
+                          color="warning"
+                          (click)="$event.stopPropagation(); reserveMonth(month)"
+                        >
+                          Réserver mois
+                        </ion-button>
+
+                        <ion-icon
+                          [name]="expandedMonths[month.month] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                        ></ion-icon>
+                      </div>
+                    </div>
+
+                    <div class="date-list" *ngIf="expandedMonths[month.month]">
+                      <div class="date-card" *ngFor="let day of month.dates">
+                        <div
+                          class="tree-header date-header"
+                          (click)="toggleDate(day)"
+                        >
+                          <div>
+                            <h4>{{ appserv.frdate(day.date) }}</h4>
+                            <p>
+                              {{ day.count }} compte(s) —
+                              {{ day.total | number }}
+                            </p>
+                          </div>
+
+                          <div class="tree-actions">
+                            <ion-badge color="success" *ngIf="isDateSelected(day)">
+                              Sélectionnée
+                            </ion-badge>
+
+                            <ion-button
+                              size="small"
+                              mode="ios"
+                              color="success"
+                              (click)="$event.stopPropagation(); reserveDate(day)"
+                            >
+                              Réserver date
+                            </ion-button>
+
+                            <ion-icon
+                              [name]="expandedDates[day.date] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                            ></ion-icon>
+                          </div>
+                        </div>
+
+                        <div class="group-lines" *ngIf="expandedDates[day.date]">
+                          <div
+                            class="user-commission-card"
+                            *ngFor="let userGroup of (day.users || [])"
+                          >
+                            <div class="tree-header user-header">
+                              <div>
+                                <h4>
+                                  {{ userGroup.member_fullname ||
+                                  userGroup.member_user_name || 'Membre' }}
+                                </h4>
+                                <p>
+                                  {{ userGroup.count }} compte(s) —
+                                  {{ userGroup.total | number }}
+                                </p>
+                              </div>
+
+                              <ion-button
+                                size="small"
+                                mode="ios"
+                                color="success"
+                                (click)="selectAccountsBulk(userGroup.accounts || [])"
+                              >
+                                Sélectionner
+                              </ion-button>
+                            </div>
+
+                            <div
+                              class="detail-line"
+                              [class.selected]="isSelected(account)"
+                              *ngFor="let account of userGroup.accounts"
+                              (click)="toggleAccount(account)"
+                            >
+                              <div class="line-left">
+                                <div
+                                  class="nature-dot"
+                                  [class.red]="account.nature === 'rouge'"
+                                  [class.green]="account.nature === 'vert'"
+                                ></div>
+
+                                <div>
+                                  <h4>
+                                    {{ account.member_fullname ||
+                                    account.member_user_name || 'Membre' }}
+                                  </h4>
+                                  <p>{{ account.account_number }}</p>
+                                  <p>
+                                    Série :
+                                    <strong>
+                                      {{ account.serial_number || 'Sans série' }}
+                                    </strong>
+                                  </p>
+
+                                  <div class="line-chips">
+                                    <ion-badge
+                                      [color]="account.nature === 'rouge' ? 'danger' : 'success'"
+                                    >
+                                      {{ account.nature }}
+                                    </ion-badge>
+
+                                    <ion-badge color="medium">
+                                      Reçu {{ account.collected_amount | number }}
+                                      {{ account.abreviation }}
+                                    </ion-badge>
+
+                                    <ion-badge color="medium">
+                                      Solde {{ account.sold | number }}
+                                      {{ account.abreviation }}
+                                    </ion-badge>
+
+                                    <ion-badge color="warning">
+                                      Première mise {{ account.amount | number }}
+                                      {{ account.abreviation }}
+                                    </ion-badge>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="line-right">
+                                <span>À réserver</span>
+                                <strong>
+                                  {{ account.amount | number }}
+                                  {{ account.abreviation }}
+                                </strong>
+                              </div>
+
+                              <ion-button
+                                size="small"
+                                mode="ios"
+                                fill="outline"
+                                color="danger"
+                                (click)="$event.stopPropagation(); reserveSingleAccount(account)"
+                              >
+                                Réserver
+                              </ion-button>
+
+                              <ion-checkbox [checked]="isSelected(account)"></ion-checkbox>
+                            </div>
+                          </div>
+
+                          <ng-container *ngIf="!day.users">
+                            <div
+                              class="detail-line"
+                              [class.selected]="isSelected(account)"
+                              *ngFor="let account of day.accounts"
+                              (click)="toggleAccount(account)"
+                            >
+                              <div class="line-left">
+                                <div
+                                  class="nature-dot"
+                                  [class.red]="account.nature === 'rouge'"
+                                  [class.green]="account.nature === 'vert'"
+                                ></div>
+
+                                <div>
+                                  <h4>
+                                    {{ account.member_fullname ||
+                                    account.member_user_name || 'Membre' }}
+                                  </h4>
+                                  <p>{{ account.account_number }}</p>
+
+                                  <div class="line-chips">
+                                    <ion-badge
+                                      [color]="account.nature === 'rouge' ? 'danger' : 'success'"
+                                    >
+                                      {{ account.nature }}
+                                    </ion-badge>
+
+                                    <ion-badge color="warning">
+                                      {{ account.amount | number }}
+                                      {{ account.abreviation }}
+                                    </ion-badge>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="line-right">
+                                <span>À réserver</span>
+                                <strong>
+                                  {{ account.amount | number }}
+                                  {{ account.abreviation }}
+                                </strong>
+                              </div>
+
+                              <ion-checkbox [checked]="isSelected(account)"></ion-checkbox>
+                            </div>
+                          </ng-container>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </section>
+
+  <!-- HISTORIQUE -->
+  <section *ngIf="activeTab === 'history'" class="page-section">
+    <div class="panel-card">
+      <div class="panel-title">
+        <div>
+          <h2>Historique des premières mises</h2>
+          <p>
+            Du {{ appserv.frdate(from) }} au {{ appserv.frdate(to) }} —
+            {{ firstentrieslist.length }} opération(s)
+          </p>
+        </div>
+
+        <ion-searchbar
+          mode="ios"
+          placeholder="Rechercher..."
+          [(ngModel)]="historysearch"
+        ></ion-searchbar>
+      </div>
+
+      <div class="group-list reservation-tree">
+        <div
+          class="empty-state"
+          *ngIf="!showprogress && (!historyTree || historyTree.length === 0)"
+        >
+          <ion-icon name="receipt-outline"></ion-icon>
+          <h3>Aucun historique</h3>
+          <p>Aucune première mise trouvée pour cette période.</p>
+        </div>
+
+        <div class="year-card" *ngFor="let year of historyTree">
+          <div class="tree-header year-header" (click)="toggleHistoryYear(year)">
+            <div>
+              <h2>{{ year.year }}</h2>
+              <p>{{ year.count }} opération(s) — {{ year.total | number }}</p>
+            </div>
+
+            <div class="tree-actions">
+              <ion-icon
+                [name]="expandedHistoryYears[year.year] ? 'chevron-up-outline' : 'chevron-down-outline'"
+              ></ion-icon>
+            </div>
+          </div>
+
+          <div class="month-list" *ngIf="expandedHistoryYears[year.year]">
+            <div class="month-card" *ngFor="let month of year.months">
+              <div
+                class="tree-header month-header"
+                (click)="toggleHistoryMonth(month)"
+              >
+                <div>
+                  <h3>{{ month.label }}</h3>
+                  <p>
+                    {{ month.count }} opération(s) —
+                    {{ month.total | number }}
+                  </p>
+                </div>
+
+                <div class="tree-actions">
+                  <ion-icon
+                    [name]="expandedHistoryMonths[month.month] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                  ></ion-icon>
+                </div>
+              </div>
+
+              <div class="date-list" *ngIf="expandedHistoryMonths[month.month]">
+                <div class="date-card" *ngFor="let day of month.dates">
+                  <div
+                    class="tree-header date-header"
+                    (click)="toggleHistoryDate(day)"
+                  >
+                    <div>
+                      <h4>{{ appserv.frdate(day.date) }}</h4>
+                      <p>{{ day.count }} ligne(s) — {{ day.total | number }}</p>
+                    </div>
+
+                    <div class="tree-actions">
+                      <ion-icon
+                        [name]="expandedHistoryDates[day.date] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                      ></ion-icon>
+                    </div>
+                  </div>
+
+                  <div class="group-lines" *ngIf="expandedHistoryDates[day.date]">
+                    <div
+                      class="user-commission-card"
+                      *ngFor="let group of (day.users || []) | filter:historysearch"
+                    >
+                      <div class="tree-header user-header">
+                        <div>
+                          <h4>{{ group.fullname }}</h4>
+                          <p>
+                            {{ group.entries_count }} opération(s) —
+                            {{ group.total_amount | number }}
+                          </p>
+
+                          <div class="line-chips">
+                            <ion-badge *ngFor="let money of group.moneys" color="medium">
+                              {{ money.total_amount | number }} {{ money.money }}
+                            </ion-badge>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        class="detail-line history-line"
+                        *ngFor="let firstentry of group.entries"
+                      >
+                        <div class="line-left">
+                          <div class="operation-icon">
+                            <ion-icon name="receipt-outline"></ion-icon>
+                          </div>
+
+                          <div>
+                            <h4>
+                              {{ firstentry.member_fullname ||
+                              firstentry.member_user_name || 'Membre' }}
+                            </h4>
+                            <p>{{ firstentry.account_number || 'Compte inconnu' }}</p>
+                            <p>OP.ID : {{ firstentry.uuid }}</p>
+
+                            <div class="line-chips">
+                              <ion-badge [color]="getStatusColor(firstentry.status)">
+                                {{ firstentry.status || 'reserved' }}
+                              </ion-badge>
+
+                              <ion-badge color="medium">
+                                Mois : {{ firstentry.first_transaction_month || '-' }}
+                              </ion-badge>
+
+                              <ion-badge color="medium">
+                                Collecteur :
+                                {{ firstentry.collector_fullname ||
+                                firstentry.collector_user_name || '-' }}
+                              </ion-badge>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="line-right">
+                          <span>Montant</span>
+                          <strong>
+                            {{ firstentry.amount | number }}
+                            {{ firstentry.abreviation }}
+                          </strong>
+                        </div>
+
+                        <ion-button
+                          size="small"
+                          mode="ios"
+                          color="danger"
+                          fill="outline"
+                          *ngIf="firstentry.status !== 'cancelled'"
+                          (click)="cancelFirstEntry(firstentry)"
+                        >
+                          Supprimer
+                        </ion-button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMISSIONS -->
+  <section *ngIf="activeTab === 'commissions'" class="page-section">
+    <div class="panel-card">
+      <div class="panel-title">
+        <div>
+          <h2>Commissions</h2>
+          <p>
+            Parrainage, collection, sans parrain et historique des paiements
+          </p>
+        </div>
+      </div>
+
+      <div class="commission-tab-buttons">
+        <ion-button
+          mode="ios"
+          size="small"
+          [fill]="commissionTab === 'sponsor' ? 'solid' : 'outline'"
+          (click)="setCommissionTab('sponsor')"
+        >
+          Parrainage
+        </ion-button>
+
+        <ion-button
+          mode="ios"
+          size="small"
+          [fill]="commissionTab === 'collector' ? 'solid' : 'outline'"
+          (click)="setCommissionTab('collector')"
+        >
+          Collection
+        </ion-button>
+
+        <ion-button
+          mode="ios"
+          size="small"
+          [fill]="commissionTab === 'no_sponsor' ? 'solid' : 'outline'"
+          (click)="setCommissionTab('no_sponsor')"
+        >
+          Sans parrainage
+        </ion-button>
+
+        <ion-button
+          mode="ios"
+          size="small"
+          [fill]="commissionTab === 'payment_history' ? 'solid' : 'outline'"
+          (click)="setCommissionTab('payment_history')"
+        >
+          Historique de paiements
+        </ion-button>
+      </div>
+
+      <ion-grid class="filter-grid">
+        <ion-row>
+          <ion-col size="12" size-md="4">
+            <ion-searchbar
+              mode="ios"
+              placeholder="Rechercher commission..."
+              [(ngModel)]="commissionSearch"
+              *ngIf="commissionTab !== 'payment_history'"
+            ></ion-searchbar>
+
+            <ion-searchbar
+              mode="ios"
+              placeholder="Rechercher paiement..."
+              [(ngModel)]="paymentHistorySearch"
+              *ngIf="commissionTab === 'payment_history'"
+            ></ion-searchbar>
+          </ion-col>
+
+          <ion-col size="6" size-md="2" *ngIf="commissionTab !== 'payment_history'">
+            <ion-select
+              interface="popover"
+              placeholder="Statut"
+              [(ngModel)]="commissionStatus"
+              (ionChange)="setCommissionStatus(commissionStatus)"
+            >
+              <ion-select-option value="pending">En attente</ion-select-option>
+              <ion-select-option value="paid">Payée</ion-select-option>
+              <ion-select-option value="all">Toutes</ion-select-option>
+            </ion-select>
+          </ion-col>
+
+          <ion-col size="6" size-md="2">
+            <ion-item lines="none" class="premium-input">
+              <ion-label position="stacked">Mois commission</ion-label>
+              <ion-input
+                type="month"
+                [(ngModel)]="commissionMonth"
+                (ionChange)="onCommissionFilterChange()"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
+
+          <ion-col size="6" size-md="2" *ngIf="commissionTab === 'payment_history'">
+            <ion-item lines="none" class="premium-input">
+              <ion-label position="stacked">Mois paiement</ion-label>
+              <ion-input
+                type="month"
+                [(ngModel)]="paidMonth"
+                (ionChange)="onCommissionFilterChange()"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
+
+          <ion-col size="12" size-md="2">
+            <ion-button
+              expand="block"
+              mode="ios"
+              color="warning"
+              (click)="loadCommissions(); loadPaymentHistory()"
+            >
+              Filtrer
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <!-- COMMISSIONS EN ATTENTE / PAYÉES -->
+      <div
+        class="group-list reservation-tree"
+        *ngIf="commissionTab !== 'payment_history'"
+      >
+        <div
+          class="empty-state"
+          *ngIf="!showprogress && (!commissionTree || commissionTree.length === 0)"
+        >
+          <ion-icon name="cash-outline"></ion-icon>
+          <h3>Aucune commission</h3>
+          <p>Aucune commission trouvée pour les filtres sélectionnés.</p>
+        </div>
+
+        <div class="year-card" *ngFor="let year of commissionTree">
+          <div
+            class="tree-header year-header"
+            (click)="toggleCommissionYear(year)"
+          >
+            <div>
+              <h2>{{ year.year }}</h2>
+              <p>{{ year.count }} commission(s) — {{ year.total | number }}</p>
+            </div>
+
+            <div class="tree-actions">
+              <ion-icon
+                [name]="expandedCommissionYears[year.year] ? 'chevron-up-outline' : 'chevron-down-outline'"
+              ></ion-icon>
+            </div>
+          </div>
+
+          <div class="month-list" *ngIf="expandedCommissionYears[year.year]">
+            <div class="month-card" *ngFor="let month of year.months">
+              <div
+                class="tree-header month-header"
+                (click)="toggleCommissionMonth(month)"
+              >
+                <div>
+                  <h3>{{ month.label }}</h3>
+                  <p>{{ month.count }} ligne(s) — {{ month.total | number }}</p>
+                </div>
+
+                <div class="tree-actions">
+                  <ion-icon
+                    [name]="expandedCommissionMonths[month.month] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                  ></ion-icon>
+                </div>
+              </div>
+
+              <div class="date-list" *ngIf="expandedCommissionMonths[month.month]">
+                <div class="date-card" *ngFor="let day of month.dates">
+                  <div
+                    class="tree-header date-header"
+                    (click)="toggleCommissionDate(day)"
+                  >
+                    <div>
+                      <h4>{{ appserv.frdate(day.date) }}</h4>
+                      <p>{{ day.count }} ligne(s) — {{ day.total | number }}</p>
+                    </div>
+
+                    <div class="tree-actions">
+                      <ion-icon
+                        [name]="expandedCommissionDates[day.date] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                      ></ion-icon>
+                    </div>
+                  </div>
+
+                  <div
+                    class="group-lines"
+                    *ngIf="expandedCommissionDates[day.date]"
+                  >
+                    <div
+                      class="user-commission-card"
+                      *ngFor="let group of (day.users || []) | filter:commissionSearch"
+                    >
+                      <div class="tree-header user-header">
+                        <div>
+                          <h4>{{ group.fullname }}</h4>
+                          <p>
+                            {{ group.lines_count }} commission(s) —
+                            {{ group.total_amount | number }}
+                          </p>
+
+                          <div class="line-chips">
+                            <ion-badge *ngFor="let money of group.moneys" color="medium">
+                              {{ money.total_amount | number }} {{ money.money }}
+                            </ion-badge>
+
+                            <ion-badge color="tertiary" *ngIf="group.type === 'sponsor'">
+                              Parrainage
+                            </ion-badge>
+
+                            <ion-badge color="primary" *ngIf="group.type === 'collector'">
+                              Collection
+                            </ion-badge>
+
+                            <ion-badge color="warning" *ngIf="group.type === 'no_sponsor'">
+                              Sans parrain
+                            </ion-badge>
+                          </div>
+                        </div>
+
+                        <div class="tree-actions">
+                          <ion-button
+                            *ngIf="group.type !== 'no_sponsor' && commissionStatus !== 'paid'"
+                            size="small"
+                            mode="ios"
+                            color="success"
+                            (click)="payCommissionGroup(group)"
+                          >
+                            <ion-icon name="wallet-outline" slot="start"></ion-icon>
+                            Tout payer
+                          </ion-button>
+                        </div>
+                      </div>
+
+                      <div
+                        class="detail-line commission-line"
+                        [class.warning-line]="line.type === 'no_sponsor'"
+                        *ngFor="let line of group.lines"
+                      >
+                        <div class="line-left">
+                          <div class="operation-icon">
+                            <ion-icon
+                              [name]="
+                                line.type === 'collector'
+                                  ? 'cash-outline'
+                                  : line.type === 'sponsor'
+                                  ? 'people-outline'
+                                  : 'person-remove-outline'
+                              "
+                            ></ion-icon>
+                          </div>
+
+                          <div>
+                            <h4>
+                              {{ line.member_fullname ||
+                              line.member_user_name || 'Membre' }}
+                            </h4>
+
+                            <p>
+                              Bénéficiaire :
+                              <strong>
+                                {{ line.beneficiary_fullname ||
+                                line.beneficiary_user_name ||
+                                (line.type === 'no_sponsor' ? 'Sans parrain' : '-') }}
+                              </strong>
+                            </p>
+
+                            <p>
+                              Mois concerné :
+                              <strong>
+                                {{ line.commission_month ||
+                                line.first_transaction_month || '-' }}
+                              </strong>
+                            </p>
+
+                            <div class="line-chips">
+                              <ion-badge *ngIf="line.type === 'sponsor'" color="tertiary">
+                                Parrain
+                              </ion-badge>
+
+                              <ion-badge *ngIf="line.type === 'collector'" color="primary">
+                                Collecteur
+                              </ion-badge>
+
+                              <ion-badge *ngIf="line.type === 'no_sponsor'" color="warning">
+                                Sans parrain
+                              </ion-badge>
+
+                              <ion-badge [color]="getStatusColor(line.status)">
+                                {{ line.status }}
+                              </ion-badge>
+
+                              <ion-badge color="medium">
+                                Opérations {{ line.operations_count || 0 }}
+                              </ion-badge>
+
+                              <ion-badge color="medium">
+                                Compte {{ line.account_number || line.account_id || '-' }}
+                              </ion-badge>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="line-right">
+                          <span>Commission</span>
+                          <strong>
+                            {{ line.amount | number }} {{ line.abreviation }}
+                          </strong>
+                        </div>
+
+                        <ion-button
+                          *ngIf="line.type !== 'no_sponsor' && line.status === 'pending'"
+                          size="small"
+                          mode="ios"
+                          color="success"
+                          (click)="payCommission(line)"
+                        >
+                          Payer
+                        </ion-button>
+
+                        <ion-button
+                          *ngIf="line.type === 'no_sponsor' && line.status === 'pending'"
+                          size="small"
+                          mode="ios"
+                          color="warning"
+                          fill="outline"
+                          (click)="openNoSponsorDetails(line)"
+                        >
+                          Affecter
+                        </ion-button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORIQUE DES PAIEMENTS -->
+      <div
+        class="group-list reservation-tree"
+        *ngIf="commissionTab === 'payment_history'"
+      >
+        <div
+          class="empty-state"
+          *ngIf="!showprogress && (!paymentHistoryTree || paymentHistoryTree.length === 0)"
+        >
+          <ion-icon name="time-outline"></ion-icon>
+          <h3>Aucun paiement</h3>
+          <p>Aucun paiement trouvé pour les filtres sélectionnés.</p>
+        </div>
+
+        <div class="year-card" *ngFor="let year of paymentHistoryTree">
+          <div class="tree-header year-header" (click)="togglePaymentYear(year)">
+            <div>
+              <h2>{{ year.year }}</h2>
+              <p>{{ year.count }} paiement(s) — {{ year.total | number }}</p>
+            </div>
+
+            <div class="tree-actions">
+              <ion-icon
+                [name]="expandedPaymentYears[year.year] ? 'chevron-up-outline' : 'chevron-down-outline'"
+              ></ion-icon>
+            </div>
+          </div>
+
+          <div class="month-list" *ngIf="expandedPaymentYears[year.year]">
+            <div class="month-card" *ngFor="let month of year.months">
+              <div
+                class="tree-header month-header"
+                (click)="togglePaymentMonth(month)"
+              >
+                <div>
+                  <h3>{{ month.label }}</h3>
+                  <p>
+                    {{ month.count }} paiement(s) —
+                    {{ month.total | number }}
+                  </p>
+                </div>
+
+                <div class="tree-actions">
+                  <ion-icon
+                    [name]="expandedPaymentMonths[month.month] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                  ></ion-icon>
+                </div>
+              </div>
+
+              <div class="date-list" *ngIf="expandedPaymentMonths[month.month]">
+                <div class="date-card" *ngFor="let day of month.dates">
+                  <div
+                    class="tree-header date-header"
+                    (click)="togglePaymentDate(day)"
+                  >
+                    <div>
+                      <h4>{{ appserv.frdate(day.date) }}</h4>
+                      <p>{{ day.count }} ligne(s) — {{ day.total | number }}</p>
+                    </div>
+
+                    <div class="tree-actions">
+                      <ion-icon
+                        [name]="expandedPaymentDates[day.date] ? 'chevron-up-outline' : 'chevron-down-outline'"
+                      ></ion-icon>
+                    </div>
+                  </div>
+
+                  <div class="group-lines" *ngIf="expandedPaymentDates[day.date]">
+                    <div
+                      class="user-commission-card"
+                      *ngFor="let group of (day.users || []) | filter:paymentHistorySearch"
+                    >
+                      <div class="tree-header user-header">
+                        <div>
+                          <h4>{{ group.fullname }}</h4>
+                          <p>
+                            {{ group.lines_count }} paiement(s) —
+                            Total payé : {{ group.total_amount | number }}
+                          </p>
+
+                          <div class="line-chips">
+                            <ion-badge color="primary">
+                              Collection : {{ group.total_collection | number }}
+                            </ion-badge>
+
+                            <ion-badge color="tertiary">
+                              Parrainage : {{ group.total_sponsor | number }}
+                            </ion-badge>
+
+                            <ion-badge color="success">
+                              Total : {{ group.total_amount | number }}
+                            </ion-badge>
+
+                            <ion-badge *ngFor="let money of group.moneys" color="medium">
+                              {{ money.total_amount | number }} {{ money.money }}
+                            </ion-badge>
+                          </div>
+                        </div>
+
+                        <div class="tree-actions">
+                          <ion-button
+                            size="small"
+                            mode="ios"
+                            color="dark"
+                            fill="outline"
+                            *ngIf="group.type !== 'no_sponsor'"
+                            (click)="downloadPayrollFromApi(group)"
+                          >
+                            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+                            Fiche de paie
+                          </ion-button>
+                        </div>
+                      </div>
+
+                      <div
+                        class="detail-line commission-line"
+                        *ngFor="let line of group.lines"
+                      >
+                        <div class="line-left">
+                          <div class="operation-icon">
+                            <ion-icon name="checkmark-done-outline"></ion-icon>
+                          </div>
+
+                          <div>
+                            <h4>
+                              {{ line.beneficiary_fullname ||
+                              line.beneficiary_user_name ||
+                              line.member_fullname ||
+                              line.member_user_name || '-' }}
+                            </h4>
+
+                            <p>
+                              Mois concerné :
+                              <strong>{{ line.commission_month || '-' }}</strong>
+                              — Payé en :
+                              <strong>{{ line.paid_month || '-' }}</strong>
+                            </p>
+
+                            <div class="line-chips">
+                              <ion-badge color="success">Payée</ion-badge>
+
+                              <ion-badge *ngIf="line.type === 'sponsor'" color="tertiary">
+                                Parrain
+                              </ion-badge>
+
+                              <ion-badge *ngIf="line.type === 'collector'" color="primary">
+                                Collecteur
+                              </ion-badge>
+
+                              <ion-badge *ngIf="line.type === 'no_sponsor'" color="warning">
+                                Sans parrain
+                              </ion-badge>
+
+                              <ion-badge color="medium">
+                                Compte {{ line.account_number || line.account_id || '-' }}
+                              </ion-badge>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="line-right">
+                          <span>Montant payé</span>
+                          <strong>
+                            {{ line.amount | number }} {{ line.abreviation }}
+                          </strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</ion-content>

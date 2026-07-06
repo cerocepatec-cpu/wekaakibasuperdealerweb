@@ -1,0 +1,69 @@
+<ion-content [class]="isModal ? 'contentbody' : 'contentbody ion-padding'">
+  <!-- Particles background -->
+  <div id="particle-bg"></div>
+
+  <div [class]="isModal ? '' : 'scallable-content'">
+    <!-- Titre principal animé -->
+    <div class="ion-text-center ion-margin-bottom animate__animated animate__fadeInDown">
+      <h1 class="font-size-60 font-bold-600 text-gradient">CERO WEKA AKIBA</h1>
+      <p class="ion-text-center text-light font-size-20" *ngIf="!isModal" style="color: white!important;">
+        Votre outil digital de gestion microfinancière
+      </p>
+    </div>
+
+    <ion-card class="feature-card animate__animated animate__fadeInUp animate__delay-1s">
+      <ion-item lines="none" class="card-item">
+        <ion-avatar slot="start" class="feature-icon bg-primary text-white">
+          <ion-icon name="document-outline" size="large"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2 class="font-bold-600">Utilisation facile</h2>
+          <p class="font-size-13 text-medium">Gérer toutes vos activités de Microfinance simplement !</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+
+    <ion-card class="feature-card animate__animated animate__fadeInUp animate__delay-2s">
+      <ion-item lines="none" class="card-item">
+        <ion-avatar slot="start" class="feature-icon bg-success text-white">
+          <ion-icon name="happy-outline" size="large"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2 class="font-bold-600">Fonctionnalités puissantes</h2>
+          <p class="font-size-13 text-medium">Importer votre liste de membres via Excel en un clic.</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+
+    <ion-card class="feature-card animate__animated animate__fadeInUp animate__delay-3s">
+      <ion-item lines="none" class="card-item">
+        <ion-avatar slot="start" class="feature-icon bg-danger text-white">
+          <ion-icon name="chevron-down-outline" size="large"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2 class="font-bold-600">Dépôts & retraits</h2>
+          <p class="font-size-13 text-medium">Effectuez les transactions de vos membres en temps réel.</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+
+    <ion-card class="feature-card animate__animated animate__fadeInUp animate__delay-4s">
+      <ion-item lines="none" class="card-item">
+        <ion-avatar slot="start" class="feature-icon bg-warning text-white">
+          <ion-icon name="print-outline" size="large"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2 class="font-bold-600">Rapports clairs & rapides</h2>
+          <p class="font-size-13 text-medium">Générez des rapports journaliers, mensuels et plus.</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+
+    <ion-button expand="block" color="warning" mode="ios" 
+                (click)="start()" 
+                class="feature-card animate__animated animate__fadeInUp animate__delay-5s" 
+                *ngIf="!isModal">
+      Continuer
+    </ion-button>
+  </div>
+</ion-content>

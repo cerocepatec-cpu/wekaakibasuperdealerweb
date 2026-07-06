@@ -1,0 +1,120 @@
+/** new css for this page **/
+
+ion-header{
+    ion-toolbar, ion-item{
+        --background:#d4dee7;
+        padding: 0 10x;
+    }
+
+    ion-toolbar{
+        .bordered{
+            --border-radius:10px;
+            --box-shadow:5px 5px 10px #d1d1d1, -5px -5px 10px #FFFFFF;
+        }
+    }
+
+    ion-item{
+        h3{
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        p{
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        ion-avatar{
+            --border-radius:40%;
+        }
+    }
+}
+
+.bg-moderate-light{
+    --background: #f6f9fb;
+}
+
+ion-content{
+    ion-item.default-avatar-item {
+        --background:#d4dee7; 
+    }  
+.slides{
+        background:#d4dee7 ;
+        padding: 4px 10px 20px 10px;
+        border-bottom-right-radius: 30px;
+        border-bottom-left-radius: 30px;
+        height:165px;
+        swiper-slide{
+            padding: 4px!important;
+            ion-avatar{
+                width: 50px!important;
+                height: 50px!important;
+            }
+        }
+}
+    ion-refresher{
+        background:#f1f5f8 ;
+    }
+    .container{
+        padding: 6px 20px;
+        color: #FFFFFF;
+
+        ion-item  {
+            --background:rgba(255,255,255,.1);
+            padding: 0;
+            margin: 14px 0;
+            --border-radius:14px;
+            color: #FFFFFF;
+            font-weight: 600;
+
+            ion-label{
+                padding: 6px 0;
+
+                h4{
+                    font-weight: 600;
+                    font-size: 16px;
+                }
+
+                h6{
+                    color: rgba(255,255,255,.66);
+                }
+            }
+        }
+        h2{
+            padding-bottom: 8px;
+
+            ion-item{
+                --background:linear-gradient(50deg, rgba(50,50,50,1) 0%, rgba(20,10,250,1) 35%, rgba(45,112,229,1) 100%);
+                font-weight: 700;
+                font-size: 14px;
+                border-radius: 14px;
+            }
+        }
+    }
+
+    .avatarifnoimg{
+        background:#f1f5f8 ;
+        border-radius:50% ;
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        color: black;
+    }
+
+    .textifnoimg{
+        position: relative;
+         top: 10px;
+     }
+    
+}
+
+ion-row{
+    ion-col{
+        padding: 4px;
+      
+        ion-card{
+            margin: 0;
+        }
+    }
+}
+

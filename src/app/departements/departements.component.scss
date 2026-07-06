@@ -1,0 +1,139 @@
+ion-content{
+  top: 5px;
+}
+ion-menu-button {
+  color: var(--ion-color-primary);
+}
+
+#searchbarinside{
+  //border: 1px rgb(219, 219, 219) solid ;
+  border-radius: 6px;
+  height: 40px;
+  top: -0.6px;
+  width: 100%;
+}
+
+#requestlist{
+  background-color:rgb(246, 249, 251);
+}
+
+.newusericon{
+width: 60px;
+height: 60px;
+}
+
+.buttons-group{
+  float: left;
+  .lightbutton{
+   justify-content: center;
+    width: 70px;
+    font-size: small;
+    border-radius: 40px;
+    background: 0 0;
+    box-shadow: 0 8px 16px rgb(2 8 20 / 10%), 0 4px 8px rgb(2 8 20 / 8%);
+    color: var(--ion-color-dark);
+  }
+
+  .submitbutton{
+    justify-content: center;
+    width: 22vmin;
+    font-size: small;
+    height: fit-content;
+    border-radius: 10px;
+    background-color:#00b2f7;
+    color:#ffffff;
+  }
+}
+
+ion-list{
+  .small-icon{
+    border: none;
+    ion-icon{
+      width:15px;
+      height:15px;
+    } 
+  }
+
+  .middle-icon{
+    margin-left: -20px!important;
+    border: none;
+    ion-icon{
+      width:15px;
+      height:15px;
+      margin-top: 5px;
+    } 
+  }
+}
+
+.totalfund{
+  margin-left: 17px;
+}
+.list-item{
+   ion-item{
+     ion-avatar{
+       width: 45px;
+       height: 45px;
+       background-color: #50c8ff;
+       margin-right: 12px;
+       justify-content: center;
+       display: flex;
+       align-items: center;
+       ion-icon{
+         font-weight: 600;
+         color:white;
+       }
+     }
+     ion-label{
+       margin-top: 24px;
+       .secondpara{
+         margin-top:-15px !important;
+         font-size: 11px;
+       }
+       .item-label-title{
+         font-size: 13px;
+         font-weight: 500;
+         color:black;
+       }
+      
+       p{
+        
+         color: grey;
+         span{
+           padding: 0 5px 0 0 ;
+         }
+         .point{
+           font-size:2em;
+           color: #50c8ff;
+         }
+         .reqtotalprinted{
+           color:#50c8ff;
+         }
+       }
+     }
+   }
+}
+
+.item-depart-list{
+  margin-left: -17px!important;
+  ion-avatar{
+    margin-right:7px!important;
+    background: #D2DBFC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    ion-text{
+      font-size: small;
+      color: rgb(10, 10, 10);
+    }
+  }
+  ion-label{
+    .item-label-title{
+      font-weight: 600;
+      color: rgb(111, 111, 230);
+    }
+    .secondpara{
+      margin-top:-10px ;
+      color: grey;
+    }
+  }
+}

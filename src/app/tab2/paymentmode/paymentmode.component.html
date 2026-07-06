@@ -1,0 +1,42 @@
+
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-item lines="none">
+          <ion-icon name="arrow-back-outline" size="small" slot="start" (click)="appserv.closemodal()"></ion-icon>
+          <ion-text slot="start">Mode de paiement</ion-text>
+        </ion-item>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="contentbody">
+      <br>
+        <ion-item class="contentbody ion-padding-bottom" (click)="selected('proforma')">
+          <ion-avatar slot="start">
+            <ion-img src="../../../assets/proforma.jpeg"></ion-img>
+          </ion-avatar>
+          <ion-label>
+            <h2>Proforma</h2>
+            <p>Enregistrer entant que proforma</p>
+          </ion-label>
+        </ion-item>
+        <ion-item class="contentbody ion-padding-bottom" (click)="selected('pause')">
+          <ion-avatar slot="start">
+            <ion-icon name="pause-circle-outline" size="large" color="primary"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2>Mettre en pause</h2>
+            <p>Mettre la facture en pause pour la rétravailler plus tard</p>
+          </ion-label>
+        </ion-item>
+        <ion-item class="contentbody ion-padding-bottom" (click)="selected('order')">
+          <ion-avatar slot="start">
+            <ion-img src="../../../assets/commande.png"></ion-img>
+          </ion-avatar>
+          <ion-label>
+            <h2>Commande</h2>
+            <p>Enregistrer la facture entant que commande</p>
+          </ion-label>
+        </ion-item>
+    </ion-content>
+    <ion-footer class="ion-no-border ion-padding">
+      <ion-textarea placeholder="Ajouter une note" class="font-size-12 bd-square bd-radius-10 ion-padding-start" color="primary" autoGrow="true" [(ngModel)]="note"></ion-textarea>
+    </ion-footer>

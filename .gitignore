@@ -1,0 +1,66 @@
+# Angular build files
+/dist/
+/out-tsc/
+/.angular/cache/
+
+# Ionic build
+/www/
+
+# Node modules
+/node_modules/
+
+# Environment files
+/src/environments/environment*.ts
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs and editors
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Compiled output
+*.js
+*.js.map
+*.css
+*.css.map
+
+# Coverage
+/coverage/
+
+# Misc
+/.tmp/
+/.sass-cache/
+/connect.lock
+/coverage/
+/libpeerconnection.log
+npm-debug.log
+testem.log
+typings/
+
+/package-lock.json
+/yarn.lock
+
+# Optional: Capacitor iOS and Android build outputs
+/android/
+/ios/
+
+# Optional: environment or config files (if any)
+.env
+.env.*.local
+
+# Optional: Firebase or Google configs
+google-services.json
+GoogleService-Info.plist
+firebase.json
+
+# Optional: custom local dev server settings
+proxy.conf.json

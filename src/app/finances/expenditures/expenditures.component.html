@@ -1,0 +1,282 @@
+<ion-header class="ion-no-border header-modern">
+  <ion-toolbar>
+    <div class="header-container">
+      <div>
+        <h1>Dépenses</h1>
+        <p>Gestion & validation des sorties</p>
+      </div>
+
+      <ion-button
+        size="small"
+        mode="ios"
+        color="warning"
+        shape="round"
+        *ngIf="!showcheckbox && canAdd()"
+        (click)="newexpenditure()"
+      >
+        <ion-icon name="add-outline"></ion-icon>
+        Nouvelle
+      </ion-button>
+    </div>
+  </ion-toolbar>
+
+  <ion-progress-bar
+    *ngIf="showprogress"
+    type="indeterminate"
+  ></ion-progress-bar>
+</ion-header>
+
+<ion-content class="page-modern expenses-scroll" [fullscreen]="true">
+  <div class="search-filter-row">
+    <div class="search-wrapper">
+      <ion-searchbar
+        #defaultinput
+        mode="ios"
+        placeholder="Rechercher une dépense..."
+        [(ngModel)]="keyword"
+        (ionChange)="onKeywordChange()"
+      ></ion-searchbar>
+    </div>
+
+    <div class="filter-actions">
+      <ion-button fill="outline" mode="ios" size="small" (click)="userpicker()">
+        <ion-icon name="person-outline" slot="start"></ion-icon>
+        Agent
+      </ion-button>
+
+      <ion-button
+        fill="outline"
+        mode="ios"
+        size="small"
+        (click)="accountpicker()"
+      >
+        <ion-icon name="wallet-outline" slot="start"></ion-icon>
+        Compte
+      </ion-button>
+
+      <ion-button
+        fill="outline"
+        mode="ios"
+        size="small"
+        (click)="periodfilter()"
+      >
+        <ion-icon name="calendar-outline" slot="start"></ion-icon>
+        Période
+      </ion-button>
+
+      <ion-button
+        fill="clear"
+        mode="ios"
+        size="small"
+        color="danger"
+        (click)="deletefilter()"
+      >
+        <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+        Reset
+      </ion-button>
+    </div>
+  </div>
+
+  <div class="dashboard-row">
+    <div class="kpi-grid">
+      <div class="kpi total">
+        <p>Total</p>
+        <h2>{{ stats.total | number }}</h2>
+        <span>{{ appserv.getDefaultmoney().abreviation }}</span>
+      </div>
+
+      <div class="kpi success">
+        <p>Validées</p>
+        <h2>{{ stats.count_validated }}</h2>
+        <span>
+          {{ stats.total_validated | number }}
+          {{ appserv.getDefaultmoney().abreviation }}
+        </span>
+      </div>
+
+      <div class="kpi warning">
+        <p>Non validées</p>
+        <h2>{{ stats.count_pending }}</h2>
+        <span>
+          {{ stats.total_pending | number }}
+          {{ appserv.getDefaultmoney().abreviation }}
+        </span>
+      </div>
+    </div>
+
+    <div class="filter-chips">
+      <ion-chip
+        [class.active]="filters.status === 'all'"
+        (click)="setStatus('all')"
+      >
+        <ion-label>Toutes</ion-label>
+      </ion-chip>
+
+      <ion-chip
+        [class.active]="filters.status === 'validated'"
+        (click)="setStatus('validated')"
+      >
+        <ion-label>Validées</ion-label>
+      </ion-chip>
+
+      <ion-chip
+        [class.active]="filters.status === 'pending'"
+        (click)="setStatus('pending')"
+      >
+        <ion-label>Non validées</ion-label>
+      </ion-chip>
+    </div>
+  </div>
+
+  <div class="actions-bar">
+    <ion-button
+      color="success"
+      size="small"
+      *ngIf="stats.count_pending > 0 && canValidate()"
+      (click)="validateAllPending()"
+    >
+      <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+      Tout valider
+    </ion-button>
+
+    <ion-button
+      size="small"
+      *ngIf="!showcheckbox && (canValidate() || canDelete())"
+      (click)="showcheckbox = true"
+    >
+      <ion-icon name="checkbox-outline" slot="start"></ion-icon>
+      Sélection
+    </ion-button>
+
+    <ion-button
+      fill="clear"
+      size="small"
+      *ngIf="showcheckbox"
+      (click)="showcheckbox = false; listselectedexpenditures = []"
+    >
+      Annuler
+    </ion-button>
+  </div>
+
+  <div class="empty-box" *ngIf="listexpenditures.length === 0">
+    <ion-icon name="wallet-outline"></ion-icon>
+    <p>Aucune dépense</p>
+  </div>
+
+  <div class="list-container" *ngIf="listexpenditures.length > 0">
+    <div
+      class="expense-card"
+      *ngFor="let expenditure of listexpenditures"
+      (click)="
+        showcheckbox
+          ? toggleSelection(expenditure, $event)
+          : menuexpenditure(expenditure)
+      "
+    >
+      <ion-checkbox
+        *ngIf="showcheckbox"
+        [checked]="isSelected(expenditure)"
+        (ionChange)="toggleSelection(expenditure, $event)"
+      ></ion-checkbox>
+
+      <div class="left">
+        <div class="icon">
+          <ion-icon name="card-outline"></ion-icon>
+        </div>
+      </div>
+
+      <div class="middle">
+        <div class="top">
+          <h3>{{ expenditure.user_name || 'Utilisateur' }}</h3>
+
+          <span class="badge success" *ngIf="isValidated(expenditure)">
+            Validée
+          </span>
+
+          <span class="badge warning" *ngIf="!isValidated(expenditure)">
+            Non validée
+          </span>
+        </div>
+
+        <p class="meta">
+          {{ expenditure.account_name || 'Sans compte' }}
+          •
+          {{ expenditure.uuid }}
+        </p>
+
+        <p class="fund-info" *ngIf="expenditure.fund_name">
+          {{ expenditure.fund_name }}
+        </p>
+
+        <p class="desc" *ngIf="expenditure.motif">
+          {{ expenditure.motif }}
+        </p>
+
+        <div class="bottom">
+          <span class="amount">
+            {{ expenditure.amount | number }}
+            {{ expenditure.abreviation }}
+          </span>
+
+          <ion-button
+            size="small"
+            fill="outline"
+            color="success"
+            *ngIf="!isValidated(expenditure) && canValidate()"
+            (click)="validateOne(expenditure, $event)"
+          >
+            Valider
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagination" *ngIf="pagination.last_page > 1">
+    <ion-button
+      fill="outline"
+      size="small"
+      [disabled]="pagination.current_page <= 1"
+      (click)="previousPage()"
+    >
+      ◀
+    </ion-button>
+
+    <span>{{ pagination.current_page }} / {{ pagination.last_page }}</span>
+
+    <ion-button
+      fill="outline"
+      size="small"
+      [disabled]="pagination.current_page >= pagination.last_page"
+      (click)="nextPage()"
+    >
+      ▶
+    </ion-button>
+  </div>
+</ion-content>
+
+<ion-footer *ngIf="showcheckbox && listselectedexpenditures.length > 0">
+  <ion-toolbar>
+    <div class="footer-select">
+      <span>{{ listselectedexpenditures.length }} sélectionnée(s)</span>
+
+      <ion-button
+        color="success"
+        size="small"
+        *ngIf="canValidate()"
+        (click)="validateSelected()"
+      >
+        Valider
+      </ion-button>
+
+      <ion-button
+        color="danger"
+        size="small"
+        *ngIf="canDelete()"
+        (click)="multipledelete()"
+      >
+        Supprimer
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

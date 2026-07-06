@@ -1,0 +1,314 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="fintech-toolbar">
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="beforeleft()" class="back-btn">
+        <ion-icon name="chevron-back-outline" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <div class="toolbar-profile">
+      <div class="profile-avatar">
+        <ion-icon name="person-outline"></ion-icon>
+      </div>
+
+      <div class="profile-info">
+        <p class="profile-name">
+          {{ (usersent.name ? usersent.name : usersent.user_name) | titlecase }}
+        </p>
+        <p class="profile-subtitle">
+          {{ usersent.note || "Nouvelle opération financière" }}
+        </p>
+      </div>
+    </div>
+  </ion-toolbar>
+
+  <ion-progress-bar mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+
+<ion-content fullscreen class="fintech-content">
+  <div class="fintech-page">
+    <div class="hero-card">
+      <div>
+        <p class="hero-label">Transaction</p>
+        <h1>{{ selectedTypeLabel }}</h1>
+        <p class="hero-desc">
+          Opération sécurisée avec prévisualisation des frais avant validation.
+        </p>
+      </div>
+
+      <div class="hero-icon">
+        <ion-icon
+          [name]="
+            transactionform.getRawValue().type === 'withdraw'
+              ? 'arrow-down-circle-outline'
+              : 'arrow-up-circle-outline'
+          "
+        ></ion-icon>
+      </div>
+    </div>
+
+    <form [formGroup]="transactionform" class="form-stack">
+      <div class="premium-card">
+        <div class="section-header">
+          <div>
+            <p class="section-kicker">Compte client</p>
+            <h2>Choisir le compte</h2>
+          </div>
+
+          <ion-chip *ngIf="actualaccount?.nature" color="primary" mode="ios">
+            {{ actualaccount.nature | uppercase }}
+          </ion-chip>
+        </div>
+
+        <select
+          mode="ios"
+          formControlName="member_account_id"
+          interface="popover"
+          placeholder="Sélectionner un compte"
+          (ionChange)="filterAccountAndFunds()"
+          class="premium-input"
+        >
+          <option *ngFor="let account of accountslist" [value]="account.id">
+            ({{ account.money_abreviation }})
+            {{
+              account.account_number
+                ? account.account_number
+                : account.description
+            }}
+
+            {{ account.nature ? " - " + account.nature : "" }}
+          </option>
+        </select>
+
+        <div *ngIf="actualaccount?.id" class="account-mini-card">
+          <div>
+            <p>Solde disponible</p>
+            <h3>
+              {{ actualaccount.sold || 0 }}
+              {{ actualaccount.money_abreviation }}
+            </h3>
+          </div>
+
+          <div class="mini-badge">
+            {{ actualaccount.account_number || actualaccount.description }}
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-card">
+        <div class="section-header">
+          <div>
+            <p class="section-kicker">Mode</p>
+            <h2>Type d’opération</h2>
+          </div>
+        </div>
+
+        <ion-segment
+          formControlName="type"
+          mode="ios"
+          (ionChange)="segmentChanged($event)"
+          class="fintech-segment"
+        >
+          <ion-segment-button value="deposit">
+            <ion-label>Dépôt</ion-label>
+          </ion-segment-button>
+
+          <ion-segment-button value="withdraw">
+            <ion-label>Retrait</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+
+        <div
+          class="mt-4"
+          *ngIf="transactionform.getRawValue().type === 'deposit'"
+        >
+          <label class="field-label">Caisse</label>
+
+          <select
+            mode="ios"
+            formControlName="fund_id"
+            interface="popover"
+            placeholder="Sélectionner une caisse"
+            (ionChange)="filterAccountAndFunds()"
+            class="premium-input"
+          >
+            <option *ngFor="let tub of listtubs" [value]="tub.id">
+              ({{ tub.money_abreviation }}) {{ tub.description }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="premium-card">
+        <div class="section-header">
+          <div>
+            <p class="section-kicker">Détails</p>
+            <h2>Informations opération</h2>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label">Montant</label>
+          <ion-input
+            type="number"
+            formControlName="amount"
+            placeholder="0.00"
+            class="premium-input amount-input"
+          ></ion-input>
+        </div>
+        <div
+          class="field-block"
+          *ngIf="transactionform.getRawValue().type === 'withdraw'"
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>
+              <label class="field-label"> Appliquer les frais </label>
+
+              <p style="margin: 0; font-size: 12px; opacity: 0.7">
+                Désactiver pour effectuer un retrait sans frais.
+              </p>
+            </div>
+
+            <ion-toggle formControlName="apply_fees" mode="ios"></ion-toggle>
+          </div>
+        </div>
+        <div class="field-block">
+          <label class="field-label">Motif</label>
+          <ion-textarea
+            autoGrow="true"
+            formControlName="motif"
+            placeholder="Motif de l’opération"
+            class="premium-input"
+          ></ion-textarea>
+        </div>
+
+        <div class="grid-fields">
+          <div class="field-block">
+            <label class="field-label">Qui fait l'opération</label>
+            <ion-input
+              formControlName="operation_done_by"
+              placeholder="Nom ou référence"
+              class="premium-input"
+            ></ion-input>
+          </div>
+
+          <div class="field-block">
+            <label class="field-label">Contact</label>
+            <ion-input
+              formControlName="phone"
+              placeholder="+243..."
+              class="premium-input"
+            ></ion-input>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label">Adresse</label>
+          <ion-input
+            formControlName="adresse"
+            placeholder="Adresse"
+            class="premium-input"
+          ></ion-input>
+        </div>
+      </div>
+
+      <div
+        *ngIf="
+          previewData &&
+          transactionform.getRawValue().nature === 'finance_withdrawal'
+        "
+        class="preview-card"
+      >
+        <div class="preview-head">
+          <div>
+            <p>Prévisualisation</p>
+            <h2>Total à débiter</h2>
+          </div>
+
+          <h1>
+            {{ previewData.total_required || previewData.total_amount || 0 }}
+            {{ selectedAccountMoney }}
+          </h1>
+        </div>
+
+        <div class="preview-grid">
+          <div>
+            <span>Montant demandé</span>
+            <strong
+              >{{ previewData.amount || 0 }} {{ selectedAccountMoney }}</strong
+            >
+          </div>
+
+          <div>
+            <span>Frais</span>
+            <strong
+              >{{ previewData?.fees?.fee || 0 }}
+              {{ selectedAccountMoney }}</strong
+            >
+          </div>
+
+          <div>
+            <span>Taux</span>
+            <strong>{{ previewData?.fees?.percent || 0 }}%</strong>
+          </div>
+
+          <div>
+            <span>Première mise</span>
+            <strong
+              >{{ previewData.first_entry_amount || 0 }}
+              {{ selectedAccountMoney }}</strong
+            >
+          </div>
+          <div>
+            <span>Frais appliqués</span>
+
+            <strong>
+              {{ transactionform.getRawValue().apply_fees ? "Oui" : "Non" }}
+            </strong>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ion-content>
+
+<ion-footer
+  *ngIf="
+    (accountslist.length > 0 &&
+      appserv.permissionFilter('transactions', 'deposit')) ||
+    (accountslist.length > 0 &&
+      appserv.permissionFilter('transactions', 'withdraw'))
+  "
+  class="fintech-footer"
+>
+  <ion-button
+    expand="block"
+    mode="ios"
+    class="validate-btn"
+    [disabled]="!transactionform.valid || previewLoading || validationLoading"
+    (click)="validateoperation()"
+  >
+    <ion-spinner
+      *ngIf="previewLoading || validationLoading"
+      name="crescent"
+      class="mr-2"
+    ></ion-spinner>
+
+    <span *ngIf="!previewLoading && !validationLoading">
+      {{
+        transactionform.getRawValue().nature === "finance_withdrawal"
+          ? "Prévisualiser et valider"
+          : "Valider l’opération"
+      }}
+    </span>
+
+    <span *ngIf="previewLoading">Calcul en cours...</span>
+    <span *ngIf="validationLoading">Validation...</span>
+  </ion-button>
+</ion-footer>

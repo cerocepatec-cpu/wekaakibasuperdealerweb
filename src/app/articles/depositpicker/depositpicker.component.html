@@ -1,0 +1,19 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back" color="primary"  size="large" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <h4 slot="start" class="font-bold-600 font-size-14">Sélectionner un  dépôt</h4>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header> 
+<ion-content class="contentbody">
+    <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-12" [(ngModel)]="search" #searchinput></ion-searchbar>
+  <ion-list class="contentbody">
+    <ion-item lines="full" *ngFor="let deposit of listdeposits | filter:search" (click)="selected(deposit)" class="font-size-15 contentbody">
+      <ion-text slot="start">{{deposit.name | titlecase}}</ion-text>
+      <ion-icon slot="end" *ngIf="deposit.selected"  name="checkmark-circle-outline" color="success" size="small"></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>
+

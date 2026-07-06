@@ -1,0 +1,19 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+        <ion-icon name="chevron-back" size="large" color="secondary" (click)="appserv.closemodal()"></ion-icon>
+        <ion-text>Monnaies disponibles</ion-text>
+        <!-- <ion-icon name="add-outline" (click)="addnewmoney()" slot="end"></ion-icon> -->
+        <ion-chip color="primary" *ngIf="selectedmoneys.length>0" (click)="sendList()" slot="end">Valider</ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+    <ion-searchbar mode="ios" placeholder="Recherche" [(ngModel)]="search" #defaultinput></ion-searchbar>
+    <ion-item lines="inset" *ngFor="let money of listmoney | filter:search" (click)="selected(money)" class="contentbody font-size-12" mode="ios">
+      {{money.money_name}}
+      <ion-icon slot="end" *ngIf="money.selected"  name="checkmark-circle-outline" color="success" size="small"></ion-icon>
+    </ion-item>
+</ion-content>
+

@@ -1,0 +1,315 @@
+<ion-header class="ion-no-border bg-white dark:bg-slate-900">
+  <ion-toolbar class="px-4 bg-transparent">
+    <div class="flex items-center gap-3 h-14">
+      <ion-icon
+        name="chevron-back-outline"
+        color="primary"
+        size="large"
+        (click)="closemodal()"
+      >
+      </ion-icon>
+
+      <div>
+        <p class="text-[11px] uppercase tracking-widest text-slate-400">
+          WEKA AKIBA
+        </p>
+        <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
+          {{ isEditMode ? "Modifier" : "Nouveau" }} service
+        </h2>
+        <span slot="end">{{data.service.name | titlecase}}</span>
+      </div>
+    </div>
+  </ion-toolbar>
+
+  <ion-progress-bar *ngIf="showcreatingprogress" type="indeterminate">
+  </ion-progress-bar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="bg-slate-50 dark:bg-slate-950">
+  <div class="px-4 pt-4 pb-24 max-w-lg mx-auto">
+    <form [formGroup]="newserviceform" class="space-y-5">
+      <!-- TYPE -->
+      <div class="premium-card">
+        <p class="premium-title">Type</p>
+
+        <ion-segment formControlName="type" mode="ios" class="mt-2">
+          <ion-segment-button value="1"> Carnet </ion-segment-button>
+        </ion-segment>
+
+        <div class="space-y-2 mt-3">
+          <ion-toggle formControlName="has_vat" mode="ios"> TVA </ion-toggle>
+          <ion-toggle formControlName="bonus_applicable" mode="ios">
+            Bonus
+          </ion-toggle>
+        </div>
+      </div>
+
+      <!-- INFOS -->
+      <div class="premium-card">
+        <p class="premium-title">Informations</p>
+
+        <div class="premium-field">
+          <label>Nom *</label>
+          <input #defaultinput formControlName="name" class="premium-input" />
+        </div>
+
+        <div class="premium-field">
+          <label>Description</label>
+          <textarea
+            formControlName="description"
+            rows="2"
+            class="premium-input resize-none"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- CATEGORIE -->
+      <div class="premium-card">
+        <p class="premium-title">Catégorisation</p>
+
+        <div class="flex gap-2 items-center">
+          <ion-select formControlName="category_id" class="flex-1">
+            <ion-select-option
+              *ngFor="let category of listcategories"
+              [value]="category.category.id"
+            >
+              {{ category.category.name }}
+            </ion-select-option>
+          </ion-select>
+
+          <ion-button fill="clear" size="small" (click)="newcategory()">
+            <ion-icon name="add-circle-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+        <div class="premium-field">
+          <label>Unité</label>
+
+          <div class="flex gap-2 items-center">
+            <ion-select
+              formControlName="uom_id"
+              interface="popover"
+              class="premium-select flex-1"
+            >
+              <ion-select-option
+                *ngFor="let oum of listunitofmeasure"
+                [value]="oum.id"
+              >
+                {{ oum.name | titlecase }}
+              </ion-select-option>
+            </ion-select>
+
+            <!-- 🔥 BOUTON AJOUT -->
+            <ion-button fill="clear" size="small" (click)="newunitofmeasure()">
+              <ion-icon name="add-circle-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🔥 PRICING INLINE -->
+      <div class="premium-card">
+        <div class="flex justify-between items-center">
+          <p class="premium-title">Prix</p>
+
+          <ion-button fill="clear" size="small" (click)="addPricingRow()">
+            <ion-icon name="add-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+        <div formArrayName="pricing" class="mt-3 space-y-4">
+          <div
+            *ngFor="
+              let p of pricing.controls;
+              let i = index;
+              trackBy: trackByIndex
+            "
+            [formGroupName]="i"
+            class="border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-slate-50 dark:bg-slate-900 animate-fade-in"
+          >
+            <!-- LABEL -->
+            <div class="premium-field">
+              <label>Libellé</label>
+              <input formControlName="label" class="premium-input" />
+            </div>
+
+            <!-- PRIX -->
+            <div class="premium-field">
+              <label>Prix</label>
+              <input
+                type="number"
+                formControlName="price"
+                class="premium-input"
+              />
+            </div>
+
+            <!-- CONCERNS -->
+            <div class="premium-field">
+              <label>Concerne</label>
+              <select formControlName="concerns" class="premium-input">
+                <option value="sale_super_dealer">Vente Super Dealer</option>
+                <option value="print_super_dealer">Prix impression Super Dealer</option>
+                <option value="buy_super_dealer">Achat Super Dealer</option>
+                <option value="sale_collector">Vente Collecteur</option>
+                <option value="buy_collector">Achat Collecteur</option>
+              </select>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="flex justify-between mt-3">
+              <ion-button size="small" fill="clear" (click)="updatePrice(p)">
+                Modifier
+              </ion-button>
+
+              <ion-button size="small" fill="clear" (click)="setPrincipal(i)">
+                ⭐ Principal
+              </ion-button>
+
+              <ion-button
+                size="small"
+                fill="clear"
+                color="danger"
+                (click)="removePricing(i)"
+              >
+                Supprimer
+              </ion-button>
+            </div>
+          </div>
+
+          <!-- EMPTY -->
+          <div
+            *ngIf="pricing.length === 0"
+            class="text-xs text-slate-400 text-center py-3"
+          >
+            Aucun prix défini
+          </div>
+        </div>
+      </div>
+
+      <!-- OPTIONS -->
+      <div class="premium-card">
+        <div class="flex justify-between items-center">
+          <p class="premium-title">Options avancées</p>
+
+          <ion-button fill="clear" size="small" (click)="addLimitRow()">
+            <ion-icon name="add-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+        <!-- GLOBAL -->
+        <div class="premium-field">
+          <label>Nombre opérations</label>
+          <input formControlName="nbr_operations" class="premium-input" />
+        </div>
+
+        <div class="premium-field">
+          <label>Expiration</label>
+          <select formControlName="expiration_period" class="premium-input">
+            <option value="one_month">1 mois</option>
+            <option value="three_month">3 mois</option>
+            <option value="six_month">6 mois</option>
+            <option value="one_year">1 année</option>
+          </select>
+        </div>
+
+        <!-- 🔥 LIMITS PAR MONNAIE -->
+        <div formArrayName="limits" class="mt-4 space-y-4">
+          <div
+            *ngFor="let l of limits.controls; let i = index"
+            [formGroupName]="i"
+            class="border rounded-xl p-3 bg-slate-50 dark:bg-slate-900"
+          >
+            <!-- MONNAIE -->
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs text-slate-500">
+                {{ l.value.money_abreviation || "Monnaie" }}
+              </span>
+
+              <ion-button size="small" fill="clear" (click)="changemoney(i)">
+                Changer
+              </ion-button>
+            </div>
+
+            <!-- MIN -->
+            <div class="premium-field">
+              <label>Montant min</label>
+              <input
+                type="number"
+                formControlName="min_amount"
+                class="premium-input"
+                min="0"
+              />
+            </div>
+
+            <!-- MAX -->
+            <div class="premium-field">
+              <label>Montant max</label>
+              <input
+                type="number"
+                formControlName="max_amount"
+                class="premium-input"
+                [disabled]="l.value.max_amount === null"
+                [placeholder]="l.value.max_amount === null ? '∞' : ''"
+              />
+            </div>
+
+            <!-- INFINITE -->
+            <div class="flex items-center gap-2 mt-2">
+              <ion-checkbox
+                [checked]="l.value.max_amount === null"
+                (ionChange)="toggleInfinite(i)"
+              ></ion-checkbox>
+              <label class="text-xs">Illimité</label>
+            </div>
+
+            <!-- ACTION -->
+            <div class="flex justify-end mt-2">
+              <ion-button
+                size="small"
+                fill="clear"
+                color="danger"
+                (click)="removeLimit(i)"
+              >
+                Supprimer
+              </ion-button>
+            </div>
+          </div>
+
+          <!-- EMPTY -->
+          <div
+            *ngIf="limits.length === 0"
+            class="text-xs text-center text-slate-400"
+          >
+            Aucun paramètre défini
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ion-content>
+
+<!-- 🔥 UNDO -->
+<div *ngIf="showUndo" class="fixed bottom-20 left-4 right-4 z-50">
+  <div
+    class="bg-black text-white px-4 py-3 rounded-xl flex justify-between items-center shadow-lg animate-fade-in"
+  >
+    <span class="text-sm">Prix supprimé</span>
+
+    <ion-button size="small" fill="clear" color="light" (click)="undoDelete()">
+      Annuler
+    </ion-button>
+  </div>
+</div>
+
+<ion-footer class="ion-no-border bg-white dark:bg-slate-900 px-4 py-4">
+  <ion-button
+    expand="block"
+    color="warning"
+    mode="ios"
+    [disabled]="!newserviceform.valid || !isFormDirty()"
+    (click)="saveService()"
+    class="h-12 rounded-xl font-semibold text-sm"
+  >
+    {{ isEditMode ? "Mettre à jour" : "Enregistrer" }}
+  </ion-button>
+</ion-footer>

@@ -1,0 +1,165 @@
+/* --- COULEURS BASE (Variables suggérées) --- */
+:root {
+  --ion-color-base-dark: #000a12;     /* Noir très profond */
+  --ion-color-surface-dark: #0f1c2c;  /* Bleu-noir pour les surfaces */
+  --ion-color-holo-blue: #00e5ff;     /* Bleu Néon/Cyan pour l'accentuation */
+  --ion-color-holo-green: #39ff14;    /* Vert Néon pour les données critiques/succès */
+  --ion-color-medium-light: #5f748c;  /* Gris/Bleu pour les textes secondaires */
+  --ion-color-text-main: #e6f7ff;     /* Blanc cassé très clair pour le texte principal */
+}
+
+/* Appliquer les variables au contenu Ionic */
+.system-viewport {
+  --ion-background-color: var(--ion-color-base-dark);
+  color: var(--ion-color-text-main);
+  
+  /* Effet subtil de 'scan line' (ligne de balayage) pour le grain rétro-futuriste */
+  background-image: linear-gradient(rgba(15, 28, 44, 0.4) 1px, transparent 1px);
+  background-size: 100% 4px; 
+}
+
+/* --- EN-TÊTE ET TITRE --- */
+
+.holo-tech-header {
+  background-color: var(--ion-color-base-dark);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3); /* Ombre de 'lueur' */
+}
+
+.critical-system-title {
+  font-family: 'Consolas', 'Roboto Mono', monospace;
+  letter-spacing: 4px;
+  color: var(--ion-color-holo-blue);
+  text-shadow: 0 0 5px var(--ion-color-holo-blue); /* Effet de tube cathodique/lueur */
+}
+
+.scan-progress-bar {
+  --background: var(--ion-color-surface-dark);
+  --progress-background: var(--ion-color-holo-green);
+  /* Animation de balayage ou clignotement pour le mode 'indeterminate' (à faire en keyframes) */
+}
+
+
+/* --- ZONE DE COMMANDE (Searchbar & Bouton) --- */
+
+.command-prompt {
+  --background: var(--ion-color-surface-dark);
+  --color: var(--ion-color-text-main);
+  --placeholder-color: var(--ion-color-medium-light);
+  border: 1px solid var(--ion-color-holo-blue);
+  border-radius: 2px;
+  box-shadow: 0 0 5px rgba(0, 229, 255, 0.5); /* Lueur d'interface */
+}
+
+.execute-lookup {
+  /* Bouton d'action tactique - Utilisation du 'warning' (ambre/orange) pour l'exécution */
+  --background: #ffaa00;
+  --color: var(--ion-color-base-dark);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* --- CARTES DE DONNÉES (Items) --- */
+
+.data-card {
+  --background: var(--ion-color-surface-dark);
+  color: var(--ion-color-text-main);
+  border: 1px solid var(--ion-color-medium-light);
+  border-radius: 4px;
+  transition: all 0.2s;
+  
+  &:hover {
+    --background: #1a2a3e; /* Léger changement pour le focus */
+    border-color: var(--ion-color-holo-blue);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+    color: white!important; /* Lueur intense au survol */
+    .border-rounded-avatar{
+      color: white!important;
+    }
+  }
+}
+
+.critical-action-card {
+    border: 1px solid var(--ion-color-holo-green);
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.4); 
+}
+
+
+/* --- AVATAR ET INITIALES --- */
+
+.status-indicator-success {
+  background: rgba(57, 255, 20, 0.15); 
+  color: var(--ion-color-holo-green);
+  border: 1px solid var(--ion-color-holo-green);
+}
+
+.status-indicator-neutral {
+  background: rgba(0, 229, 255, 0.15);
+  color: var(--ion-color-holo-blue);
+  border: 1px solid var(--ion-color-holo-blue);
+}
+
+.initial-text-mono {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 22px !important;
+  font-weight: 900;
+}
+
+/* --- ZONE DE RÉSULTATS ET TYPOGRAPHIE --- */
+
+.data-feed {
+    padding: 0 !important;
+    background: none;
+}
+
+.log-entry {
+  /* Texte de log système avec crochets et couleur néon */
+  font-family: 'Consolas', monospace;
+  color: var(--ion-color-holo-green);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.user-id-label {
+  /* Nom d'utilisateur en couleur d'accentuation */
+  color: var(--ion-color-text-main);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.data-uuid-label {
+  /* ID/UUID en police mono-espacée et couleur secondaire */
+  color: var(--ion-color-medium-light);
+  font-family: 'Roboto Mono', monospace;
+  font-size: 10px !important;
+}
+
+.balance-block-grid {
+  margin-top: 10px;
+  padding-top: 5px;
+  /* Effet de grille/séparation des données */
+  border-top: 1px dashed var(--ion-color-medium-light); 
+  background-color: rgba(0, 0, 0, 0.1);
+  padding-left: 5px;
+}
+
+.balance-title-mono {
+  color: var(--ion-color-holo-blue);
+  font-size: 11px !important;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.balance-currency-code {
+  /* Code de devise en couleur de donnée critique */
+  color: var(--ion-color-holo-green);
+  font-weight: 700;
+  font-family: 'Consolas', monospace;
+  padding-right: 5px;
+}
+
+.balance-value-hightech {
+  /* Valeur numérique en couleur principale */
+  color: var(--ion-color-text-main);
+  font-weight: 700;
+  font-size: 13px;
+  font-family: 'Consolas', monospace;
+}

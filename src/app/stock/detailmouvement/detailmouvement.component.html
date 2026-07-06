@@ -1,0 +1,74 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+      <ion-icon name="chevron-back" color="primary" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text>Détail mouvement</ion-text>
+      <ion-icon name="print-outline" color="secondary" slot="end" size="small" (click)="export('print')"></ion-icon>
+      <ion-icon name="share-outline" color="primary" slot="end" size="small" [matMenuTriggerFor]="menuexport"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item (click)="export('excel')"><ion-text class="font-size-12">Exporter en Excel</ion-text></button>
+      <button mat-menu-item (click)="export('pdf')"><ion-text class="font-size-12">Exporter en PDF</ion-text></button>
+    </mat-menu>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <br>
+  <div class="userprofiltoedit ion-text-center">
+    <ion-avatar style="margin:auto;">
+      <ion-icon name="image-outline" size="large"></ion-icon>
+    </ion-avatar>
+    <ion-note class="font-size-20 font-bold-600" color="dark">{{mouvementsent.service_name | titlecase}}</ion-note>
+    <br>
+    <ion-note class="font-size-12" color="secondary">OpID. {{mouvementsent.id}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">Dépôt. {{mouvementsent.deposit_name | titlecase}}</ion-note>
+    <br>
+    <ion-note class="font-size-12">Type. {{mouvementsent.type==='entry'?'entrée':'sortie' | titlecase}}</ion-note>
+  </div>
+
+  <ion-card class=" bd-radius-10 margin-btm-15" mode="ios">
+    <ion-item class="font-size-12 default-list-item2" mode="ios" lines="full">
+      <ion-text slot="start">Qté</ion-text>
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{mouvementsent.quantity | number}}</ion-text></h2>
+     </ion-item> 
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+      <ion-text slot="start">Prix</ion-text> 
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{mouvementsent.price | number}}</ion-text></h2>
+     </ion-item> 
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="none" >
+      <ion-text slot="start">Total</ion-text>
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{mouvementsent.price>0?mouvementsent.quantity*mouvementsent.price:mouvementsent.quantity}}</ion-text></h2>
+     </ion-item>
+  </ion-card>
+
+  <ion-card mode="ios">
+    <ion-item class="font-size-12 default-list-item2" mode="ios" lines="full" >
+      <ion-text slot="start">Stock initial</ion-text>
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{mouvementsent.quantity_before | number}}</ion-text></h2>
+     </ion-item>
+
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full" >
+      <ion-text slot="start">Solde</ion-text> 
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{(mouvementsent.quantity_before>0?mouvementsent.quantity_before-mouvementsent.quantity:mouvementsent.quantity) | number}}</ion-text></h2>
+     </ion-item>
+
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full">
+      <ion-text slot="start">Type mouvement</ion-text>
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{(mouvementsent.type_approvement==='credit'?'crédit':mouvementsent.type_approvement) | titlecase}}</ion-text></h2>
+     </ion-item>   
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="full">
+      <ion-text slot="start">Libellé</ion-text>
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{mouvementsent.motif | titlecase}}</ion-text></h2>
+     </ion-item>
+     <ion-item  class="font-size-12 default-list-item2" mode="ios" lines="none">
+      <ion-text slot="start">Note</ion-text>
+        <h2 slot="end" class="font-size-12 item-label-title"><ion-text>{{mouvementsent.note | titlecase}}</ion-text></h2>
+     </ion-item>
+  </ion-card>
+  <br>
+  <ion-item mode="ios" class="contentbody footeritem" lines="none">
+      <h4 class="font-size-11"><ion-note>Effectué le {{mouvementsent.created_at | date}}</ion-note></h4> <br> <br>
+      <h4 class="font-size-11"><ion-note> &nbsp; par {{mouvementsent.done_by_name | titlecase}} </ion-note></h4>
+</ion-item>
+</ion-content>

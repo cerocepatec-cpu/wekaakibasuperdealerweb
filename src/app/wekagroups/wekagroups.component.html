@@ -1,0 +1,187 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-text class="font-size-30 font-bold-600">Gestion des <ion-note color="warning" class="font-size-30 font-bold-600">groupes</ion-note></ion-text>
+  </ion-toolbar>
+  <ion-progress-bar *ngIf="showprogress" type="indeterminate" mode="ios"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [scrollY]="true" [scrollX]="true" style="height: fit-content!important;scrollbar-width: thin;" fullscreen="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données...">
+    </ion-refresher-content>
+  </ion-refresher>
+<ion-grid>
+  <ion-row>
+    <ion-col sizeLg="12">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" class="largedevicehidden bd-square">
+            <ion-chip class="font-bold cursor-pointer font-size-10" *ngFor="let group of groupslist" (click)="toggleAccordion(group)">
+              {{group.name}} ({{group.totalmembers}} {{group.totalmembers>1?'membres':'membre'}} )
+            </ion-chip>
+          </ion-col> 
+        </ion-row>
+        <ion-row *ngIf="!appserv.isMyDeviceConnected()">
+          <ion-col size="12">
+              <ion-card mode="ios" color="warning" class="ion-padding display-flex-center">
+                <ion-text color="light">
+                  Veuillez vous connecter à Internet pour récupérer les données de cette page!
+                </ion-text>
+              </ion-card>
+          </ion-col>
+        </ion-row>
+        <ion-row class="ion-padding-top">
+          <ion-col size="12" size-lg="2.5">
+            <ion-text class="font-size-20 font-bold-600">Total ({{groupslist.length}})</ion-text>
+          </ion-col>
+          <ion-col size="12" size-lg="3.5" class="ion-padding-end">
+            <ion-item  lines="none" class="bd-square bd-radius-10" style="height: 35px!important">
+              <ion-icon name="search" size="small" slot="start" style="margin-top:2px!important;"></ion-icon>
+              <ion-input class="font-size-12" placeholder="Rechercher" mode="ios" #defaultsearchinput [(ngModel)]="search" style="margin-top: -13px!important;"></ion-input>
+              <ion-icon id="open-action-sheet" name="ellipsis-vertical-outline" class="largedevicehidden cursor-pointer" size="small" slot="end" style="margin-top:2px!important;"></ion-icon>
+            </ion-item>
+              <ion-action-sheet trigger="open-action-sheet" header="Que voulez-vous faire?" translucent="true" [buttons]="actionSheetButtons" mode="ios"></ion-action-sheet>
+          </ion-col>
+          <ion-col size="2" class="smalldevicehidden">
+            <ion-button  style="height: 30px!important" color="medium" mode="ios" fill="outline" size="small" [matMenuTriggerFor]="filter_menu">
+              <ion-icon name="download-outline" slot="start"></ion-icon>
+              Exporter
+            </ion-button>
+            <mat-menu #filter_menu="matMenu">
+              <button mat-menu-item (click)="exportallgroupsinexcel()"> <ion-text class="font-size-12">Excel</ion-text></button>
+              <button mat-menu-item (click)="exportallgroupsinpdf()"> <ion-text class="font-size-12">PDF</ion-text></button>
+            </mat-menu>
+          </ion-col> 
+          <ion-col size="2" class="ion-padding-end smalldevicehidden">
+            <ion-button  style="height: 30px!important" color="secondary" mode="ios" fill="outline" size="small" (click)="printgroups()">
+              <ion-icon name="print-outline" slot="start"></ion-icon> Imprimer
+            </ion-button>
+          </ion-col>
+      </ion-row>
+        <ion-row class="ion-padding-top">
+            <ion-col size="12" size-lg="8" class="ion-padding-end">
+              <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" (click)="newgroup()" *ngIf="appserv.permissionFilter('agents', 'add_group')">
+                <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                  <ion-icon name="add-outline"></ion-icon>
+                </ion-avatar>
+                <ion-label>
+                  <p class="item-label-title font-size-12">Nouveau groupe</p>
+                  <p class="secondpara font-size-11">Cliquez ici pour créer un nouveau groupe</p>
+                </ion-label>
+               </ion-item>
+             
+               <div *ngIf="loaded">
+                  <ion-list *ngFor="let item of [0,1,3,4]">
+                    <ion-list-header>
+                      <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+                    </ion-list-header>
+                    <ion-item>
+                      <ion-thumbnail slot="start">
+                        <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+                      </ion-thumbnail>
+                      <ion-label>
+                        <h3>
+                          <ion-skeleton-text [animated]="true" style="width: 80%;"></ion-skeleton-text>
+                        </h3>
+                        <p>
+                          <ion-skeleton-text [animated]="true" style="width: 60%;"></ion-skeleton-text>
+                        </p>
+                        <p>
+                          <ion-skeleton-text [animated]="true" style="width: 30%;"></ion-skeleton-text>
+                        </p>
+                      </ion-label>
+                    </ion-item>
+                  </ion-list>
+               </div>
+               
+               <ion-accordion-group #accordionGroup>
+                <ion-accordion [value]="group.id" *ngFor="let group of groupslist | filter:search" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom" (click)="group.activated=!group.activated; handleopenaccordion(group)">
+                  <ion-item slot="header" color="light">
+                    <ion-label>
+                      <p class="item-label-title font-size-15">{{group.name | titlecase}}</p>
+                      <p class="secondpara font-size-12 font-bold">
+                        <ion-text class="font-bold-600 font-size-11" color="dark">{{group.description}} </ion-text> <br *ngIf="group.description">
+                        <ion-text class="font-bold-600 font-size-11" color="dark" *ngIf="!group.activated">Membres: {{group.totalmembers}} </ion-text> </p>
+                      <p class="secondpara font-size-11"> {{group.created_at | date}}</p>
+                    </ion-label>
+                  </ion-item>
+                  <div class="ion-padding" slot="content">
+                    <ion-row>
+                      <ion-col size="12" size-lg="4" class="ion-padding-end" *ngIf="appserv.permissionFilter('agents', 'edit_group')">
+                        <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" (click)="editgroup(group)">
+                          <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                            <ion-icon name="document-outline"></ion-icon>
+                          </ion-avatar>
+                          <ion-label>
+                            <p class="item-label-title font-size-12">Modifier</p>
+                            <p class="secondpara font-size-11">Cliquez ici pour modifier le groupe</p>
+                          </ion-label>
+                         </ion-item>
+                      </ion-col>
+                      <ion-col size="12" size-lg="4" *ngIf="appserv.permissionFilter('agents', 'affect_members_group')" class="ion-padding-end">
+                        <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true" (click)="addmembers(group)">
+                          <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                            <ion-icon name="add-outline"></ion-icon>
+                          </ion-avatar>
+                          <ion-label>
+                            <p class="item-label-title font-size-12">Nouveaux membres</p>
+                            <p class="secondpara font-size-11">Cliquez ici pour ajouter des membres</p>
+                          </ion-label>
+                         </ion-item>
+                      </ion-col> 
+                      <ion-col size="12" size-lg="4" *ngIf="appserv.permissionFilter('agents', 'edit_group')" >
+                        <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true">
+                          <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20" [matMenuTriggerFor]="filter_group_menu">
+                            <ion-icon name="download-outline"></ion-icon>
+                          </ion-avatar>
+                          <ion-label>
+                            <p class="item-label-title font-size-12">Exporter</p>
+                            <p class="secondpara font-size-11">Cliquez ici pour exporter</p>
+                          </ion-label>
+                         </ion-item>
+
+                         <mat-menu #filter_group_menu="matMenu">
+                          <button mat-menu-item (click)="ExcelexportGroup(group)"> <ion-text class="font-size-12">Excel</ion-text></button>
+                          <button mat-menu-item (click)="PdfExportGroup(group)"> <ion-text class="font-size-12">PDF</ion-text></button>
+                        </mat-menu>
+                      </ion-col>
+                    </ion-row>
+                  
+                     <ion-searchbar mode="ios" placeholder="Rechercher un membre" class="font-size-11" (ionInput)="handlesearchmembersingroup($event,group)"></ion-searchbar>
+                     <hr class="hr">
+                     <ion-note>{{group.totalmembers}} {{group.totalmembers>1?'membres':'membre'}}</ion-note>
+                     <ion-item class="default-list-item"  lines="inset" *ngFor="let user of group.members" detail="true" (click)="menumember(user,group)">
+                      <ion-avatar slot="start">
+                        <ion-icon name="person"></ion-icon>
+                      </ion-avatar>
+                      <ion-label >
+                        <p class="item-label-title"><ion-text>{{(user.full_name?user.full_name:user.user_name)|titlecase }} <ion-note class="font-size-12">({{user.uuid?user.uuid:user.description}})</ion-note></ion-text></p>
+                        <p class="secondpara"><ion-text>{{user.user_name?user.user_name:user.note}}</ion-text></p>
+                        <p class="secondpara"><ion-text>Ajouté le {{user.affected_at | date}}</ion-text></p>
+                      </ion-label>
+                      <ion-note *ngIf="user.level==='admin'" slot="end" style="margin-top:7px!important;">Admin</ion-note>
+                    </ion-item>
+                  </div>
+                </ion-accordion>
+              </ion-accordion-group>
+            </ion-col>
+            <ion-col size="12" size-lg="4" class="smalldevicehidden">
+              <div class="bd-square bd-radius-5 ion-padding-start ion-padding-bottom ion-padding-end">
+                <h4>Synthèse des groupes </h4>
+                <ion-note class="font-bold cursor-pointer ion-margin-bottom" *ngFor="let group of groupslist" (click)="toggleAccordion(group)">
+                 {{group.name}} ({{group.totalmembers}} {{group.totalmembers>1?'membres':'membre'}} )
+                 <br> <br>
+                </ion-note>
+              </div>
+            </ion-col>
+          </ion-row>
+      </ion-grid>
+    </ion-col>
+   
+  </ion-row>
+</ion-grid>
+    
+</ion-content>

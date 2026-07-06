@@ -1,0 +1,50 @@
+/* Cartes KPI */
+ion-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Solde indicateur */
+.solde-credit {
+  color: #4caf50; /* vert */
+  font-weight: bold;
+}
+
+.solde-debit {
+  color: #f44336; /* rouge */
+  font-weight: bold;
+}
+
+.solde-equilibre {
+  color: #777; /* gris neutre */
+  font-weight: bold;
+}
+
+/* Boutons inline */
+.closure-actions ion-button {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
+/* Responsivité des listes */
+.closure-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+
+  @media(min-width: 768px) {
+    flex-direction: row;
+  }
+}
+
+/* Graphique Chart.js responsive */
+canvas {
+  max-width: 100% !important;
+  height: 400px !important;
+}
+
+/* Scroll sur tableau si long */
+ion-card-content {
+  overflow-x: auto;
+}

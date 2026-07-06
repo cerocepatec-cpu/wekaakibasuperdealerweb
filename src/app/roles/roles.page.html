@@ -1,0 +1,54 @@
+
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" class="margin-left-moins-15">
+      <ion-back-button slot="start"></ion-back-button>
+      <ion-text slot="start" color="primary" (click)="showcheckbox=!showcheckbox" *ngIf="!showcheckbox">Sélectionner</ion-text>
+      <ion-text slot="start" color="primary" (click)="showcheckbox=!showcheckbox; listselectedRoles=[];" *ngIf="showcheckbox">Terminer</ion-text>
+      <ion-icon name="print-outline" color="secondary" slot="end" *ngIf="!showcheckbox"></ion-icon>
+      <ion-icon name="download-outline" color="success" slot="end" [matMenuTriggerFor]="menuexport" *ngIf="!showcheckbox"></ion-icon>
+      <ion-icon name="share-outline" color="primary" slot="end" *ngIf="!showcheckbox"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item ><ion-text class="font-size-12">Exporter en Excel</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-12">Exporter en PDF</ion-text></button>
+    </mat-menu>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-item lines="none" class="contentbody">
+    <h1 class="font-bold-600 font-size-40">{{listselectedRoles.length===0?'Rôles ('+listRoles.length+')':listselectedRoles.length>1?listselectedRoles.length + ' sélectionnés':listselectedRoles.length + ' sélectionné'}}</h1>
+  </ion-item>
+  
+  <ion-item lines="none" class="contentbody margin-left-moins-15">
+    <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche"></ion-searchbar>
+  </ion-item>
+  <hr class="hr">
+  <ion-card class="bd-radius-10 ion-padding"  color="warning" *ngIf="listRoles.length===0">
+    <ion-text class="font-size-13">Aucun rôle disponible</ion-text>
+  </ion-card>
+  
+  <ion-item class="default-list-item contentbody"  lines="inset" *ngFor="let role of listRoles" (click)="menurole(role)" detail="true">
+    <ion-checkbox slot="start" *ngIf="showcheckbox" mode="ios" size="small"></ion-checkbox>
+    <ion-avatar slot="start">
+      <ion-icon name="document-outline" size="small"></ion-icon>
+    </ion-avatar>
+    <ion-label>
+      <p class="item-label-title"><ion-text>{{(role.name?role.name:role.description)|titlecase }}</ion-text></p>
+      <p class="secondpara"><ion-text>{{role.description}}</ion-text></p>
+    </ion-label>
+  </ion-item>
+  <ion-fab *ngIf="!showcheckbox && listselectedRoles.length===0" slot="fixed" vertical="bottom" horizontal="end" (click)="newrole()">
+    <ion-fab-button color="secondary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+<ion-footer class="ion-no-border" [translucent]="true" *ngIf="showcheckbox && listselectedRoles.length>0">
+  <ion-toolbar>
+    <ion-item lines="none" class="font-size-14">
+      <ion-text slot="start" color="danger" (click)="multipledelete()"><ion-icon name="trash-outline"></ion-icon></ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>

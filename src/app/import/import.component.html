@@ -1,0 +1,73 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+      <ion-icon name="chevron-back" color="primary" size="large" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text>{{criteria==='customer'?'Importation Fichier Clients':criteria==='accounts'?'Importation Fichier Comptes':criteria==='users'?'Imporation agents':'Importation Fichier Produits'}}</ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-card mode="ios" color="warning" class="bd-radius-20 ion-padding">
+      <ion-text class="font-size-12">Nous acceptons seulement les formats csv</ion-text>
+  </ion-card>
+
+  <ion-card mode="ios" class="ion-padding bd-radius-20" *ngIf="showinputfile">
+    <input type="file" (change)="fileadding($event)" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" label="Charger fichier">
+  </ion-card>
+   
+  <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche" [(ngModel)]="keyword" *ngIf="!showinputfile"></ion-searchbar>
+  
+  <ion-item lines="none" class="contentbody" *ngIf="result.length>0">
+    <ion-text slot="start" color="primary" class="font-size-14">Résultat ({{result.length}})</ion-text>
+    <ion-icon name="grid" slot="end" color="primary" size="small" (click)="showcheckbox=!showcheckbox"></ion-icon>
+    <ion-text slot="end" color="primary" class="font-size-14" (click)="sendingdata()"> <ion-icon name="cloud-upload-outline" size="large"></ion-icon> Importer</ion-text>
+  </ion-item>
+  <hr class="hr">
+  <ng-container *ngIf="criteria==='users'">
+    <ion-item class="contentbody default-list-item" *ngFor="let member of result | filter:keyword;let i=index;" lines="inset" detail="true">
+      <ion-checkbox slot="start" *ngIf="showcheckbox" mode="ios" size="small"></ion-checkbox>
+      <ion-badge slot="start" *ngIf="!showcheckbox">{{i+1}}</ion-badge>
+      <ion-label>
+        <p class="item-label-title">
+          <ion-text>{{member.fullname| titlecase}}</ion-text>
+        </p>
+         <p class="secondpara">
+          <ion-text *ngIf="member.mail" >
+            <span class="font-bold-600">Email:</span>{{member.email}}
+          </ion-text>
+        </p>
+        <p class="secondpara">
+          <ion-text *ngIf="member.phone" >
+            <span class="font-bold-600">Phone:</span>{{member.phone}}
+          </ion-text>
+        </p>
+        <p class="secondpara">
+          <ion-text>
+            <span class="font-bold-600">UUID:</span>{{member.uuid}}
+          </ion-text>
+        </p>
+        <p class="secondpara">
+          <ion-text>
+            <span class="font-bold-600">Sexe:</span>{{member.sex}}
+          </ion-text>
+        </p> 
+        <p class="secondpara">
+          <ion-text>
+            <span class="font-bold-600">Solde CDF:</span>{{(member.soldecdf?member.soldecdf:0)}}
+          </ion-text>
+        </p> <p class="secondpara">
+          <ion-text>
+            <span class="font-bold-600">Solde USD:</span>{{(member.soldeusd?member.soldeusd:0)}}
+          </ion-text>
+        </p>
+      </ion-label>
+    </ion-item>
+  </ng-container>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" (click)="restelist()" *ngIf="!showinputfile" >
+    <ion-fab-button color="secondary">
+      <ion-icon name="document-attach"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

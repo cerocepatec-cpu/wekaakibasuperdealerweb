@@ -1,0 +1,97 @@
+<!-- HEADER -->
+<ion-header class="ion-no-border">
+  <ion-toolbar class="px-2">
+    <!-- BACK -->
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="appserv.smartBack()">
+        <ion-icon name="chevron-back-outline" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <!-- TITLE -->
+    <ion-title class="text-base font-semibold tracking-wide">
+      TRANSACTIONS
+    </ion-title>
+
+  </ion-toolbar>
+
+  <ion-progress-bar mode="ios" *ngIf="showprogress" color="success">
+  </ion-progress-bar>
+</ion-header>
+
+<!-- CONTENT -->
+<ion-content fullscreen class="bg-slate-50 dark:bg-slate-900">
+  <!-- SEARCH BLOCK -->
+  <div class="px-4 pt-4 pb-2">
+    <div class="flex gap-2 items-center">
+      <ion-searchbar
+        mode="ios"
+        placeholder="Nom ou numéro"
+        [(ngModel)]="search"
+        #defaultinputsearch
+        class="flex-1 rounded-xl shadow-sm"
+      ></ion-searchbar>
+
+      <ion-button
+        size="small"
+        mode="ios"
+        color="warning"
+        [disabled]="!search"
+        (click)="memberlookup()"
+        class="h-10 px-3 rounded-xl"
+      >
+        OK
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="px-4 pb-6">
+    <ion-note class="block text-xs mb-3 opacity-70">
+      {{ listUsers ? listUsers.length : 0 }}
+      {{ listUsers.length > 1 ? "RECORDS" : "RECORD" }} FOUND
+    </ion-note>
+
+    <app-skeleton-loader *ngIf="showprogress"></app-skeleton-loader>
+
+    <ng-container *ngIf="!showprogress">
+      <ion-item
+        mode="ios"
+        detail="true"
+        lines="none"
+        (click)="newtransaction(user)"
+        *ngFor="let user of listUsers"
+        class="mb-3 rounded-2xl shadow-sm bg-white dark:bg-slate-800 cursor-pointer"
+      >
+        <ion-avatar slot="start" class="w-11 h-11">
+          <ion-img
+            [src]="user.avatar ? appserv.imgUrl + user.avatar : ''"
+            *ngIf="user.avatar"
+          >
+          </ion-img>
+
+          <div
+            *ngIf="!user.avatar"
+            class="w-full h-full flex items-center justify-center bg-warning/20 text-warning font-semibold rounded-full"
+          >
+            {{
+              (user.name ? user.name : user.user_name)
+                | uppercase
+                | slice : 0 : 1
+            }}
+          </div>
+        </ion-avatar>
+
+        <ion-label class="py-2">
+          <h3 class="text-sm font-semibold">
+            {{ (user.name ? user.name : user.user_name) | titlecase }}
+          </h3>
+
+          <p class="text-xs opacity-60">
+            ID: {{ user.uuid ? user.uuid : user.description }}
+          </p>
+        </ion-label>
+      </ion-item>
+    </ng-container>
+  </div>
+</ion-content>

@@ -1,0 +1,56 @@
+<!-- 🟢 LISTE VERTICALE -->
+<ng-container *ngIf="type === 'list'">
+  <div *ngFor="let item of [].constructor(repeat)">
+    <ion-list>
+      <ion-list-header>
+        <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+      </ion-list-header>
+      <ion-item>
+        <ion-thumbnail slot="start">
+          <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+        </ion-thumbnail>
+        <ion-label>
+          <h3><ion-skeleton-text [animated]="true" style="width: 80%;"></ion-skeleton-text></h3>
+          <p><ion-skeleton-text [animated]="true" style="width: 60%;"></ion-skeleton-text></p>
+          <p><ion-skeleton-text [animated]="true" style="width: 30%;"></ion-skeleton-text></p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ng-container>
+
+<!-- 🔵 LISTE HORIZONTALE (scroll horizontal corrigé) -->
+<ng-container *ngIf="type === 'horizontal'">
+  <div style="display: flex; overflow-x: auto; gap: 12px; padding: 8px;">
+    <div *ngFor="let item of [].constructor(repeat)" style="flex: 0 0 auto;">
+      <ion-card>
+        <ion-thumbnail class="ion-margin">
+          <ion-skeleton-text [animated]="true" style="width: 100px; height: 100px;"></ion-skeleton-text>
+        </ion-thumbnail>
+        <ion-card-content>
+          <ion-skeleton-text [animated]="true" style="width: 80%; height: 10px;"></ion-skeleton-text>
+          <ion-skeleton-text [animated]="true" style="width: 60%; height: 10px;" class="ion-margin-top"></ion-skeleton-text>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ng-container>
+
+<!-- 🔴 GRILLE DE CARTES -->
+<ng-container *ngIf="type === 'grid'">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6" sizeMd="4" sizeLg="3" *ngFor="let item of [].constructor(repeat)">
+        <ion-card>
+          <ion-thumbnail class="ion-margin">
+            <ion-skeleton-text [animated]="true" style="width: 100%; height: 120px;"></ion-skeleton-text>
+          </ion-thumbnail>
+          <ion-card-content>
+            <ion-skeleton-text [animated]="true" style="width: 80%; height: 10px;"></ion-skeleton-text>
+            <ion-skeleton-text [animated]="true" style="width: 60%; height: 10px;" class="ion-margin-top"></ion-skeleton-text>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ng-container>

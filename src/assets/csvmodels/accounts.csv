@@ -1,0 +1,10 @@
+name,type,description
+Transport,gestion,Frais de transport
+Communication,gestion,Frais de communication
+Loyer,gestion,Frais de loyer
+Courants,gestion,Electricité
+Eau,gestion,REGIDESO
+Personnel,gestion,Salaires du personnel
+Divers,gestion,Autres dépenses
+Charges boss,gestion,Autres dépenses du boss
+TMB Bank,caisse,Déplacements des sommes vers la Banque TMB

@@ -1,0 +1,49 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody" lines="none">
+      <ion-icon name="chevron-back-outline" color="primary" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text class="font-size-15">Rapport stock filtré</ion-text>
+      <ion-icon name="print-outline" color="secondary" slot="end" size="small" (click)="export('print')"></ion-icon>
+      <ion-icon name="download-outline" color="success" slot="end" [matMenuTriggerFor]="menuexport" size="small"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item (click)="export('excel')"><ion-text class="font-size-12">Exporter en Excel</ion-text></button>
+      <button mat-menu-item (click)="export('pdf')"><ion-text class="font-size-12">Exporter en PDF</ion-text></button>
+    </mat-menu>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <ion-searchbar mode="ios" placeholder="Recherche" [(ngModel)]="search"></ion-searchbar>
+  
+  <ion-accordion-group [multiple]="true">
+    <ion-accordion [value]="i" *ngFor="let data of datasent | filter:search; index as i" >
+      <ion-item slot="header" color="light">
+        <ion-label>{{data[0]['service_name']}} ({{data.length}})</ion-label>
+      </ion-item>
+      <div slot="content">
+        <ion-item mode="ios" class="default-list-item3 contentbody"  lines="full" *ngFor="let mouv of data" (click)="detail(mouv)">
+          <ion-avatar slot="start"><ion-icon [name]="mouv.type==='withdraw'?'arrow-up':'arrow-down'" [color]="mouv.type==='withdraw'?'danger':''"></ion-icon></ion-avatar>
+          <ion-label>
+            <ion-text class="item-label-title" [color]="mouv.type==='withdraw'?'danger':''">Dépôt: {{mouv.deposit_name | titlecase}}</ion-text>
+            <h4 class="secondpara font-size-11">
+              <ion-note class="ion-margin-end">Stock initial : {{(mouv.quantity_before?mouv.quantity_before:'0') | number}}</ion-note>
+            </h4>
+            <h4 class="secondpara font-size-11">
+              <ion-note class="font-bold-600">Solde : {{(mouv.type==='withdraw'?mouv.quantity_before>0?mouv.quantity_before-mouv.quantity:mouv.quantity:mouv.quantity_before>0?mouv.quantity_before+mouv.quantity:mouv.quantity) | number}} {{mouv.uom_symbol |lowercase}}</ion-note>
+            </h4>
+            <h4 class="secondpara font-size-11">
+              <ion-note class="font-bold-600">Fait, le {{mouv.created_at| date}} </ion-note>
+            </h4> 
+            <h4 class="secondpara">
+              <ion-note class="done_by_bloc">Par {{mouv.done_by_name | titlecase}}</ion-note>
+            </h4>
+          </ion-label>
+          <ion-chip slot="end" class="font-size-11 chipset" [color]="mouv.type==='withdraw'?'danger':''">{{mouv.type_approvement | titlecase}}</ion-chip>
+          <ion-text slot="end" class="font-size-11" [color]="mouv.type==='withdraw'?'danger':''">
+            {{mouv.quantity | number}} {{mouv.uom_symbol}} 
+          </ion-text>
+        </ion-item>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+</ion-content>

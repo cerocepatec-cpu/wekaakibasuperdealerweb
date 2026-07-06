@@ -1,0 +1,147 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon color="medium" name="chevron-back-outline" size="large" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-title style="text-align:center;" slot="start">{{criteria==='entries'?"Entrées argent ("+listentries.length+")":criteria==='expenditures'?"Dépenses ("+listentries.length+")":criteria==='customers'?"Clients ("+listcustomers.length+")":criteria==='invoices'?"Factures ("+listinvoices.length+")":criteria==='stock'?"Stock en attente ("+liststockstories.length+")":criteria==='debts'?"Dettes ("+listdebts.length+")":criteria==='payments'?"Paiements dettes ("+payments.length+")":""}}</ion-title>
+      <ion-icon name="trash-outline"  (click)="delete()" slot="end" *ngIf="dataLength>0"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content  style="height: 100% !important;">
+      <ng-container *ngIf="criteria === 'entries' || criteria==='expenditures'">
+        <ion-item class="default-list-item contentbody"  lines="inset" *ngFor="let entry of listentries | filter:keyword">
+          <ion-checkbox slot="start" *ngIf="showentrycheckbox" mode="ios" size="small"></ion-checkbox>
+          <ion-avatar slot="start">
+            <ion-icon name="book-outline" size="small"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <p class="secondpara"><ion-text><span *ngIf="entry.account_name">Compte:</span> {{(entry.account_name?entry.account_name:entry.motif?entry.motif:entry.created_at) | titlecase}}</ion-text></p>
+            <p class="secondpara" *ngIf="entry.uuid"><ion-note class="font-size-11">OP.ID: {{entry.uuid}}</ion-note></p>
+            <p class="secondpara" *ngIf="entry.account_name"><ion-note class="font-size-11">Libellé: {{entry.motif}}</ion-note></p>
+          </ion-label>
+          <ion-text slot="end">{{entry.amount | number}} {{entry.money_abreviation}}</ion-text>
+        </ion-item>
+      </ng-container>
+      
+      <ng-container *ngIf="criteria==='customers'">
+        <ion-item class="contentbody default-list-item" *ngFor="let customer of listcustomers | filter:keyword" lines="inset">
+          <ion-checkbox slot="start" *ngIf="showcustomercheckbox" mode="ios" size="small"></ion-checkbox>
+          <ion-avatar slot="start">
+              <ion-img [src]="customer.photo?appserv.imgUrl+customer.photo:''" *ngIf="customer.photo"></ion-img>
+              <ion-icon [name]="customer.type==='physique'?'person':customer.type==='moral'?'people':'person'" size="large" *ngIf="!customer.photo"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <p class="item-label-title">
+              <ion-text>{{customer.customerName| titlecase}}</ion-text>
+            </p>
+            <p class="secondpara">
+              <ion-text *ngIf="customer.type" >
+                <span class="font-bold-600">Type:</span>{{customer.type | titlecase}}
+              </ion-text>
+            </p>
+            <p class="secondpara">
+              <ion-text *ngIf="customer.category_name" >
+                <span class="font-bold-600">Catég:</span> {{customer.category_name}}
+              </ion-text>
+            </p>
+             <p class="secondpara">
+              <ion-text *ngIf="customer.mail" >
+                <span class="font-bold-600">Email:</span>{{customer.mail}}
+              </ion-text>
+            </p>
+            <p class="secondpara">
+              <ion-text *ngIf="customer.phone" >
+                <span class="font-bold-600">Phone:</span>{{customer.phone}}
+              </ion-text>
+            </p>
+          </ion-label>
+        </ion-item>
+      </ng-container>
+      
+      <ng-container *ngIf="criteria === 'invoices'">
+        <ion-item class="default-list-item contentbody"  lines="inset" *ngFor="let invoice of listinvoices | filter:keyword">
+          <ion-checkbox slot="start" *ngIf="showinvoicecheckbox" mode="ios" size="small"></ion-checkbox>
+          <ion-avatar slot="start">
+            <ion-icon name="cash-outline" size="small" [color]="invoice.invoice.status==='cancelled'?'danger':''"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <p class="item-label-title"><ion-text [color]="invoice.invoice.status==='cancelled'?'danger':''">{{invoice.invoice.customer_name?invoice.invoice.customer_name:invoice.invoice.uuid | uppercase}}</ion-text></p>
+            <p class="secondpara" *ngIf="invoice.invoice.customer_name"><ion-text>OP.ID: {{invoice.invoice.uuid}}</ion-text></p>
+            <p class="secondpara"><ion-text>{{(invoice.invoice.type_facture==='credit'?'crédit':invoice.invoice.type_facture) | titlecase}}</ion-text></p>
+          </ion-label>
+          <ion-text slot="end" [color]="invoice.invoice.status==='cancelled'?'danger':''">{{invoice.invoice.netToPay?invoice.invoice.netToPay:invoice.invoice.total | number}} {{invoice.invoice.abreviation}}</ion-text>
+        </ion-item>
+      </ng-container>
+      
+      <ng-container *ngIf="criteria === 'stock'">
+        <ion-item mode="ios" class="default-list-item3 contentbody"  lines="full" *ngFor="let mouv of liststockstories |filter:keyword;let i = index ">
+          <ion-avatar slot="start">
+              <ion-text [color]="mouv.type==='withdraw'?'danger':'light'">{{i+1}}</ion-text>
+            <!-- <ion-icon [name]="mouv.type==='withdraw'?'arrow-up':'arrow-down'" [color]="mouv.type==='withdraw'?'danger':''"></ion-icon> -->
+          </ion-avatar>
+          <ion-label>
+            <ion-text class="item-label-title font-size-15" [color]="mouv.type==='withdraw'?'danger':''">{{mouv.service_name | titlecase}}</ion-text>
+            <h4 class="secondpara font-size-11"><ion-note>Dépôt: {{mouv.deposit_name | titlecase}}</ion-note></h4>
+            <h4 class="secondpara font-size-11">
+              <ion-note class="ion-margin-end">Stock initial : {{(mouv.quantity_before?mouv.quantity_before:'0') | number}}</ion-note>
+            </h4>
+            <h4 class="secondpara font-size-11">
+              <ion-note class="font-bold-600">Solde : {{(mouv.type==='withdraw'?mouv.quantity_before>0?mouv.quantity_before-mouv.quantity:mouv.quantity:mouv.quantity_before>0?mouv.quantity_before+mouv.quantity:mouv.quantity) | number}} {{mouv.uom_symbol |lowercase}}</ion-note>
+            </h4>
+            <h4 class="secondpara font-size-11">
+              <ion-note class="font-bold-600">Fait, le {{appserv.frdate(mouv.created_at?mouv.created_at:mouv.done_at)}} </ion-note>
+            </h4>
+            <h4 class="secondpara font-size-11">
+              <ion-note class="font-bold-600">Date op. {{appserv.frdate(mouv.done_at?mouv.done_at:mouv.created_at)}} </ion-note>
+            </h4>
+            <h4 class="secondpara">
+              <ion-note class="done_by_bloc">Par {{(appserv.actualUser.id===mouv.user_id?'vous':mouv.done_by_name )| titlecase}}</ion-note>
+            </h4>
+          </ion-label>
+          <ion-chip slot="end" class="font-size-11 chipset" [color]="mouv.type==='withdraw'?'danger':''">{{mouv.type_approvement==='entry'?'Entrée':mouv.type_approvement | titlecase}}</ion-chip>
+          <ion-text slot="end" class="font-size-16" [color]="mouv.type==='withdraw'?'danger':''">
+            {{mouv.quantity | number}} {{mouv.uom_symbol}}
+          </ion-text>
+          <ion-icon name="radio-button-on-outline" color="secondary" slot="end" size="small" class="unreadbutton ion-padding-start" *ngIf="!mouv.read" ></ion-icon>
+        </ion-item>
+      </ng-container>
+      
+      <ng-container *ngIf="criteria === 'debts'">
+        <ion-item class="default-list-item contentbody"  lines="inset" *ngFor="let debt of listdebts | filter:keyword" detail="true">
+          <ion-checkbox slot="start" *ngIf="showdebtcheckbox" mode="ios" size="small"></ion-checkbox>
+          <ion-avatar slot="start">
+            <ion-icon name="cash-outline" size="small"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <p class="item-label-title"><ion-text>{{debt.debt.customerName?debt.debt.customerName:debt.debt.invoiceUuid?debt.debt.invoiceUuid:''}}</ion-text></p>
+            <p class="secondpara" *ngIf="debt.debt.customerName"><ion-text>{{debt.debt.invoiceUuid}}</ion-text></p>
+            <p class="secondpara font-bold-500"><ion-text class="font-bold-500">Total : {{debt.debt.amount | number}} {{debt.debt.abreviation}}</ion-text></p>
+            <p class="secondpara"><ion-text>Date : {{debt.debt.created_at | date}}</ion-text></p>
+          </ion-label>
+          <ion-text slot="end">Solde :{{debt.debt.sold | number}} {{debt.debt.abreviation}}</ion-text>
+          <ion-icon name="checkmark-outline" color="success" slot="end" *ngIf="debt.debt.status==='1'"></ion-icon>
+          <ion-icon name="ellipsis-horizontal-outline" color="warning" slot="end" *ngIf="debt.debt.status==='0'"></ion-icon>
+        </ion-item>
+      </ng-container>
+      
+      <ng-container *ngIf="criteria === 'payments'">
+        <ion-item class="contentbody default-list-item" *ngFor="let payment of payments |filter:keyword" lines="inset" detail="true">
+          <ion-label>
+            <p class="item-label-title">
+              <ion-text *ngIf="!payment.customerName">Op.ID: {{payment.uuid}}</ion-text> 
+              <ion-text *ngIf="payment.customerName">{{payment.customerName}}</ion-text> 
+            </p>
+            <p class="secondpara" *ngIf="payment.customerName">
+              OP.ID: {{payment.uuid}}
+            </p> 
+            <p class="secondpara">
+              Date: {{payment.created_at | date}}
+            </p>
+            <p class="secondpara">
+              <span class="reqtotalprinted font-size-11 font-bold-600">Par : {{payment.user_name | titlecase}}</span>
+            </p>
+          </ion-label>
+          <ion-text slot="end">{{payment.amount_payed | number}} {{payment.abreviation}}</ion-text>
+        </ion-item>
+      </ng-container>
+  </ion-content>

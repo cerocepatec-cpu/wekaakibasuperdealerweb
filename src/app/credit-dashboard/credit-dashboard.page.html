@@ -1,0 +1,138 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Crédits</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="creditCreate()">
+        <ion-icon name="add-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <main class="p-4 bg-gray-50 dark:bg-gray-900">
+    <!-- ===== KPI ===== -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+
+  <app-stat-card
+    title="Actifs"
+    [data]="stats.active"
+    icon="cash-outline"
+  ></app-stat-card>
+
+  <app-stat-card
+    title="En retard"
+    [data]="stats.late"
+    icon="alert-circle-outline"
+  ></app-stat-card>
+
+  <app-stat-card
+    title="En cours"
+    [data]="stats.in_progress"
+    icon="trending-up-outline"
+  ></app-stat-card>
+
+  <app-stat-card
+    title="Terminés"
+    [data]="stats.completed"
+    icon="checkmark-done-outline"
+  ></app-stat-card>
+
+  <app-stat-card
+  title="En attente"
+  [data]="stats.pending"
+  icon="time-outline"
+></app-stat-card>
+
+
+</div>
+
+
+
+
+    <!-- ===== FILTERS ===== -->
+    <div
+  class="mb-4 p-4 rounded-2xl bg-white dark:bg-gray-800 shadow-sm
+         flex flex-col md:flex-row md:items-end gap-3"
+>
+
+  <!-- SEARCH -->
+  <ion-input
+    label="Membre"
+    labelPlacement="stacked"
+    placeholder="Nom ou téléphone"
+    [(ngModel)]="filters.search"
+    (ionInput)="debounceSearch()"
+  ></ion-input>
+
+  <!-- STATUS -->
+  <ion-select
+    label="Statut"
+    labelPlacement="stacked"
+    [(ngModel)]="filters.status"
+    (ionChange)="applyFilters()"
+  >
+    <ion-select-option value="">Tous</ion-select-option>
+    <ion-select-option value="pending">En attente</ion-select-option>
+    <ion-select-option value="approved">Approuvé</ion-select-option>
+    <ion-select-option value="disbursed">Servi</ion-select-option>
+    <ion-select-option value="active">Actif</ion-select-option>
+    <ion-select-option value="late">En retard</ion-select-option>
+    <ion-select-option value="completed">Terminé</ion-select-option>
+  </ion-select>
+
+  <!-- TYPE -->
+  <ion-select
+    label="Type"
+    labelPlacement="stacked"
+    [(ngModel)]="filters.installment_type"
+    (ionChange)="applyFilters()"
+  >
+    <ion-select-option value="">Tous</ion-select-option>
+    <ion-select-option value="daily">Journalier</ion-select-option>
+    <ion-select-option value="weekly">Hebdomadaire</ion-select-option>
+    <ion-select-option value="monthly">Mensuel</ion-select-option>
+  </ion-select>
+
+  <!-- FROM DATE -->
+  <ion-input
+    label="Du"
+    labelPlacement="stacked"
+    type="date"
+    [(ngModel)]="filters.from_date"
+    (ionChange)="applyFilters()"
+  ></ion-input>
+
+  <!-- TO DATE -->
+  <ion-input
+    label="Au"
+    labelPlacement="stacked"
+    type="date"
+    [(ngModel)]="filters.to_date"
+    (ionChange)="applyFilters()"
+  ></ion-input>
+
+  <!-- RESET -->
+  <ion-button
+    color="medium"
+    fill="outline"
+    (click)="resetFilters()"
+  >
+    Reset
+  </ion-button>
+
+</div>
+
+
+    <!-- ===== TABLE / CARDS ===== -->
+    <app-credit-table
+      [credits]="credits"
+      (approve)="onApprove($event)"
+      (disburse)="onDisburse($event)"
+      (activate)="activate($event)"
+      (pay)="onPay($event)"
+    >
+    </app-credit-table>
+  </main>
+</ion-content>

@@ -1,0 +1,7 @@
+{
+  "name": "cero uzisha",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

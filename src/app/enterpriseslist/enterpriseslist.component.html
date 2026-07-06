@@ -1,0 +1,176 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-row>
+      <ion-col size="12" class="ion-text-left normal-contentbody">
+        <ion-text class="font-size-30 font-bold-600">Entreprises</ion-text>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+  <ion-progress-bar *ngIf="showprogress" type="indeterminate" mode="ios"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [scrollY]="true" [scrollX]="true" style="height: fit-content!important;scrollbar-width: thin;" fullscreen="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données...">
+    </ion-refresher-content>
+  </ion-refresher>
+<ion-grid>
+  <ion-row>
+    <ion-col sizeLg="12">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" class="largedevicehidden bd-square">
+            <ion-chip class="font-bold cursor-pointer" routerLink="/uzisha/membersactivation">
+              Eses à valider (0)
+            </ion-chip>
+            <ion-chip class="font-bold cursor-pointer">
+              Eses expirées (0)
+            </ion-chip> 
+            <ion-chip class="font-bold cursor-pointer">
+              Restant avec 1 mois (0)
+            </ion-chip>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="!appserv.isMyDeviceConnected()">
+          <ion-col size="12">
+              <ion-card mode="ios" color="warning" class="ion-padding display-flex-center">
+                <ion-text color="light">
+                  Veuillez vous connecter à Internet pour récupérer les données de cette page!
+                </ion-text>
+              </ion-card>
+          </ion-col>
+        </ion-row>
+        <ion-row class="ion-padding-top">
+            <ion-col size="12" size-lg="2.5">
+              <ion-text class="font-size-20 font-bold-600">Total ({{enterpriseslist.length}})</ion-text>
+            </ion-col>
+            <ion-col size="2" class="smalldevicehidden">
+              <ion-button  style="height: 35px!important" color="medium" mode="ios" (click)="agentsfilter()">
+                <ion-text class="font-size-11">Filtre par entreprises</ion-text>
+              </ion-button> <br>
+              <ion-note *ngFor="let member of selectedmembers" class="font-size-9">
+                {{(member.full_name?member.full_name:member.user_name) | titlecase}} <span *ngIf="selectedmembers.length>0">,</span>
+              </ion-note>
+            </ion-col> 
+            <ion-col size="2" class="ion-padding-end smalldevicehidden">
+              <ion-button  style="height: 35px!important" color="secondary" mode="ios" (click)="dashboardperiodfilter()">
+                <ion-text class="font-size-11">Filtre par date</ion-text>
+              </ion-button>
+            </ion-col>
+            <ion-col size="10" size-lg="3" class="ion-padding-end">
+              <ion-item  lines="none" class="bd-square bd-radius-10" style="height: 35px!important">
+                <ion-icon name="search" size="small" slot="start" style="margin-top:2px!important;"></ion-icon>
+                <ion-input class="font-size-12" placeholder="Rechercher" mode="ios" #defaultinput [(ngModel)]="search" style="margin-top: -13px!important;"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="2" size-lg="0.5">
+              <ion-item  lines="none" class="bd-square bd-radius-10 cursor-pointer" style="height: 35px!important" (click)="transactionsfilter('all')">
+                <ion-icon name="close-circle" size="large" color="danger" style="margin-top:-10px!important;"></ion-icon> 
+              </ion-item>
+            </ion-col>
+        </ion-row>
+        <ion-row class="ion-padding-top">
+            <ion-col size="12" size-lg="8" class="ion-padding-end">
+              <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true">
+                <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                  <ion-icon name="add-outline"></ion-icon>
+                </ion-avatar>
+                <ion-label>
+                  <p class="item-label-title font-size-12">Nouvelle entreprise</p>
+                  <p class="secondpara font-size-11">Cliquez ici pour créer une nouvelle entreprise</p>
+                </ion-label>
+               </ion-item>
+               <hr class="hr">
+               <ion-row>
+                <ion-col><ion-checkbox type="checkbox" (ionChange)="selectalltransactions($event)" label="Tout" [checked]="buttonselectalltransactions"></ion-checkbox></ion-col>
+                <ion-col>Sélectionnées ({{selectedtransactionslist.length}})</ion-col>
+                <ion-col>
+                  <ion-item class="bd-square bd-radius-10 font-size-11" style="height: 35px!important;">
+                    <ion-select label="Que voulez-vous faire?" style="margin-top: -13px!important;">
+                      <ion-select-option value="validate">Activer</ion-select-option>
+                      <ion-select-option value="cancel">Suspendre</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+               </ion-row>
+               <br>
+               <div *ngIf="loaded">
+                  <ion-list *ngFor="let item of [0,1,3,4]">
+                    <ion-list-header>
+                      <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+                    </ion-list-header>
+                    <ion-item>
+                      <ion-thumbnail slot="start">
+                        <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+                      </ion-thumbnail>
+                      <ion-label>
+                        <h3>
+                          <ion-skeleton-text [animated]="true" style="width: 80%;"></ion-skeleton-text>
+                        </h3>
+                        <p>
+                          <ion-skeleton-text [animated]="true" style="width: 60%;"></ion-skeleton-text>
+                        </p>
+                        <p>
+                          <ion-skeleton-text [animated]="true" style="width: 30%;"></ion-skeleton-text>
+                        </p>
+                      </ion-label>
+                    </ion-item>
+                  </ion-list>
+               </div>
+               
+
+               <ion-row *ngFor="let enterprise of enterpriseslist | filter:search" (click)="menuenterprise(enterprise)">
+                <ion-col size="0.5">
+                  <ion-checkbox [checked]="enterprise.selected" (ionChange)="handletransactionchange($event,enterprise)" style="margin-top: 30px!important;"></ion-checkbox>
+                </ion-col>
+                <ion-col size="11.5">
+                  <ion-item mode="ios" lines="none" class="contentbody second-bd-rounded dashboard-summary-item ion-margin-bottom cursor-pointer" detail="true">
+                    <ion-avatar slot="start" class="border-rounded-avatar ion-icon-width-20">
+                      <ion-icon name="logo-apple-appstore"></ion-icon>
+                    </ion-avatar>
+                    <ion-label>
+                      <p class="item-label-title font-size-13">{{enterprise.name | titlecase}}</p>
+                      <p class="secondpara font-size-12 font-bold">
+                        <ion-text class="font-bold-600 font-size-11" color="dark">Phone: {{enterprise.phone}} </ion-text> <br>
+                        <ion-text class="font-bold-600 font-size-11" color="dark">Email: {{enterprise.memberaccount_name}} </ion-text> </p>
+                      <p class="secondpara font-size-11">Créée, le {{ enterprise.created_at | date:" dd MMM, yyyy 'à' hh:mm a"}} par {{enterprise.user_name | titlecase}}</p>
+                    </ion-label>
+                    <ion-chip name="chevron-forward" size="small" slot="end" [class]="enterprise.status==='enabled'?'font-size-10 font-bold bg-sucess-tint-whitecolor':'font-size-10 font-bold bg-warning-tint-whitecolor'">{{enterprise.status | titlecase}}</ion-chip>
+                   </ion-item> 
+                </ion-col>
+               </ion-row>
+              
+            </ion-col>
+            <ion-col size="12" size-lg="4" class="smalldevicehidden">
+              <div class="bd-square bd-radius-5 ion-padding-start ion-padding-bottom ion-padding-end">
+                <h4>Autres opérations</h4>
+                <ion-note class="font-bold cursor-pointer">
+                  Eses à valider (0)
+                </ion-note>
+                <br>
+                <br>
+                <ion-note class="font-bold cursor-pointer">
+                  Eses validées (0)
+                </ion-note>
+                <br>
+                <br>
+                <ion-note class="font-bold cursor-pointer">
+                  Eses expirées (0)
+                </ion-note>
+                <br> <br> 
+                <ion-note class="font-bold cursor-pointer">
+                  Restant avec 1 mois (0)
+                </ion-note>
+              </div>
+            </ion-col>
+          </ion-row>
+      </ion-grid>
+    </ion-col>
+   
+  </ion-row>
+</ion-grid>
+    
+</ion-content>

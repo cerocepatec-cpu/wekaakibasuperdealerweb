@@ -1,0 +1,148 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none">
+      <ion-icon
+        name="chevron-back-outline"
+        slot="start"
+        (click)="appserv.closemodal()"
+        size="large"
+        color="primary">
+      </ion-icon>
+
+      <ion-label>
+        <p><ion-text>Utilisateurs du rôle {{ roleName }}</ion-text></p>
+        <p>
+          <ion-note *ngFor="let user of selectedusers" class="font-size-11">
+            {{ (user.full_name ? user.full_name : user.user_name) | lowercase }},
+          </ion-note>
+        </p>
+      </ion-label>
+
+      <ion-icon
+      *ngIf="listusers.length"
+        name="{{ editMode ? 'close-outline' : 'create-outline' }}"
+        slot="end"
+        color="primary"
+        (click)="toggleEditMode()">
+      </ion-icon>
+
+      <ion-chip
+        color="primary"
+        *ngIf="selectedusers.length > 0"
+        (click)="removeSelectedUsers()"
+        slot="end">
+        Supprimer
+      </ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" type="indeterminate" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+
+<ion-content class="contentbody">
+
+  <ion-searchbar
+    mode="ios"
+    placeholder="Recherche"
+    class="font-size-14"
+    [(ngModel)]="search"
+    #defaultinput>
+  </ion-searchbar>
+
+  <ion-item lines="none" *ngIf="editMode">
+    <ion-checkbox
+      slot="start"
+      color="primary"
+      [(ngModel)]="selectAll"
+      (ionChange)="toggleSelectAll()">
+    </ion-checkbox>
+    <ion-label>Sélectionner tout</ion-label>
+  </ion-item>
+
+  <ion-list class="contentbody" *ngIf="listusers.length; else noData">
+    <ion-item
+      class="default-list-item contentbody"
+      lines="inset"
+      *ngFor="let user of listusers | filter:search"
+      (click)="editMode ? toggleUserSelection(user) : null">
+
+      <ion-checkbox
+        *ngIf="editMode"
+        slot="start"
+        color="primary"
+        [checked]="isSelected(user)"
+        (ionChange)="toggleUserSelection(user)">
+      </ion-checkbox>
+
+      <!-- Avatar -->
+      <ion-avatar slot="start" *ngIf="!editMode">
+        <ion-img
+          [src]="user.avatar ? appserv.imgUrl + user.avatar : ''"
+          *ngIf="user.avatar">
+        </ion-img>
+        <ion-icon
+          name="person-outline"
+          size="small"
+          *ngIf="!user.avatar">
+        </ion-icon>
+      </ion-avatar>
+
+      <!-- Infos -->
+      <ion-label>
+        <p class="item-label-title">
+          <ion-text>
+            {{ (user.full_name ? user.full_name : user.user_name) | titlecase }}
+          </ion-text>
+        </p>
+        <p class="secondpara">
+          <ion-text>{{ user.uuid }}</ion-text>
+        </p>
+      </ion-label>
+
+      <ion-icon
+        slot="end"
+        name="trash-outline"
+        color="success"
+        size="small"
+        class="cursor-pointer"
+        (click)="removeFromList(user)"
+        *ngIf="!editMode">
+      </ion-icon>
+    </ion-item>
+  </ion-list>
+  <ng-template #noData>
+    <ion-text color="medium" class="ion-padding">
+      Aucun utilisateur trouvé pour ce rôle.
+    </ion-text>
+  </ng-template>
+</ion-content>
+<ion-footer class="ion-no-padding footer-nav">
+  <div class="pagination-container ion-text-center">
+    <ion-button
+      fill="clear"
+      color="primary"
+      (click)="prevPage()"
+      [disabled]="currentPage === 1"
+      class="nav-btn">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+    </ion-button>
+
+    <ion-text color="medium" class="page-info">
+      Page {{ currentPage }} / {{ lastPage }} sur {{totalUsers}}
+    </ion-text>
+
+    <ion-button
+      fill="clear"
+      color="primary"
+      (click)="nextPage()"
+      [disabled]="currentPage === lastPage"
+      class="nav-btn">
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </ion-button>
+  </div>
+</ion-footer>
+
+
+
+
+
+

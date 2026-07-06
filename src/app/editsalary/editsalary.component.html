@@ -1,0 +1,34 @@
+<ion-header class="ion-no-border ion-padding">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-label>
+        <p class="item-label-title font-size-15">{{agent.agent_fullname?agent.agent_fullname:agent.agent_username | uppercase}}</p>
+        <p class="secondpara font-size-12 font-bold">
+          <ion-text class="font-size-11" color="dark">Poste:{{agent.position_name}} </ion-text> <br *ngIf="agent.position_name">
+        </p>
+      </ion-label>
+      <ion-icon name="checkmark-circle-outline" slot="end" color="warning" size="large" (click)="editsalary()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>  
+</ion-header>
+<ion-content class="ion-padding">
+  <ion-grid class="font-size-12 bd-radius-10 bd-square full-width ion-margin-bottom">
+    <ion-row>
+      <ion-col size="12" class="font-size-12">
+        <ion-item lines="full">
+          <ion-text slot="start" class="font-size-12">Poste:</ion-text>
+          <select [(ngModel)]="agent.position_id" class="bd-square bd-radius-10 font-size-12" slot="end">
+            <option *ngFor="let position of positionslist" [value]="position.id">
+              {{position.name}}
+            </option>
+          </select>
+        </ion-item>
+      </ion-col> 
+      <ion-col size="12" class="font-size-12">
+        <ion-item lines="full">
+          <ion-textarea class="font-size-12" autoGrow="true" spellcheck="true" [(ngModel)]="agent.description" label="Déscription:"></ion-textarea>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

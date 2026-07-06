@@ -1,0 +1,70 @@
+.permission-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.permission-card {
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  background: var(--ion-card-background, #fff);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  ion-card-header {
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade));
+    color: #fff;
+    border-radius: 20px 20px 0 0;
+    padding: 16px;
+
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .icon-title {
+      font-size: 1.4rem;
+    }
+  }
+
+  ion-card-content {
+    padding-top: 10px;
+  }
+
+  .permission-item {
+    --padding-start: 10px;
+    ion-label {
+      font-weight: 500;
+    }
+    ion-toggle {
+      zoom: 0.9;
+    }
+  }
+}
+
+ion-fab-button {
+  --border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 128, 0, 0.3);
+}
+
+
+ion-accordion-group {
+  margin: 12px;
+}
+
+ion-item[slot="header"] {
+  --padding-start: 12px;
+  --inner-padding-end: 8px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.mt-2 {
+  margin-top: 10px;
+}

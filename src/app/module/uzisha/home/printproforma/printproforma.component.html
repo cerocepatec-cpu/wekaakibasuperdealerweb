@@ -1,0 +1,287 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon color="medium" name="chevron-back-outline" size="large" (click)="cancel()" slot="start"></ion-icon>
+      <ion-title style="text-align:center;" slot="start">Aperçu proforma</ion-title>
+      <ion-icon name="print-outline"  (click)="printToCart()" slot="end">Imprimer</ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding" style="height: 100% !important;">
+      <ng-container *ngIf="typeInvoice === 'model1'">
+        <div class="invoice model1" id="invoiceOne">
+          <div class="header">
+            <ion-item lines="none">
+              <ion-img id="imgbloc" [src]="appserv.getactualEse().logo?appserv.imgUrl+appserv.getactualEse().logo:''" style="width: 50px;height: 50px;" *ngIf="posprintoptions.logo"></ion-img>
+              &nbsp;&nbsp;
+              <ion-text *ngIf="posprintoptions.name" class="font-bold-600 font-size-20" style="top:15px!important;">{{appserv.getactualEse().name | uppercase}}</ion-text>
+            </ion-item>
+            <br>
+            <ion-text class="font-size-30 font-bold-600">PROFORMA</ion-text> <br>
+            <hr class="proforma-line">
+            <br>
+            <div class="grid">
+              <table>
+                <tr>
+                  <td>
+                    <ion-text *ngIf="posprintoptions.description" class="font-bold-600 font-size-12">{{appserv.getactualEse().description |titlecase}}</ion-text> <br>
+                    <ion-text *ngIf="posprintoptions.adresse" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().adresse}}</ion-text> <br>
+                    <ion-text *ngIf="posprintoptions.num_impot" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().num_impot}}</ion-text> <br>
+                    <ion-text *ngIf="posprintoptions.national_identification" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().national_identification}}</ion-text> <br>
+                    <ion-text *ngIf="posprintoptions.rccm" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().rccm}}</ion-text> <br>
+                    <ion-text *ngIf="posprintoptions.phone" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().phone}}</ion-text>
+                  </td>
+                  <td>
+                    <ion-text class="font-bold-600 font-size-12">NUMERO</ion-text> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="text-right font-bold-600 text-medium font-size-10">{{invoice.uuid}}</span> <br>
+                    <ion-text class="font-bold-600 font-size-12">COMMANDE</ion-text> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-right font-bold-600 text-medium font-size-10">{{invoice.id}}</span> <br>
+                    <ion-text class="font-bold-600 font-size-12">DATE</ion-text> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-right font-bold-600 text-medium font-size-10">{{invoice.created_at | date}}</span>
+                  </td>
+                </tr>
+              </table>
+
+              <table>
+                <tr>
+                  <td>
+                    <div class="ion-padding bg-medium-clean-proforma bd-radius-10 margin-5">
+                      <ion-text  class="font-bold-600 font-size-12">INFORMATIONS CLIENT</ion-text>
+                      <table>
+                        <tr>
+                          <td>
+                            <ion-text  class="font-size-12 font-bold-600 text-medium">Nom client</ion-text> <br>
+                            <ion-text  class="font-size-12 font-bold-600">{{invoice.customer.customerName}}</ion-text> <br>
+                          </td>
+                          <td>
+                            <ion-text  class="font-size-12 font-bold-600 text-medium">Adresse</ion-text> <br>
+                            <ion-text  class="font-size-12 font-bold-600">{{invoice.customer.adress}}</ion-text> <br>
+                            <ion-text  class="font-size-12 font-bold-600">Tél:{{invoice.customer.phone}}</ion-text>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  </td>
+                  <td>
+                    <!-- <div class="ion-padding bg-medium-clean-proforma bd-radius-10 margin-5">
+                      <ion-text  class="font-bold-600 font-size-12">PAIEMENT ET LIVRAISON</ion-text> <br>
+                      <ion-text  class="font-size-12 font-bold-600 text-medium">MODE DE LIVRAISON</ion-text> <br>
+                      <ion-text  class="font-size-12 font-bold-600"></ion-text> <br> <br>
+                      <ion-text  class="font-size-12 font-bold-600 text-medium">MODE DE PAIEMENT</ion-text> <br>
+                      <ion-text  class="font-size-12 font-bold-600"></ion-text> <br> <br>
+                      <ion-text  class="font-size-12 font-bold-600 text-medium">DELAIS DE LIVRAISON</ion-text> <br>
+                      <ion-text  class="font-size-12 font-bold-600"></ion-text>
+                    </div>  -->
+                    <div class="ion-padding bg-medium-clean-proforma bd-radius-10 margin-5">
+                      <ion-text  class="font-bold-600 font-size-12">AUTRES INFORMATIONS</ion-text> <br>
+                      <ion-text  class="font-size-12 font-bold-600 text-medium">
+                        <span *ngFor="let note of invoice.noteArray" class="font-bold-500">
+                          {{note}} <br>
+                        </span>
+                      </ion-text>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <br>
+          <div class="body">
+            <table class="table-proforma-model1">
+              <thead>
+                <tr class="thead-proforma-model1">
+                  <th class="text-left">Article</th>
+                  <th class="text-right">Qté</th>
+                  <th class="text-right">Prix</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody class="body">
+                <tr *ngFor="let detail2 of invoice.details" class="ion-padding tbody-proforma-model1">
+                  <td class="text-wrapped font-size-12">
+                    <ion-span>{{detail2.service_name | titlecase}}</ion-span> <br>
+                    <ion-span class="font-bold-600 text-medium font-size-10">{{detail2.description | titlecase}}</ion-span>
+                  </td>
+                  <td class="text-right font-size-12">{{detail2.quantity | number}} ({{detail2.uom_symbol}})</td>
+                  <td class="text-right font-size-12">{{detail2.price | number}} {{defaultmoney.abreviation}}</td>
+                  <td class="text-right font-size-12">{{detail2.quantity*detail2.price | number}} {{defaultmoney.abreviation}}</td>
+                </tr>
+                <tr class="line-height-2-5">
+                  <td colspan="3" class="font-size-12 text-right">TOTAL HT</td>
+                  <td  class="text-right font-size-12">{{invoice.total_ht | number}} {{defaultmoney.abreviation}}</td>
+                </tr> 
+                <!-- <tr class="line-height-2-5">
+                  <td colspan="3" class="font-size-12 text-right">LIVRAISON ET MAIN D'OEUVRE</td>
+                  <td  class="text-right font-size-12"></td>
+                </tr> -->
+                <tr class="line-height-2-5">
+                  <td colspan="3" class="font-size-12 text-right">TVA ({{tva_rate}}%)</td>
+                  <td  class="text-right font-size-12">{{vat_amount | number}} {{defaultmoney.abreviation}}</td>
+                </tr>   
+                <tr class="line-height-2-5">
+                  <td colspan="3" class="font-size-12 text-right font-bold-600">NET A PAYER</td>
+                  <td  class="text-right font-size-14 background-proforma-model1 font-bold-600">{{invoice.netToPay | number}} {{defaultmoney.abreviation}}</td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <div class="bg-medium-clean-proforma ion-padding text-center bd-radius-10 footer">
+                <span class="text-center font-size-10 font-bold-600" *ngIf="posprintoptions.invoicefooter"> {{appserv.getactualEse().invoicefooter | uppercase}}</span> <br>
+                <span class="text-center font-size-10 font-bold-600 text-italic">{{appserv.version}}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="typeInvoice === 'model2'">
+          <div class="invoice model2" id="invoiceTwo" style="border: 2px solid black;">
+            <table>
+              <tr>
+                <td>
+                  <ion-img id="imgbloc" [src]="appserv.getactualEse().logo?appserv.imgUrl+appserv.getactualEse().logo:''" style="width: 100px;height: 100px;" *ngIf="posprintoptions.logo"></ion-img>
+                </td>
+                <td>
+                  <ion-text class="font-size-30 font-bold-600">PROFORMA N°</ion-text>
+                  <ion-text>{{invoice.uuid?invoice.uuid:invoice.id}}</ion-text>
+                  <br>
+                  <ion-text>Date : {{invoice.created_at | date}}</ion-text>
+                </td>
+              </tr>
+            </table>
+
+            <table>
+              <tr>
+                <td>
+                  <ion-text *ngIf="posprintoptions.description" class="font-bold-600 font-size-12">{{appserv.getactualEse().description |titlecase}}</ion-text> <br>
+                  <ion-text *ngIf="posprintoptions.name" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().name | uppercase}}</ion-text> <br>
+                  <ion-text *ngIf="posprintoptions.adresse" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().adresse}}</ion-text> <br>
+                  <ion-text *ngIf="posprintoptions.num_impot" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().num_impot}}</ion-text> <br>
+                  <ion-text *ngIf="posprintoptions.national_identification" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().national_identification}}</ion-text> <br>
+                  <ion-text *ngIf="posprintoptions.rccm" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().rccm}}</ion-text> <br>
+                  <ion-text *ngIf="posprintoptions.phone" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().phone}}</ion-text>
+                  <ion-text *ngIf="posprintoptions.mail" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().mail}}</ion-text>
+                </td>
+                <td>
+                  <ion-text class="font-size-30 font-bold-600">PROFORMA N°</ion-text>
+                  <ion-text>{{invoice.uuid}}</ion-text> <br>
+                  <ion-text>{{invoice.created_at | date}}</ion-text>
+                </td>
+              </tr>
+            </table>
+            <div class="header">
+              <ion-item lines="none">
+               
+                &nbsp;&nbsp;
+                <ion-text *ngIf="posprintoptions.name" class="font-bold-600 font-size-20" style="top:15px!important;">{{appserv.getactualEse().name | uppercase}}</ion-text>
+              </ion-item>
+              <br>
+               <br>
+              <hr class="proforma-line">
+              <br>
+              <div class="grid">
+                <table>
+                  <tr>
+                    <td>
+                      <ion-text *ngIf="posprintoptions.description" class="font-bold-600 font-size-12">{{appserv.getactualEse().description |titlecase}}</ion-text> <br>
+                      <ion-text *ngIf="posprintoptions.adresse" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().adresse}}</ion-text> <br>
+                      <ion-text *ngIf="posprintoptions.num_impot" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().num_impot}}</ion-text> <br>
+                      <ion-text *ngIf="posprintoptions.national_identification" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().national_identification}}</ion-text> <br>
+                      <ion-text *ngIf="posprintoptions.rccm" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().rccm}}</ion-text> <br>
+                      <ion-text *ngIf="posprintoptions.phone" class="font-size-12 font-bold-600 text-medium">{{appserv.getactualEse().phone}}</ion-text>
+                    </td>
+                    <td>
+                      <ion-text class="font-bold-600 font-size-12">NUMERO</ion-text> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="text-right font-bold-600 text-medium font-size-10">{{invoice.uuid}}</span> <br>
+                      <ion-text class="font-bold-600 font-size-12">COMMANDE</ion-text> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-right font-bold-600 text-medium font-size-10">{{invoice.id}}</span> <br>
+                      <ion-text class="font-bold-600 font-size-12">DATE</ion-text> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-right font-bold-600 text-medium font-size-10">{{invoice.created_at | date}}</span>
+                    </td>
+                  </tr>
+                </table>
+
+                <table>
+                  <tr>
+                    <td>
+                      <div class="ion-padding bg-medium-clean-proforma bd-radius-10 margin-5">
+                        <ion-text  class="font-bold-600 font-size-12">INFORMATIONS CLIENT</ion-text>
+                        <table>
+                          <tr>
+                            <td>
+                              <ion-text  class="font-size-12 font-bold-600 text-medium">Nom client</ion-text> <br>
+                              <ion-text  class="font-size-12 font-bold-600">{{invoice.customer.customerName}}</ion-text> <br>
+                            </td>
+                            <td>
+                              <ion-text  class="font-size-12 font-bold-600 text-medium">Adresse</ion-text> <br>
+                              <ion-text  class="font-size-12 font-bold-600">{{invoice.customer.adress}}</ion-text> <br>
+                              <ion-text  class="font-size-12 font-bold-600">Tél:{{invoice.customer.phone}}</ion-text>
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                    </td>
+                    <td>
+                      <!-- <div class="ion-padding bg-medium-clean-proforma bd-radius-10 margin-5">
+                        <ion-text  class="font-bold-600 font-size-12">PAIEMENT ET LIVRAISON</ion-text> <br>
+                        <ion-text  class="font-size-12 font-bold-600 text-medium">MODE DE LIVRAISON</ion-text> <br>
+                        <ion-text  class="font-size-12 font-bold-600"></ion-text> <br> <br>
+                        <ion-text  class="font-size-12 font-bold-600 text-medium">MODE DE PAIEMENT</ion-text> <br>
+                        <ion-text  class="font-size-12 font-bold-600"></ion-text> <br> <br>
+                        <ion-text  class="font-size-12 font-bold-600 text-medium">DELAIS DE LIVRAISON</ion-text> <br>
+                        <ion-text  class="font-size-12 font-bold-600"></ion-text>
+                      </div>  -->
+                      <div class="ion-padding bg-medium-clean-proforma bd-radius-10 margin-5">
+                        <ion-text  class="font-bold-600 font-size-12">AUTRES INFORMATIONS</ion-text> <br>
+                        <ion-text  class="font-size-12 font-bold-600 text-medium">
+                          <span *ngFor="let note of invoice.noteArray" class="font-bold-500">
+                            {{note}}
+                          </span>
+                        </ion-text>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <br>
+            <div class="body">
+              <table class="table-proforma-model1">
+                <thead>
+                  <tr class="thead-proforma-model1">
+                    <th class="text-left">Article</th>
+                    <th class="text-right">Qté</th>
+                    <th class="text-right">Prix</th>
+                    <th class="text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody class="body">
+                  <tr *ngFor="let detail2 of invoice.details" class="ion-padding tbody-proforma-model1">
+                    <td class="text-wrapped font-size-12">
+                      <ion-span>{{detail2.service_name | titlecase}}</ion-span> <br>
+                      <ion-span class="font-bold-600 text-medium font-size-10">{{detail2.description | titlecase}}</ion-span>
+                    </td>
+                    <td class="text-right font-size-12">{{detail2.quantity | number}} ({{detail2.uom_symbol}})</td>
+                    <td class="text-right font-size-12">{{detail2.price | number}} {{defaultmoney.abreviation}}</td>
+                    <td class="text-right font-size-12">{{detail2.quantity*detail2.price | number}} {{defaultmoney.abreviation}}</td>
+                  </tr>
+                  <tr class="line-height-2-5">
+                    <td colspan="3" class="font-size-12 text-right">TOTAL HT</td>
+                    <td  class="text-right font-size-12">{{invoice.total_ht | number}} {{defaultmoney.abreviation}}</td>
+                  </tr> 
+                  <!-- <tr class="line-height-2-5">
+                    <td colspan="3" class="font-size-12 text-right">LIVRAISON ET MAIN D'OEUVRE</td>
+                    <td  class="text-right font-size-12"></td>
+                  </tr> -->
+                  <tr class="line-height-2-5">
+                    <td colspan="3" class="font-size-12 text-right">TVA ({{tva_rate}}%)</td>
+                    <td  class="text-right font-size-12">{{vat_amount | number}} {{defaultmoney.abreviation}}</td>
+                  </tr>   
+                  <tr class="line-height-2-5">
+                    <td colspan="3" class="font-size-12 text-right font-bold-600">NET A PAYER</td>
+                    <td  class="text-right font-size-14 background-proforma-model1 font-bold-600">{{invoice.netToPay | number}} {{defaultmoney.abreviation}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <br>
+              <div class="bg-medium-clean-proforma ion-padding text-center bd-radius-10 footer">
+                  <span class="text-center font-size-10 font-bold-600" *ngIf="posprintoptions.phone"> {{appserv.getactualEse().invoicefooter | uppercase}}</span> <br>
+                  <span class="text-center font-size-10 font-bold-600 text-italic">{{appserv.version}}</span>
+              </div>
+            </div>
+          </div>
+      </ng-container>
+  </ion-content>

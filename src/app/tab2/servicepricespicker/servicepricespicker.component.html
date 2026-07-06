@@ -1,0 +1,28 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="arrow-back-outline" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <h4 slot="start" class="font-bold-600 font-size-14">Sélectionner un prix</h4>
+      <ion-icon name="add-outline" slot="end" color="primary" (click)="addnewprice()" *ngIf="appserv.permissionFilter('pricing', 'add')"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+    <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-14" [(ngModel)]="search"></ion-searchbar>
+  <ion-list class="contentbody">
+    <ion-item lines="full" *ngFor="let price of listprices | filter:search" (click)="selected(price)" class="font-size-14 contentbody">
+      <ion-text slot="start">{{price.label | titlecase}}</ion-text>
+      <ion-text slot="start">{{price.price}}</ion-text>
+      <ion-text slot="start">{{price.abreviation}}</ion-text>
+      <ion-badge slot="end" *ngIf="price.principal===1" color="warning">P</ion-badge>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<ion-footer class="ion-no-border ion-padding contentbody">
+    <ion-item class="light-shadow2 bd-radius-20" color="warning">
+      <ion-input label="Entrer un prix:" #defaultinput type="number" [(ngModel)]="discussed" class="font-size-13" (keyup)="otherpricevent($event)"></ion-input>
+      <ion-icon name="send" class="strock-icon" size="small" (click)="otherprice()" color="dark"></ion-icon>
+    </ion-item>
+</ion-footer>
+
+

@@ -1,0 +1,112 @@
+<div class="invoice">
+  <div class="header">
+    <ion-text>{{appserv.getactualEse().name}}</ion-text> <br>
+    <ion-text>{{appserv.getactualEse().adresse}}</ion-text> <br>
+    <ion-text>{{appserv.getactualEse().description}}</ion-text>
+    <ion-text>NUMERO IMPOT: {{appserv.getactualEse().num_impot}}</ion-text> <br>
+    <ion-text>ID. NAT.: {{appserv.getactualEse().national_identification}}</ion-text> <br>
+    <ion-text>RCCM: {{appserv.getactualEse().rccm}}</ion-text> <br>
+    <ion-text>CONTACT: {{appserv.getactualEse().phone}}</ion-text> <br>
+  </div>
+  <div class="suheader ion-no-padding">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="8"> <ion-text>Facture N°: {{invoice.uuid}}</ion-text></ion-col>
+        <ion-col size="4"><ion-text>Type: {{invoice.type_facture | titlecase}}</ion-text></ion-col>
+      </ion-row>
+    </ion-grid>
+    <ion-text>Imprimée le {{appserv.today.toLocaleDateString('fr')}} à {{appserv.today.getHours()}}h {{appserv.today.getMinutes()}}min {{appserv.today.getSeconds()}}s</ion-text> <br>
+    <ion-text>Par :{{appserv.getactualuser().user_name | titlecase}}</ion-text> <br>
+  </div>
+  <div class="body">
+    <table>
+      <thead>
+        <tr class="border-bottom-dashed">
+          <th>Article</th>
+          <th>Qté</th>
+          <th>Prix</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody class="body">
+        <tr *ngFor="let detail2 of listselectedarticles">
+          <td class="text-wrapped">{{detail2.name}}</td>
+          <td class="text-right">{{detail2.selling_qte}}</td>
+          <td class="text-right">{{detail2.price}}</td>
+          <td class="text-right">{{detail2.total}}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Total HT</td>
+          <td>:</td>
+          <td colspan="2" class="text-right"></td>
+        </tr>
+        <tr>
+          <td>TVA (%)</td>
+          <td>:</td>
+          <td colspan="2" class="text-right">{{invoice.vat_amount | number}}</td>
+        </tr> 
+        <tr>
+          <td>Réduction</td>
+          <td>:</td>
+          <td colspan="2" class="text-right"></td>
+        </tr> 
+        <tr>
+          <td>Net à payer</td>
+          <td>:</td>
+          <td colspan="2" class="text-right"></td>
+        </tr>
+        <tr>
+          <td>Retour</td>
+          <td>:</td>
+          <td colspan="2" class="text-right">{{invoice.back | number}}</td>
+        </tr> 
+        <tr class="border-bottom-dashed">
+          <td>Total Reçu</td>
+          <td>:</td>
+          <td colspan="2" class="text-right">{{invoice.total_received}}</td>
+        </tr>
+        <tr class="border-bottom-dashed">
+          <td>Cash</td>
+          <td>:</td>
+          <td colspan="2" class="text-right">{{invoice.totalespeces}}</td>
+        </tr>
+        <tr class="border-bottom-dashed">
+          <td>Banque</td>
+          <td>:</td>
+          <td colspan="2" class="text-right">{{invoice.totalcreditcard}}</td>
+        </tr>
+        <tr class="border-bottom-dashed">
+          <td>Mobile money</td>
+          <td>:</td>
+          <td colspan="2" class="text-right">{{invoice.totalmobilemoney}}</td>
+        </tr>
+        <tr>
+          <td>Nom Client</td>
+          <td>:</td>
+          <td colspan="2"> {{invoice.customer_name}}</td>
+        </tr>  
+        <tr>
+          <td>Téléphone</td>
+          <td>:</td>
+          <td colspan="2"> {{invoice.custome_phone}}</td>
+        </tr> 
+        <tr>
+          <td>Total Points</td>
+          <td>:</td>
+          <td colspan="2"></td>
+        </tr>
+        <tr>
+          <td colspan="3">
+            Merci pour votre visite. Nous vous garantissons des meilleures promotions à l'avenir.
+            Contacter le SERVICE CLIENT: +234 99 151 87 15
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3" class="text-right font-size-10 font-bold-600 text-italic">{{appserv.version}}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

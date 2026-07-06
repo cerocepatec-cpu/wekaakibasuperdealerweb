@@ -1,0 +1,405 @@
+<ion-header class="ion-no-border">
+  <ion-grid class="ion-no-margin ion-no-padding white-bg">
+    <ion-row class="ion-no-margin ion-no-padding white-bg">
+      <ion-col size="3" class="ion-no-margin ion-no-padding center-content white-bg">
+          <ion-item lines="none" class="contentbody white-bg">
+            <ion-icon name="chevron-back-outline" size="large" color="primary" slot="start" *ngIf="ismodal" (click)="appserv.closemodal()"></ion-icon>
+            <ion-button style="width:80px!important;height:30px!important;" color="warning" mode="ios" size="small" slot="start" (click)="newtransfert()"><ion-note color="light" class="font-bold-600 font-size-14">Nouveau</ion-note></ion-button>
+            <ion-text class="font-bold-600 font-size-20" slot="start" style="top:-20px!important;margin-left:-25px!important;">Transferts argent</ion-text>
+          </ion-item>
+      </ion-col>
+      <ion-col size="6" class="ion-no-margin ion-no-padding center-content white-bg">
+          <ion-row *ngIf="listselecteddata.length>0">
+            <ion-col size="8" class="ion-no-margin ion-no-padding" style="padding-right:3px!important;">
+              <div class="selected-items-bloc ion-no-padding ion-float-right">
+                <ng-container *ngIf="!isAllDataSelected">
+                  <ion-text>{{listselecteddata.length}} sélectionné(s)</ion-text>
+                  <ion-badge (click)="selectallData()"><ion-icon name="arrow-forward-outline" size="small" color="light"></ion-icon> Tout sélectionner {{paginationOptions.total}}</ion-badge>
+                </ng-container>
+                <ng-container *ngIf="isAllDataSelected">
+                  <ion-text>Tous <span class="font-bold-600">{{paginationOptions.total}}</span> sélectionné(s)</ion-text>
+                </ng-container>
+                <ion-icon name="close-outline" size="small" color="success" class="cursor-pointer" (click)="closeselectionmode()"></ion-icon>
+              </div>
+            </ion-col>
+            <ion-col size="4" class="ion-no-margin ion-no-padding">
+               <ion-buttons class="ion-float-end" *ngIf="appserv.permissionFilter('comptes','edit-transaction')">
+                  <ion-button mode="ios" class="bg-button font-size-12" (click)="handleselectedtransactionschanged('validated')">Valider</ion-button>
+                  <ion-button mode="ios" class="bg-button font-size-12" (click)="handleselectedtransactionschanged('cancelled')">Annuler</ion-button>
+                  <ion-button mode="ios" class="bg-button font-size-12 display-flex-center" (click)="excelexport('xlsx')"> <ion-icon name="download-outline" size="small" style="width:14px!important; vertical-align: middle;"></ion-icon> Télécharger</ion-button>
+                  <ion-button mode="ios" class="bg-button font-size-12 display-flex-center" [mat-menu-trigger-for]="othersaction"> <ion-icon name="settings-outline" size="small" style="height:14px!important; vertical-align: middle;"></ion-icon> Actions</ion-button>
+            
+                  <mat-menu #othersaction="matMenu">
+                    <button mat-menu-item (click)="excelexport('csv')">
+                      <div class="menu-item-content">
+                        <ion-icon name="push-outline" size="small" style="height:14px!important; vertical-align: middle;"></ion-icon>
+                        <ion-text class="menu-item-text">CSV</ion-text>
+                      </div>
+                    </button>
+                    <button mat-menu-item (click)="excelexport('xlsx')">
+                      <div class="menu-item-content">
+                        <ion-icon name="push-outline" size="small" style="height:14px!important; vertical-align: middle;"></ion-icon>
+                        <ion-text class="menu-item-text">XLSX</ion-text>
+                      </div>
+                    </button>
+                    <button mat-menu-item (click)="exportpdf()">
+                      <div class="menu-item-content">
+                        <ion-icon name="cloud-upload-outline" size="small" style="height:14px!important; vertical-align: middle;"></ion-icon>
+                        <ion-text class="menu-item-text">PDF</ion-text>
+                      </div>
+                    </button>
+                  </mat-menu>
+              </ion-buttons>
+            </ion-col>
+          </ion-row>
+       
+        <div appFocusClass *ngIf="listselecteddata.length<=0">
+          <ion-item lines="none" class="search-item white-bg">
+              <ion-icon name="search" size="small" slot="start" class="search-item-icon"></ion-icon>
+              <ion-icon name="close-circle" size="small" slot="start" (click)="transactionsfilter('all')" matTooltip="Supprimer filtre" class="cursor-pointer"></ion-icon>
+              <ion-input class="font-size-12 search-item-input" placeholder="Rechercher..." [(ngModel)]="search" #defaultinput></ion-input>
+              <div slot="end" class="border-left-filter cursor-pointer">
+                <ion-icon name="calendar-outline" slot="end" size="small" (click)="dashboardperiodfilter()" class="middle-icon"></ion-icon> &nbsp; &nbsp;
+              </div>
+          </ion-item>
+        </div>
+      </ion-col>
+      <ion-col size="3" class="ion-no-margin ion-no-padding center-content white-bg">
+         <div class="ion-float-end" style="padding-right:10px!important;">
+            <ion-buttons>
+              <ion-button>
+                <ion-text> {{paginationOptions.from?paginationOptions.from:0}}-{{paginationOptions.to?paginationOptions.to:0}} / {{paginationOptions.total?paginationOptions.total:0}} </ion-text>
+              </ion-button>
+              <ion-button class="bg-button" (click)="onPageChange(paginationOptions.current_page-1)" matTooltip="Page précédente" [disabled]="!paginationOptions.prev_page_url" matTooltip="Précédent">
+                <ion-icon name="chevron-back-outline"></ion-icon>
+              </ion-button>
+              <ion-button class="bg-button" (click)="onPageChange(paginationOptions.current_page+1)" matTooltip="Page suivante" [disabled]="!paginationOptions.next_page_url" matTooltip="Suivant">
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+              </ion-button>
+              <ion-button class="bg-button" (click)="onViewChange('table')" [ngClass]="defaultview==='table'?'btn-selected':''" matTooltip="Table">
+                <ion-icon name="list-outline"></ion-icon>
+              </ion-button>
+              <ion-button class="bg-button" (click)="onViewChange('card')" [ngClass]="defaultview==='card'?'btn-selected':''" matTooltip="Carte">
+                <ion-icon name="grid-outline"></ion-icon>
+              </ion-button> 
+              <ion-button class="bg-button" (click)="onViewChange('item')" [ngClass]="defaultview==='item'?'btn-selected':''" matTooltip="Item">
+                <ion-icon name="newspaper-outline"></ion-icon>
+              </ion-button>
+            </ion-buttons> 
+          </div>
+      </ion-col>
+      <ion-col size="12" class="ion-no-margin ion-no-padding center-content white-bg">
+        <ion-grid class="ion-no-margin ion-no-padding" *ngIf="listselecteddata.length <= 0">
+          <ion-row class="ion-no-margin ion-no-padding">
+            <!-- Bloc Totaux avec caret -->
+            <ion-col size="12" class="ion-no-margin ion-no-padding">
+              <!-- Bouton toggle -->
+               <ion-row class="ion-no-margin ion-no-padding">
+                  <ion-col size="3" class="ion-no-margin ion-no-padding">
+                    <div class="ion-padding-horizontal ion-padding-bottom toggle-subtotals-button"
+                        (click)="toggleSubtotals()"
+                        style="cursor: pointer; display: flex; align-items: center;">
+                      <ion-icon
+                        name="chevron-down-outline"
+                        size="small"
+                        class="ion-margin-end rotating-caret"
+                        [class.open]="showSubtotalsToggle">
+                      </ion-icon>
+                      <span class="font-bold">Totaux par devise</span>
+                    </div>
+                  </ion-col>
+                  <ion-col size="9" class="ion-no-margin ion-no-padding">
+                      <ion-buttons class="ion-float-end">
+                          <ion-button mode="ios" class="bg-button font-size-12 display-flex-center">
+                            <ion-select label="Autres" (ionChange)="handletypechanged($event)" interface="popover">
+                              <ion-select-option value="all">Tout</ion-select-option>
+                              <ion-select-option value="deposit">Dépôt</ion-select-option>
+                              <ion-select-option value="withdraw">Rétrait</ion-select-option>
+                              <ion-select-option value="pending">En attente</ion-select-option>
+                            </ion-select>
+                          </ion-button>
+                          <ion-button mode="ios" class="bg-button font-size-12 display-flex-center">
+                            <ion-note color="dark" (click)="periodicfilter()">Du {{(appserv.frdate(from))}} au {{appserv.frdate(to)}}</ion-note>
+                          </ion-button>
+                        </ion-buttons>
+                  </ion-col>
+               </ion-row>
+             
+
+              <!-- Bloc animé subtotals -->
+              <div [@toggleSubtotals]="showSubtotalsToggle ? 'visible' : 'hidden'">
+                <ion-card class="totals-scroll-container ion-padding-horizontal ion-padding">
+                  <div class="cards-scroll-wrapper">
+                    <div class="money-card" *ngFor="let item of subtotalsbymoney">
+                      <div class="money-header">
+                        <div class="money-title">
+                          <ion-icon name="cash-outline"></ion-icon>
+                          <span>{{ item.abreviation }}</span>
+                        </div>
+                        <div class="money-total">
+                          Total : <strong>{{ item.total | number:'1.2-2' }}</strong>
+                        </div>
+                      </div>
+                      <div class="money-stats">
+                        <div class="line in">
+                          <span>Entrée</span>
+                          <span>{{ item.total_in | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="line out">
+                          <span>Sortie</span>
+                          <span>{{ item.total_out | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="line net">
+                          <span>Net</span>
+                          <span>{{ item.total_net | number:'1.2-2' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ion-card>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        <hr class="hr">
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" fullscreen>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données...">
+    </ion-refresher-content>
+  </ion-refresher>
+  <main>
+     <app-skeleton-loader *ngIf="loaded" [repeat]="6" type="list"></app-skeleton-loader>
+        <ng-container *ngIf="defaultview==='table' && !loaded">
+            <div class="table-container">
+                <table>
+                  <thead>
+                    <tr style="font-size: large!important;">
+                      <th>
+                        <ion-checkbox [(ngModel)]="allSelected" (ionChange)="toggleAllSelection()" color="success"></ion-checkbox>
+                        #
+                      </th>
+                      <th>Date</th>
+                      <th>Faite par</th>
+                      <th>Membre</th>
+                      <th>Type</th>
+                      <th>Montant</th>
+                      <th class="ion-text-left">Imputée</th>
+                      <th>Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let transaction of transactionslist | filter:search" class="cursor-pointer" [ngClass]="{'selected-tr': transaction.selected}">
+                      <td>
+                        <ion-checkbox color="success" [(ngModel)]="transaction.selected" style="margin-right: 8px;" (ionChange)="toggleSelection(transaction,$event)"></ion-checkbox>
+                        {{transaction.uuid}}
+                      </td>
+                      <td (click)="menutransaction(transaction)">{{transaction.done_at | date}}</td>
+                      <td (click)="menutransaction(transaction)">{{transaction.done_by_name | uppercase}}</td>
+                      <td (click)="menutransaction(transaction)">{{transaction.member_fullname | titlecase}} ({{transaction.member_uuid}})</td>
+                      <td (click)="menutransaction(transaction)">{{transaction.type}}</td>
+                      <td (click)="menutransaction(transaction)">{{transaction.amount | number}} {{transaction.abreviation}}</td>
+                      <td><ion-icon [name]="transaction.imputed_to?'checkmark-done-outline':'ellipsis-horizontal-outline'" size="small" [color]="transaction.imputed_to?'primary':''"></ion-icon></td>
+                      <td><ion-badge [class]="transaction.transaction_status==='validated'?'font-size-10 font-bold bg-sucess-tint-whitecolor':'font-size-10 font-bold bg-warning-tint-whitecolor'">{{transaction.transaction_status | titlecase}}</ion-badge></td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+        </ng-container>
+    
+        <ng-container *ngIf="defaultview==='card' && !loaded">
+            <ion-grid>
+               <ion-row class="ion-align-items-center ion-margin-bottom">
+                  <ion-col size="12">
+                    <ion-item lines="none" class="ion-padding-horizontal second-bd-rounded shadow-light">
+                      <ion-checkbox
+                        slot="start"
+                        [(ngModel)]="buttonselectalltransactions"
+                        (ionChange)="selectalltransactions($event)">
+                      </ion-checkbox>
+                      <ion-label class="font-size-14 font-bold">Tout sélectionner</ion-label>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col size="12" size-md="6" size-lg="4" *ngFor="let transaction of transactionslist | filter:search">
+                    <ion-card class="fintech-card" [ngClass]="{'selected-card': transaction.selected}">
+                      <ion-card-header>
+                        <div class="card-header-top">
+                          <ion-checkbox
+                            color="success"
+                            slot="start"
+                            [(ngModel)]="transaction.selected"
+                            (ionChange)="toggleSelection(transaction, $event)">
+                          </ion-checkbox>
+                          <div class="uuid-date">
+                            <div class="uuid">#{{ transaction.uuid }}</div>
+                            <div class="date">{{ transaction.done_at | date:'mediumDate' }}</div>
+                          </div>
+                          <ion-badge
+                            [color]="transaction.transaction_status === 'validated' ? 'success' : 'warning'"
+                            class="status-badge">
+                            {{ transaction.transaction_status | titlecase }}
+                          </ion-badge>
+                        </div>
+                      </ion-card-header>
+
+                      <ion-card-content (click)="menutransaction(transaction)">
+                        <div class="info-row">
+                          <ion-icon name="person-circle-outline" class="info-icon"></ion-icon>
+                          <div class="info-text">
+                            <strong>Par:</strong> {{ transaction.done_by_name | uppercase }}
+                          </div>
+                        </div>
+
+                        <div class="info-row">
+                          <ion-icon name="people-outline" class="info-icon"></ion-icon>
+                          <div class="info-text">
+                            <strong>Membre:</strong> {{ transaction.member_fullname | titlecase }}<br />
+                            <span class="uuid-small">({{ transaction.member_uuid }})</span>
+                          </div>
+                        </div>
+
+                        <div class="info-row">
+                          <ion-icon [name]="transaction.type === 'deposit' ? 'arrow-down-circle-outline' : 'arrow-up-circle-outline'" class="info-icon"></ion-icon>
+                          <div class="info-text">
+                            <strong>Type:</strong> {{ transaction.type | titlecase }}
+                          </div>
+                        </div>
+
+                        <div class="amount-row" [ngClass]="transaction.type === 'withdraw' ? 'danger-text' : 'success-text'">
+                          {{ transaction.amount | number:'1.2-2' }} {{ transaction.abreviation }}
+                        </div>
+                      </ion-card-content>
+                    </ion-card>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+        </ng-container>
+
+        <ng-container *ngIf="defaultview==='item' && !loaded">
+          <br>
+          <ion-row>
+            <ion-col size="8" class="ion-no-padding ion-no-margin">
+                <ion-row class="ion-align-items-center ion-margin-bottom ion-no-padding ion-no-margin">
+                  <ion-col size="12" class="ion-no-padding ion-no-margin">
+                    <ion-item lines="none" class="ion-padding-horizontal second-bd-rounded shadow-light align-checkbox" style="--padding-end:-30px!important;">
+                      <ion-checkbox
+                        slot="start"
+                        [(ngModel)]="buttonselectalltransactions"
+                        (ionChange)="selectalltransactions($event)"
+                        color="success">
+                      </ion-checkbox>
+                      <ion-label class="font-size-14 font-bold">Tout sélectionner</ion-label>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+
+             <ion-row *ngFor="let transaction of transactionslist | filter:search" class="ion-margin-bottom align-checkbox">
+                  <ion-col size="1" class="ion-no-padding">
+                    <ion-checkbox 
+                      [(ngModel)]="transaction.selected" 
+                      (ionChange)="handletransactionchange($event, transaction)"
+                      color="success" style="margin-left:20px!important;">
+                    </ion-checkbox>
+                  </ion-col>
+
+                  <ion-col size="11" class="ion-no-padding" style="margin-left: -30px!important;">
+                    <ion-item 
+                      mode="ios" 
+                      lines="none" 
+                      class="second-bd-rounded shadow-light dashboard-summary-item ion-padding-vertical"
+                      [ngClass]="{'selected-item-border': transaction.selected}" 
+                      detail="true">
+                      
+                      <ion-avatar slot="start" class="bg-avatar-icon rounded-md">
+                        <ion-icon 
+                          [name]="transaction.type === 'withdraw' ? 'arrow-up-circle-outline' : 'arrow-down-circle-outline'" 
+                          [color]="transaction.type === 'withdraw' ? 'danger' : 'success'" 
+                          size="large">
+                        </ion-icon>
+                      </ion-avatar>
+
+                      <ion-label (click)="menutransaction(transaction)">
+                        <p class="font-size-14 font-bold text-dark">
+                          {{ transaction.member_fullname | titlecase }} ({{ transaction.member_uuid }})
+                        </p>
+                        <p class="font-size-13 text-muted d-flex align-items-center">
+                          <ion-icon name="time-outline" class="calendar-icon" color="medium"></ion-icon>
+                          &nbsp;{{ transaction.done_at | date:'short' }} &nbsp;&bull;&nbsp; Par 
+                          <strong>{{ transaction.done_by_name | titlecase }}</strong>
+                        </p>
+                        <p class="font-size-13 text-muted">
+                          Cpt: <strong>{{ transaction.memberaccount_name }}</strong> &nbsp;&bull;&nbsp; OP.ID: {{ transaction.uuid }}
+                        </p>
+                      </ion-label>
+
+                      <div class="ion-text-end text-right" slot="end">
+                        <p class="font-size-15 font-bold" 
+                          [class.text-danger]="transaction.type === 'withdraw'" 
+                          [class.text-success]="transaction.type !== 'withdraw'">
+                          {{ transaction.amount | number:'1.0-2' }} {{ transaction.abreviation }}
+                        </p>
+                        <ion-badge 
+                          [color]="transaction.transaction_status === 'validated' ? 'success' : 'warning'" 
+                          class="font-size-11 font-bold">
+                          {{ transaction.transaction_status | titlecase }}
+                        </ion-badge>
+                      </div>
+                    </ion-item>
+                  </ion-col>
+              </ion-row>
+            </ion-col>
+            <ion-col size="4">
+                <div class="fintech-summary-box ion-padding">
+                  <ion-card class="summary-card">
+                    <ion-card-header>
+                      <ion-card-title class="summary-title">Suivi des opérations</ion-card-title>
+                    </ion-card-header>
+                    <ion-card-content class="summary-content">
+
+                      <ion-item lines="none" class="summary-item" routerLink="/uzisha/membersactivation" detail="false">
+                        <ion-icon name="person-add-outline" slot="start" color="primary"></ion-icon>
+                        <ion-label>Comptes à valider</ion-label>
+                        <ion-badge color="primary" slot="end">0</ion-badge>
+                      </ion-item>
+
+                      <ion-item lines="none" class="summary-item" (click)="transactionsfilter('pending')" detail="false">
+                        <ion-icon name="time-outline" slot="start" color="warning"></ion-icon>
+                        <ion-label>Transactions en attente</ion-label>
+                        <ion-badge color="warning" slot="end">0</ion-badge>
+                      </ion-item>
+
+                      <ion-item lines="none" class="summary-item" (click)="transactionsfilter('validated')" detail="false">
+                        <ion-icon name="checkmark-done-outline" slot="start" color="success"></ion-icon>
+                        <ion-label>Transactions validées</ion-label>
+                        <ion-badge color="success" slot="end">0</ion-badge>
+                      </ion-item>
+
+                      <ion-item lines="none" class="summary-item" detail="false">
+                        <ion-icon name="book-outline" slot="start" color="tertiary"></ion-icon>
+                        <ion-label>Carnets à valider</ion-label>
+                        <ion-badge color="tertiary" slot="end">0</ion-badge>
+                      </ion-item>
+
+                      <ion-item lines="none" class="summary-item" routerLink="/uzisha/firstentries" detail="false">
+                        <ion-icon name="sparkles-outline" slot="start" color="medium"></ion-icon>
+                        <ion-label>Premières mises</ion-label>
+                        <ion-badge color="medium" slot="end">0</ion-badge>
+                      </ion-item>
+                    </ion-card-content>
+                  </ion-card>
+                </div>
+            </ion-col>
+          </ion-row>
+        </ng-container>
+    </main>
+</ion-content>

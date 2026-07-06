@@ -1,0 +1,110 @@
+body {
+  font-size: x-small;
+  font-family:"Yu Gothic Medium","Yu Gothic",Verdana,"Berlin Sans FB","Gill Sans MT",system-ui;
+}
+.invoice {
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.company-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.invoice-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.invoice-number {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.separator {
+  border-bottom: 1px dashed #000;
+  margin: 6px 0;
+}
+
+.items-table {
+  width: 100%;
+}
+
+.item-block {
+  padding: 4px 0;
+}
+
+.item-name {
+  font-weight: 600;
+}
+
+.item-sub {
+  font-size: 11px;
+  color: #444;
+}
+
+.item-calculation {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.item-total {
+  font-weight: 600;
+}
+
+.totals-table {
+  width: 100%;
+}
+
+.totals-table td {
+  padding: 3px 0;
+}
+
+.net-to-pay {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.small-text {
+  font-size: 10px;
+}
+.model2 {
+  .containerlogo {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px !important;
+    .logo {
+      vertical-align: middle;
+      width: 80px;
+      height: 80px;
+    }
+    .border-bottom-dashed{
+      border-style:none none dashed none ;
+      border-width: 1px;
+    }
+
+  }
+}
+
+.item-serials {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.serials-title {
+  font-weight: 600;
+}
+
+.serials-list {
+  margin-top: 2px;
+}
+
+.serial-item {
+  white-space: normal;
+}
+

@@ -1,0 +1,291 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none" class="default-list-item">
+      <ion-avatar (click)="openeditprofil()">
+        <ion-img [src]="actualEse.logo?appserv.imgUrl+actualEse.logo:''" *ngIf="actualEse.logo"></ion-img>
+        <ion-icon name="person-outline" size="small" *ngIf="!actualEse.logo"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title">{{(actualEse.name?actualEse.name:actualEse.mail) | titlecase}}</p>
+        <p class="secondpara">
+          <ion-text class="font-size-11">{{actualEse.description}}</ion-text>
+        </p>
+      </ion-label>
+      <ion-icon name="document-outline" color="warning" size="large" slot="end" (click)="openeditEse()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showpermissionprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody ion-padding" fullscreen="true">
+    <mat-tab-group  mat-stretch-tabs="false" mat-align-tabs="start"> 
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <ion-icon name="information-circle-outline"></ion-icon> &nbsp;
+          Général
+        </ng-template>
+          <br>
+          <div class="content ion-padding bd-square bd-radius-10">
+            <ion-grid>
+              <ion-row>
+                <ion-col size="12" size-lg="6">
+                  <ion-card class="bd-radius-10 accept-use" mode="ios">
+                    <ion-item  mode="ios" lines="full" detail="false">
+                      <h2 class=" font-size-12">Nom</h2>
+                      <ion-text slot="end" class="font-size-11">{{actualEse.name | titlecase}}</ion-text>
+                    </ion-item>
+                    <ion-item  mode="ios" lines="full" detail="false">
+                      <h2 class=" font-size-12">Description</h2>
+                      <ion-text slot="end" class="font-size-11">{{actualEse.description | titlecase}}</ion-text>
+                  </ion-item>
+                    <ion-item  mode="ios" lines="full" detail="false">
+                        <h2 class=" font-size-12">Email</h2>
+                        <ion-text slot="end" class="font-size-11">{{actualEse.mail | titlecase}}</ion-text>
+                    </ion-item>   
+                    <ion-item  mode="ios" lines="full" detail="false">
+                        <h2 class=" font-size-12">Téléphone</h2>
+                        <ion-text slot="end" class="font-size-11">{{actualEse.phone}}</ion-text>
+                    </ion-item>
+                    <ion-item  mode="ios" lines="none" detail="false">
+                        <h2 class=" font-size-12">Adresse physique</h2>
+                        <ion-text slot="end" class="font-size-11">{{actualEse.adresse}}</ion-text>
+                    </ion-item> 
+                  </ion-card>
+                </ion-col>
+                <ion-col size="12" size-lg="6">
+                  <ion-card class="bd-radius-10 accept-use" mode="ios">
+                    <ion-item  mode="ios" lines="full" detail="false">
+                      <h2 class=" font-size-12">RCCM</h2>
+                      <ion-text slot="end" class="font-size-11">{{actualEse.rccm | titlecase | uppercase}}</ion-text>
+                    </ion-item>
+                    <ion-item  mode="ios" lines="full" detail="false">
+                      <h2 class=" font-size-12">I.D NAT</h2>
+                      <ion-text slot="end" class="font-size-11">{{actualEse.national_identification | titlecase | uppercase}}</ion-text>
+                  </ion-item>
+                    <ion-item  mode="ios" lines="full" detail="false">
+                        <h2 class=" font-size-12">Numero Impôt</h2>
+                        <ion-text slot="end" class="font-size-11">{{actualEse.num_impot | titlecase | uppercase}}</ion-text>
+                    </ion-item>   
+                    <ion-item  mode="ios" lines="none" detail="false">
+                        <h2 class=" font-size-12">Autorisation de fonctionnement</h2>
+                        <ion-text slot="end" class="font-size-11">{{actualEse.autorisation_fct | uppercase}}</ion-text>
+                    </ion-item> 
+                  </ion-card>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="12" size-lg="6">
+                  <ion-card class="bd-radius-10 accept-use" mode="ios">
+                    <ion-item  mode="ios" lines="full" detail="false">
+                      <h2 class=" font-size-12">Site web</h2>
+                      <ion-text slot="end" class="font-size-11">{{actualEse.website}}</ion-text>
+                    </ion-item>
+                    <ion-item  mode="ios" lines="full" detail="false">
+                      <h2 class=" font-size-12">Facebook</h2>
+                      <ion-text slot="end" class="font-size-11">{{actualEse.facebook}}</ion-text>
+                  </ion-item>
+                    <ion-item  mode="ios" lines="full" detail="false">
+                        <h2 class=" font-size-12">Instagram</h2>
+                        <ion-text slot="end" class="font-size-11">{{actualEse.instagram | titlecase}}</ion-text>
+                    </ion-item>   
+                    <ion-item  mode="ios" lines="none" detail="false">
+                        <h2 class=" font-size-12">LinkedIn</h2>
+                        <ion-text slot="end" class="font-size-11">{{actualEse.linkdin}}</ion-text>
+                    </ion-item> 
+                  </ion-card>
+                </ion-col>
+                <ion-col size="12" size-lg="6">
+                  <ion-card class="bd-radius-10 accept-use" mode="ios">
+                    <ion-item  mode="ios" lines="full" detail="false">
+                      <h2 class=" font-size-12">Taux TVA</h2>
+                      <ion-text slot="end" class="font-size-11">{{actualEse.vat_rate}}%</ion-text>
+                    </ion-item> 
+                    <ion-item  mode="ios" lines="full" detail="false">
+                      <h2 class=" font-size-12">Pieds de page</h2>
+                      <ion-text slot="end" class="font-size-11">{{actualEse.invoicefooter}}</ion-text>
+                    </ion-item>
+                  </ion-card>
+                </ion-col>
+              </ion-row>
+              
+            </ion-grid>
+          </div>
+      </mat-tab>
+
+    <!-- <mat-tab>
+        <ng-template mat-tab-label>
+          <ion-icon name="medkit-outline"></ion-icon> &nbsp;
+          Santé de l'entreprise
+        </ng-template>
+          <br>
+          <div class="content ion-padding bd-square bd-radius-10">
+                <ion-grid>
+                  <ion-row>
+                    <ion-col size="12"><h2>Vos factures et abonnements</h2></ion-col>
+                    <ion-col size="12" size-lg="4">
+                      <ion-card class="bd-radius-10" mode="ios">
+            
+                        <ion-item  mode="ios" lines="full" detail="false">
+                          <h2 class=" font-size-12">Abonnements entreprise </h2>
+                          <ion-badge slot="end" color="warning">{{datafromapi.length}}</ion-badge>
+                        </ion-item>
+                        <ion-grid>
+                          <ion-row>
+                              <ion-col size="3"></ion-col>
+                              <ion-col size="6"><ion-button size="small" color="warning" expand="block" mode="ios">Me réabonner</ion-button></ion-col>
+                              <ion-col size="3"></ion-col>
+                          </ion-row>
+                        </ion-grid>
+                        
+                        <ion-list>
+                          <ion-item class="contentbody default-list-item ion-padding-bottom"  lines="full" detail="true" *ngFor="let invoice of datafromapi">
+                            <ion-avatar slot="start" class="bg-medium">
+                              <ion-icon name="checkmark-outline" size="large"></ion-icon>
+                            </ion-avatar>
+                            <ion-label>
+                              <p class="item-label-title">
+                                <ion-text>du 01/01/2024</ion-text>
+                              </p>
+                              <p class="secondpara">
+                                <ion-text >  au 01/01/2024</ion-text>
+                              </p> 
+                            </ion-label>
+                            <ion-chip  slot="end" class="font-size-10" color="primary">
+                              <span>2 USD</span>
+                            </ion-chip>
+                          </ion-item>
+                        </ion-list>
+                      
+                      </ion-card>
+                    </ion-col> <ion-col size="12" size-lg="4">
+                      <ion-card class="bd-radius-10 accept-use" mode="ios">
+                        <ion-item  mode="ios" lines="full" detail="false">
+                          <h2 class=" font-size-12">Fidélisation avec Points</h2>
+                          <ion-badge slot="end" color="warning">{{pointsdata.length}}</ion-badge>
+                        </ion-item> 
+                        <ion-grid>
+                          <ion-row>
+                              <ion-col size="3"></ion-col>
+                              <ion-col size="6" (click)="openmodal('point')"><ion-button size="small" color="warning" expand="block" mode="ios">Me réabonner</ion-button></ion-col>
+                              <ion-col size="3"></ion-col>
+                          </ion-row>
+                        </ion-grid>
+                        
+                        <ion-list>
+                          <ion-item class="contentbody default-list-item ion-padding-bottom"  lines="full" detail="true" *ngFor="let invoice of pointsdata">
+                            <ion-avatar slot="start" class="bg-medium">
+                              <ion-icon name="checkmark-outline" size="large"></ion-icon>
+                            </ion-avatar>
+                            <ion-label>
+                              <p class="item-label-title">
+                                <ion-text>du 01/01/2024</ion-text>
+                              </p>
+                              <p class="secondpara">
+                                <ion-text >  au 01/01/2024</ion-text>
+                              </p> 
+                            </ion-label>
+                            <ion-chip  slot="end" class="font-size-10" color="primary">
+                              <span>2 USD</span>
+                            </ion-chip>
+                          </ion-item>
+                        </ion-list>
+                      </ion-card>
+                    </ion-col> 
+                    <ion-col size="12" size-lg="4">
+                      <ion-card class="bd-radius-10 accept-use" mode="ios">
+                        <ion-item  mode="ios" lines="full" detail="false">
+                          <h2 class=" font-size-12">Fidélisation avec Bonus</h2>
+                          <ion-badge slot="end" color="warning">{{bonusdata.length}}</ion-badge>
+                        </ion-item> 
+                        <ion-grid>
+                          <ion-row>
+                              <ion-col size="3"></ion-col>
+                              <ion-col size="6" (click)="openmodal('bonus')"><ion-button size="small" color="warning" expand="block" mode="ios">Me réabonner</ion-button></ion-col>
+                              <ion-col size="3"></ion-col>
+                          </ion-row>
+                        </ion-grid>
+                        
+                        <ion-list>
+                          <ion-item class="contentbody default-list-item ion-padding-bottom"  lines="full" detail="true" *ngFor="let invoice of bonusdata">
+                  
+                              <ion-icon [name]="invoice.status==='pending'?'ellipsis-horizontal':invoice.status==='validated'?'checkmark-outline':'close-outline'" size="small"></ion-icon>
+                           
+                            <ion-label>
+                              <p class="item-label-title">
+                                <ion-text>{{invoice.uuid}}</ion-text>
+                              </p>
+                              <p class="secondpara">
+                                <ion-text>Du {{appserv.frdate(invoice.from)}}</ion-text>
+                              </p>
+                              <p class="secondpara">
+                                <ion-text>Au {{appserv.frdate(invoice.to)}}</ion-text>
+                              </p> 
+                              <p class="secondpara">
+                                <ion-text>Prix unitaire :{{invoice.unite_price}} USD</ion-text>
+                              </p>
+                              <p class="secondpara">
+                                <ion-chip><ion-icon name="people-outline" size="small"></ion-icon> &nbsp; &nbsp;{{invoice.nbrpersons}} personnes</ion-chip>
+                              </p> 
+                            </ion-label>
+                            <ion-chip  slot="end" class="font-size-13" color="primary">
+                              <span>{{invoice.amount_due | number}} USD pour {{invoice.nbrmonth}} mois</span>
+                            </ion-chip>
+                          </ion-item>
+                        </ion-list>
+                      </ion-card>
+                    </ion-col>
+                   
+                  </ion-row>
+                </ion-grid>
+          </div>
+      </mat-tab> -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <ion-icon name="wallet-outline"></ion-icon> &nbsp;
+          Monnaies
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+
+    <ion-modal  (willDismiss)="BeforeClosingSellModal($event)" [isOpen]="isSellModalOpen" class="modal-border-radius-20">
+      <ng-template>
+        <ion-header class="ion-no-border">
+          <ion-toolbar class="contentbody">
+            <ion-item lines="none" class="contentbody">
+              <ion-icon name="chevron-back-outline" size="large"  (click)="appserv.closemodal()" color="warning" slot="start"></ion-icon>
+              <ion-text class="font-size-20 font-bold-600">{{modaltitle}}</ion-text>
+            </ion-item>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="contentbody ion-padding">
+          <ng-container *ngIf="operationtype==='bonus'">
+            <h4 class="font-size-16 font-bold-600">Choisissez votre type d'abonnement (3 USD/mois)</h4>
+            <ion-item *ngFor="let item of fidelityinvoices">
+              <ion-checkbox [value]="item.amount" [checked]="item.checked" (ionChange)="selected(item,'bonus')" class="font-size-12">Pour {{item.nbrmonth}} mois à ({{item.amount}} USD) pour {{item.nbrpersons}} personnes</ion-checkbox>
+            </ion-item> 
+          </ng-container>
+          <ng-container *ngIf="operationtype==='point'"></ng-container>
+          <ng-container *ngIf="operationtype==='soft'"></ng-container>
+        </ion-content>
+        <ion-footer class="ion-no-border">
+          <ion-grid>
+            <ion-row>
+              <ion-col size="12" class="bd-square bd-radius-10">
+               
+                  Durée:  {{actualinvoice.nbrmonth}} mois<br>
+                  Pour:  {{actualinvoice.nbrpersons}} personnes<br>
+                  <hr class="hr">
+                  <br>
+                  Total Net à Payer:  <span class="font-size-20 font-bold-500">{{actualinvoice.amount}}</span> USD
+              
+              </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col size="1"></ion-col>
+                <ion-col size="10" (click)="validationoperation()"><ion-button size="small" color="warning" expand="block" mode="ios">Valider</ion-button></ion-col>
+                <ion-col size="1"></ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-footer>
+      </ng-template>
+    </ion-modal>
+</ion-content>

@@ -1,0 +1,100 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Paiement crédit</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="close()">✕</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="p-4 bg-gray-50 dark:bg-gray-900">
+
+  <div class="bg-white dark:bg-gray-800 rounded-xl p-4 space-y-4 max-w-md mx-auto">
+
+    <!-- ERROR -->
+    <div *ngIf="error"
+      class="text-red-600 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded">
+      {{ error }}
+    </div>
+
+    <!-- MODE -->
+    <div class="flex gap-2">
+      <ion-segment [(ngModel)]="mode">
+        <ion-segment-button value="installments">
+          Échéances
+        </ion-segment-button>
+        <ion-segment-button value="amount">
+          Montant libre
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <!-- INSTALLMENTS MODE -->
+    <div *ngIf="mode === 'installments'" class="space-y-2">
+      <div *ngFor="let i of installments"
+        class="flex justify-between items-center p-2 border rounded dark:border-gray-700">
+        <div>
+          <div class="text-sm font-medium">
+            {{ i.due_date | date:'dd/MM/yyyy' }} | {{i.amount | number}} {{credit.money.abreviation}}
+          </div>
+          <div class="text-xs text-gray-500">
+            Reste : {{ (i.amount - i.paid_amount) | number}} {{credit.money.abreviation}}
+          </div>
+        </div>
+        <ion-checkbox
+          (ionChange)="toggleInstallment(i)">
+        </ion-checkbox>
+      </div>
+    </div>
+
+    <!-- AMOUNT MODE -->
+    <div *ngIf="mode === 'amount'">
+      <ion-input
+        label="Montant à payer"
+        type="number"
+        [(ngModel)]="amount">
+      </ion-input>
+      <div class="text-xs text-gray-500">
+        Reste à payer : {{ credit.remaining_to_pay }}
+      </div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <ion-select
+      label="Compte du membre"
+      [(ngModel)]="selectedAccountId">
+      <ion-select-option
+        *ngFor="let a of memberAccounts"
+        [value]="a.id">
+        {{ a.account_number }} {{a.money_abreviation}}
+      </ion-select-option>
+    </ion-select>
+
+    <!-- FUND -->
+    <ion-select
+      label="Caisse"
+      [(ngModel)]="selectedFundId">
+      <ion-select-option
+        *ngFor="let f of funds"
+        [value]="f.id">
+        {{ f.description }}
+      </ion-select-option>
+    </ion-select>
+
+    <!-- SUMMARY -->
+    <div class="text-sm text-right">
+      <b>Total :</b> {{ amount }}
+    </div>
+
+    <!-- SUBMIT -->
+    <ion-button
+    (click)="submit()"
+      expand="block"
+      color="success"
+      [disabled]="loading">
+      {{ loading ? 'Traitement...' : 'Valider le paiement' }}
+    </ion-button>
+
+  </div>
+
+</ion-content>

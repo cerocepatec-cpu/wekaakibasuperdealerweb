@@ -1,0 +1,63 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" slot="start" size="large" color="warning" (click)="closemodal()"></ion-icon>
+      <h4 slot="start" class="font-bold-600 font-size-14">{{criteria==="deposits"?"Dépôts":criteria==="agents"?"Agents":criteria==='funds'?'Caisses':criteria==='accounts'?'Comptes':criteria==='agents_cashbooks'?'Agents':criteria==='collectors'?'Collecteurs':criteria==='members'?'Membres':criteria==='memberstransactions'?'Membres':criteria==='cashiers'?'Caissiers':criteria==='moneys'?'Monnaies':criteria==='transactionmoneys'?'Monnaies':"Articles"}}</h4>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header> 
+<ion-content class="contentbody">
+  <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-12" #search [(ngModel)]="searching"></ion-searchbar>
+  
+  <ng-container *ngIf="criteria==='moneys' || criteria==='transactionmoneys'">
+      <ion-item lines="full" *ngFor="let money of datasent | filter :searching" class="font-size-15 contentbody">
+        <ion-text slot="start">{{(money.abreviation?money.abreviation:money.money_name) | titlecase}}</ion-text>
+        <ion-icon name="trash-outline" size="small" (click)="removedeposit(money)" slot="end"></ion-icon>
+      </ion-item>
+  </ng-container> 
+  
+  <ng-container *ngIf="criteria==='accounts'">
+      <ion-item lines="full" *ngFor="let account of datasent | filter :searching" class="font-size-15 contentbody">
+        <ion-text slot="start">{{account.name | titlecase}}</ion-text>
+       <ion-chip (click)="removedeposit(account)" slot="end"><ion-icon name="trash-outline" size="small"></ion-icon></ion-chip> 
+      </ion-item>
+  </ng-container> 
+  
+  <ng-container *ngIf="criteria==='funds'">
+      <ion-item lines="full" *ngFor="let tub of datasent | filter :searching" class="font-size-15 contentbody">
+        <ion-text slot="start">{{tub.description | titlecase}}</ion-text>
+       <ion-chip (click)="removedeposit(tub)" slot="end"><ion-icon name="trash-outline" size="small"></ion-icon></ion-chip> 
+      </ion-item>
+  </ng-container>
+  
+  <ng-container *ngIf="criteria==='customers'">
+      <ion-item lines="full" *ngFor="let customer of datasent | filter :searching" class="font-size-15 contentbody">
+        <ion-text slot="start">{{customer.customerName | titlecase}}</ion-text>
+       <ion-chip (click)="removedeposit(customer)" slot="end"><ion-icon name="trash-outline" size="small"></ion-icon></ion-chip> 
+      </ion-item>
+  </ng-container> 
+  
+  <ng-container *ngIf="criteria==='deposits'">
+      <ion-item lines="full" *ngFor="let deposit of datasent | filter :searching" class="font-size-15 contentbody">
+        <ion-text slot="start">{{deposit.name | titlecase}}</ion-text>
+       <ion-chip (click)="removedeposit(deposit)" slot="end"><ion-icon name="trash-outline" size="small"></ion-icon></ion-chip> 
+      </ion-item>
+  </ng-container>
+  
+  <ng-container *ngIf="criteria==='articles'">
+      <ion-item lines="full" *ngFor="let article of datasent | filter :searching" class="font-size-15 contentbody">
+        <ion-text slot="start">{{article.service.name | titlecase}}</ion-text>
+       <ion-chip (click)="removearticle(article)" slot="end"><ion-icon name="trash-outline" size="small"></ion-icon></ion-chip> 
+      </ion-item>
+  </ng-container>
+  
+  <ng-container *ngIf="criteria==='agents' || criteria==='agents_cashbooks' || criteria==='collectors' || criteria==='members' || criteria==='memberstransactions' || criteria==='cashiers'">
+      <ion-item lines="full" *ngFor="let agent of datasent | filter :searching" class="font-size-15 contentbody">
+        <ion-text slot="start">{{(agent.full_name?agent.full_name:agent.user_name) | titlecase}}</ion-text>
+        <ion-icon name="trash-outline" size="small" (click)="removeagent(agent)" slot="end"></ion-icon>
+      </ion-item>
+  </ng-container>
+ 
+</ion-content>
+

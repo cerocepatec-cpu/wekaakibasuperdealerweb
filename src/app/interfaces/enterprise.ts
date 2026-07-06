@@ -1,0 +1,30 @@
+export interface Enterprise{
+    id?: number;
+    name?: string;	
+    description?: string;
+    rccm?: string;	
+    national_identification?: string;
+    num_impot?: string;	
+    autorisation_fct?: string;
+    adresse?: string;	
+    phone?: string;
+    mail?: string;	
+    website?: string;	
+    logo?: string;	
+    category?: string;	   
+    vat_rate?: number;	
+    uuid?: string;	
+    sync_status?: string;
+    user_id?: string;
+    status?: string;
+    invoicefooter?: string;
+    selected?: boolean;
+    loading?: boolean;
+    facebook?: string;
+    instagram?:string;
+    linkdin?:string;
+    fidelitypointvalue?:number;	
+	fidelitydefaultmode?:string;	
+    fidelitypoint?:boolean;
+    fidelitybonus?:boolean;
+}

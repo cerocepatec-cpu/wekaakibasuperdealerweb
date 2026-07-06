@@ -1,0 +1,121 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" (click)="closemodal()" slot="start"></ion-icon>
+      <ion-text slot="start">Infos du département</ion-text>
+      <ion-icon slot="end" (click)="deletedepart(departsent)" name="trash-outline" size="small"></ion-icon>
+      <ion-icon slot="end" (click)="modeEdit()" *ngIf="!showedingmode" name="document-outline" size="small"></ion-icon>
+      <ion-icon name="checkmark-outline" slot="end" (click)="editdepart(departsent)" color="primary" *ngIf="showedingmode" size="small"></ion-icon>
+    </ion-item>
+    <ion-progress-bar type="indeterminate" *ngIf="showprogress" ></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-modal [isOpen]="isDescriptionModalOpen" class="modal-border-radius-20">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar>
+          <ion-item lines="none">
+            <ion-icon name="chevron-back-outline" (click)="isDescriptionModalOpen=false" slot="start"></ion-icon>
+            <ion-text slot="start">Description département</ion-text>
+            <ion-icon name="checkmark-outline" size="small" slot="end" (click)="isDescriptionModalOpen=false;editdepart(departsent)" color="success"></ion-icon>
+          </ion-item>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding contentbody">
+        <form [formGroup]="departinfos">
+          <ion-item lines="none" class="bd-rounded">
+            <ion-textarea placeholder="Type something here" [autoGrow]="true" formControlName="description" class="font-size-12" #descriptionInput>
+            </ion-textarea>
+          </ion-item>
+          <ion-note class="font-size-11">La description permet d'ajouter une brève présentation de ce que fait le département </ion-note>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  <div class="ion-text-center detailrequestheader ion-padding">
+    <div class="blocheader ion-text-center">
+      <ion-avatar style="margin:auto;">
+        <ion-icon name="folder-outline"  size="large"></ion-icon>
+      </ion-avatar>
+      <h2 *ngIf="!showedingmode">{{departsent.department_name | uppercase}}</h2>
+      <ion-note class="font-size-12" *ngIf="!showedingmode">Département </ion-note>
+    </div>
+    <form *ngIf="showedingmode" [formGroup]="departinfos" class="ion-padding-start ion-padding-end">
+      <ion-item lines="none" class="contentbody bd-rounded">
+        <ion-input formControlName="department_name" class="font-size-11" #departmentName></ion-input> 
+      </ion-item>
+    </form>
+    
+    <ion-card mode="ios" class="margin-btm-15 bd-radius-10">
+      <ion-item lines="none" (click)="openDescriptionEdition()">
+        <ion-text class="font-size-12" [color]="departsent.description?'':'primary'">{{departsent.description?departsent.description:'Ajouter une description au département'}}</ion-text>
+        <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+      </ion-item>
+    </ion-card>
+   
+    <!-- <ion-card class=" bd-radius-10 ion-padding margin-btm-15" mode="ios">
+      <ion-item class="font-size-12 " mode="ios" (click)="openfilesdetail()" lines="inset">
+        <ion-avatar slot="start" class="square-avatar-primary"><mat-icon>image</mat-icon></ion-avatar>
+        <ion-text slot="start">Médias et documents</ion-text>
+        <ion-note slot="end">10</ion-note>
+        <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end" size="small"></ion-icon>
+      </ion-item> 
+       <ion-item class="font-size-12 " mode="ios" (click)="opensearchagents()" lines="inset">
+        <ion-avatar slot="start" class="square-avatar-warning"><mat-icon>groups</mat-icon></ion-avatar>
+        <ion-text slot="start">Agents</ion-text>
+        <ion-note slot="end">{{listagents.length}}</ion-note>
+        <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+      </ion-item> 
+      <ion-item class="font-size-12 " mode="ios" lines="inset" (click)="opendepartsubdepartments()">
+        <ion-avatar slot="start" class="square-avatar-success"><mat-icon>account_tree</mat-icon></ion-avatar>
+        <ion-text slot="start">Sous départements</ion-text>
+        <ion-note slot="end">{{listsubdepartments?.length}}</ion-note>
+        <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+      </ion-item>  
+      <ion-item lines="none" class="font-size-12 " mode="ios" lines="inset" (click)="openmodalrequests()">
+       <ion-avatar slot="start" class="square-avatar-danger"><mat-icon>real_estate_agent</mat-icon></ion-avatar> 
+        <ion-text slot="start">Réquisitions</ion-text>
+        <ion-note slot="end">{{listrequests?.length}}</ion-note>
+        <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+      </ion-item>
+    </ion-card> -->
+    
+    <ion-item lines="none" class="contentbody margin-btm-25 font-bold-500 smallavatar">
+      <ion-text slot="start" class="font-size-14">{{listagents.length}} agent{{listagents.length>1?'s':''}}</ion-text>
+      <ion-avatar slot="end"><ion-icon name="search-outline" size="small" (click)="opensearchagents()"></ion-icon></ion-avatar>
+    </ion-item>
+    <ion-card class=" bd-radius-10 ion-padding" mode="ios">
+      <ion-item class="font-size-12 middleavatar" (click)="openaddnewagentdepart()">
+        <ion-avatar slot="start"><ion-icon color="primary" name="add" size="small"></ion-icon></ion-avatar>
+        <ion-label>
+          <h2 class="item-label-title font-size-12"><ion-text color="primary">Ajouter des agents</ion-text></h2>
+        </ion-label>
+      </ion-item>
+      <ion-item mode="ios" class="list-item" *ngFor="let agent of listagents | slice:0:10" lines="inset" (click)="actionstoagent(agent)">
+        <ion-avatar slot="start"><ion-icon name="person-outline" size="small"></ion-icon></ion-avatar>
+        <ion-label>
+          <h2 class="item-label-title ion-padding-bottom">{{(agent.full_name?agent.full_name: agent.user_name) | titlecase}}</h2>
+          <h4 class="secondpara">{{agent.note}}</h4>
+        </ion-label>
+        <ion-note slot="end" class="font-size-11">
+          {{agent.level==='chief'?'Chef':'Agent simple'}}
+        </ion-note>
+        <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+      </ion-item>
+      <ion-item mode="ios" lines="none" *ngIf="listagents.length>3" (click)="opensearchagents()">
+        <ion-note slot="start" class="font-size-12">
+          Tout voir
+        </ion-note>
+        <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+      </ion-item>
+    </ion-card>
+    <ion-item mode="ios" class="contentbody footeritem" lines="none">
+      <ion-label>
+        <h2 class="font-size-11"><ion-note>Département créé par {{departsent.user_name | titlecase}}.</ion-note></h2>
+        <h4 class="font-size-11"><ion-note>Créé le {{departsent.created_at | date}}.</ion-note></h4>
+        <h4 class="font-size-11"><ion-note>Dernière modification : {{departsent.updated_at | date}}.</ion-note></h4>
+      </ion-label>
+  </ion-item>
+</div>
+</ion-content>

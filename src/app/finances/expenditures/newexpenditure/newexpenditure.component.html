@@ -1,0 +1,125 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back" color="warning" size="large" (click)="appserv.closemodal()"></ion-icon>
+      <ion-text color="primary">{{title?title :'Nouvelle dépense'}}</ion-text>
+      <ion-button color="warning" mode="ios" size="small" (click)="addnew()" slot="end" [disabled]="!newexpenditure.valid">Valider <ion-icon name="checkmark-outline"></ion-icon></ion-button>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" type="indeterminate" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <ion-text>Informations de base</ion-text>
+      </ng-template>
+        <div class="content ion-padding-top">
+          <div class="mobileform">
+            <form class="contentbody form" [formGroup]="newexpenditure">
+              <ion-card class="bd-radius-10 margin-btm-15" mode="ios">
+                <ion-item lines="inset" class="default-list-item2" mode="ios" lines="inset">
+                  <ion-avatar slot="start" class="square-avatar-medium"><ion-icon name="calendar-outline"></ion-icon></ion-avatar> 
+                  <ion-label>
+                    <h2 class="font-size-14 item-label-title"><ion-text>Date opération</ion-text></h2>
+                  </ion-label>
+                  <ion-chip class="font-size-11" slot="end">
+                    <ion-input type="date" formControlName="done_at"></ion-input>
+                  </ion-chip> 
+                 </ion-item>
+                 <br>  
+                 <ion-item lines="inset" class="default-list-item2" mode="ios" lines="inset" (click)="accountpicker()">
+                  <ion-avatar slot="start" class="square-avatar-medium"><ion-icon name="book-outline"></ion-icon></ion-avatar> 
+                  <ion-label>
+                    <h2 class="font-size-14 item-label-title"><ion-text>Compte</ion-text></h2>
+                  </ion-label>
+                  <ion-chip class="font-size-11" *ngIf="actualaccount.name" slot="end">
+                    <ion-text>{{actualaccount.name}}</ion-text>
+                  </ion-chip> 
+                 </ion-item>
+                 <br>
+                 <ion-item lines="none" class="default-list-item2" mode="ios">
+                  <ion-avatar slot="start" class="square-avatar-medium"><ion-icon name="card-outline"></ion-icon></ion-avatar> 
+                  <ion-label>
+                    <h2 class="font-size-14 item-label-title"><ion-text>Monnaie</ion-text></h2>
+                  </ion-label>
+                  <ion-chip class="font-size-11" slot="end">
+                    <ion-text *ngIf="actualMoney.money_name" >{{actualMoney.abreviation}}</ion-text>
+                  </ion-chip> 
+                 </ion-item>
+                 <br>
+                 <ion-item lines="none" class="default-list-item2" mode="ios" (click)="pickservant()">
+                  <ion-avatar slot="start" class="square-avatar-medium"><ion-icon name="people-outline"></ion-icon></ion-avatar> 
+                  <ion-label>
+                    <h2 class="font-size-14 item-label-title"><ion-text>{{isentry?'Provenance':'Bénéficiaire'}}</ion-text></h2>
+                  </ion-label>
+                  <ion-chip class="font-size-11" slot="end" *ngIf="actualservant.name">
+                    <ion-text>{{actualservant.name | titlecase}}</ion-text>
+                  </ion-chip> 
+                 </ion-item> 
+                 <br>
+                 <ion-item lines="none" class="default-list-item2" mode="ios" (click)="picktubs()" *ngIf="!isentry">
+                  <ion-avatar slot="start" class="square-avatar-medium"><ion-icon name="people-outline"></ion-icon></ion-avatar> 
+                  <ion-label>
+                    <h2 class="font-size-14 item-label-title"><ion-text>Caisse source</ion-text></h2>
+                  </ion-label>
+                  <ion-chip class="font-size-11" slot="end" *ngIf="actualfund.description">
+                    <ion-text>{{actualfund.description}}</ion-text>
+                  </ion-chip> 
+                 </ion-item>
+              </ion-card>
+              <ion-card mode="ios">
+                <ion-item lines="full" class="font-size-12 contentbody">
+                  <ion-input label="Montant" type="number" formControlName="amount" #defaultinput></ion-input>
+                </ion-item>
+                
+                <ion-item lines="none" class="font-size-12 contentbody">
+                  <ion-input label="Libellé" type="text" formControlName="motif"></ion-input>
+                </ion-item> 
+        
+              </ion-card>
+            </form>
+          </div>
+        </div>
+    </mat-tab> 
+    <mat-tab class="workspace-item">
+      <ng-template mat-tab-label>
+        <ion-text>{{isentry?'Provenance':'Bénéficiaire'}}</ion-text>
+      </ng-template>
+        <div class="content">
+         <br>
+          <ion-button size="small" mode="ios" color="warning" shape="round" class="ion-margin-start ion-margin-end" [disabled]="!this.newservant.valid" (click)="addnewservant()">
+            <ion-icon name="checkmark-circle" size="small"></ion-icon> &nbsp;
+            <span class="font-size-9">Ajouter</span>
+          </ion-button>
+          <ion-button size="small" mode="ios" color="warning" shape="round" (click)="pickservant()">
+            <ion-icon name="navigate-circle"></ion-icon> &nbsp;
+            <span class="font-size-9">ou séléctionner</span>
+          </ion-button>
+        
+          <form class="contentbody form" [formGroup]="newservant">
+            <ion-card mode="ios">
+              <ion-item lines="full" class="font-size-12 contentbody">
+                <ion-input label="Nom" type="text" formControlName="name"></ion-input>
+              </ion-item>
+              <ion-item lines="full" class="font-size-12 contentbody">
+                <ion-input label="Description" type="text" formControlName="description"></ion-input>
+              </ion-item>
+              
+              <ion-item lines="full" class="font-size-12 contentbody">
+                <ion-input label="Téléphone" type="phone" formControlName="phone"></ion-input>
+              </ion-item> 
+              <ion-item lines="full" class="font-size-12 contentbody">
+                <ion-input label="Email" type="mail" formControlName="email"></ion-input>
+              </ion-item> 
+              <ion-item lines="none" class="font-size-12 contentbody">
+                <ion-input label="Adresse" type="text" formControlName="address"></ion-input>
+              </ion-item>
+            </ion-card>
+          </form>
+      
+        </div>
+    </mat-tab>
+  </mat-tab-group>
+</ion-content>
+

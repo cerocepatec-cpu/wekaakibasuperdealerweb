@@ -1,0 +1,27 @@
+.list-item{
+    margin-bottom: 15px;
+        ion-avatar{
+          width: 35px;
+          height: 35px;
+          background-color: #50c8ff;
+          margin-right: 10px;
+          justify-content: center;
+          display: flex;
+          align-items: center;
+          ion-icon{
+            font-weight: 600;
+            color:white;
+          }
+        }
+        ion-label{
+          .secondpara{
+            // margin-top: -10px !important;
+            font-size: 11px;
+            color: rgb(166, 163, 163);
+          }
+          .item-label-title{
+            font-size: 12px;
+            font-weight: 500;
+          }
+        }
+   }

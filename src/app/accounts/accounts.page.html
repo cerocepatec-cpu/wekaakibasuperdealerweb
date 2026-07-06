@@ -1,0 +1,57 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="full">
+      <ion-text class="font-bold-600 font-size-30" slot="start">Comptes</ion-text>
+      <!-- <ion-text slot="start" color="primary" (click)="showcheckbox=!showcheckbox" *ngIf="!showcheckbox && listaccounts.length>0">Sélectionner</ion-text>
+      <ion-text slot="start" color="primary" (click)="showcheckbox=!showcheckbox; listselectedaccounts=[];" *ngIf="showcheckbox">Terminer</ion-text> -->
+      <ion-icon name="add-circle-outline" slot="end" (click)="newaccount()" *ngIf="!showcheckbox && appserv.permissionFilter('comptes', 'add')" size="large" color="primary"></ion-icon>
+      <!-- <ion-icon name="print-outline" color="secondary" slot="end" *ngIf="!showcheckbox" size="large"></ion-icon> -->
+      <ion-icon name="download-outline" color="success" slot="end" (click)="import()"  *ngIf="!showcheckbox" size="large"></ion-icon>
+      <ion-icon name="share-outline" color="primary" slot="end" [matMenuTriggerFor]="menuexport" *ngIf="!showcheckbox" size="large"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item (click)="exportcsv()"><ion-text class="font-size-12">Exporter en Excel</ion-text></button>
+      <!-- <button mat-menu-item ><ion-text class="font-size-12">Exporter en PDF</ion-text></button> -->
+    </mat-menu>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody cartpreview-80">
+
+  <ion-item lines="none" class="contentbody margin-left-moins-15">
+    <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche" [(ngModel)]="keyword"></ion-searchbar>
+    <ion-icon name="filter-outline" slot="end" [matMenuTriggerFor]="filter_menu" color="primary"></ion-icon>
+    <mat-menu #filter_menu="matMenu">
+      <button mat-menu-item (click)="deletefilter()"> <ion-text class="font-size-11" color="danger">Annuler le filtre</ion-text></button>
+      <button mat-menu-item (click)="filterbytype('gestion')"> <ion-text class="font-size-11">Gestion</ion-text></button>
+      <button mat-menu-item (click)="filterbytype('caisse')"> <ion-text class="font-size-11">Caisse</ion-text></button>
+    </mat-menu>
+  </ion-item>
+
+  <ion-card class="bd-radius-10 ion-padding"  color="warning" *ngIf="listaccounts.length===0">
+    <ion-text class="font-size-13">Aucun compte disponible</ion-text>
+  </ion-card>
+
+  <ion-item class="default-list-item contentbody"  lines="inset" *ngFor="let account of listaccounts | filter:keyword" (click)="menuaccount(account)">
+    <ion-checkbox slot="start" *ngIf="showcheckbox" mode="ios" size="small"></ion-checkbox>
+    <ion-avatar slot="start">
+      <ion-icon name="book-outline" size="small"></ion-icon>
+    </ion-avatar>
+    <ion-label>
+      <p class="item-label-title"><ion-text>{{(account.name?account.name:account.created_at)|titlecase }}</ion-text></p>
+      <p class="secondpara"><ion-text>{{account.description | titlecase}}</ion-text></p>
+    </ion-label>
+    <ion-chip slot="end" class="font-bold-500">{{account.type | titlecase}}</ion-chip>
+  </ion-item>
+</ion-content>
+<ion-footer class="ion-no-border" [translucent]="true" *ngIf="showcheckbox && listselectedaccounts.length>0 && appserv.permissionFilter('comptes','delete')">
+  <ion-toolbar>
+    <ion-item lines="none" class="font-size-14">
+      <ion-text slot="start" color="danger" (click)="multipledelete()"><ion-icon name="trash-outline"></ion-icon></ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>
+
+
+
+

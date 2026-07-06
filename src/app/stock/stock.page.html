@@ -1,0 +1,323 @@
+
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none" lines="full">
+      <ion-text class="font-bold-600" slot="start">Mouvements de stock</ion-text>
+      <ion-chip routerLink="/uzisha/stock/inventory" class="font-bold-600 cursor-pointer light-shadow font-size-12 smalldevicehidden" slot="end">Inventaire</ion-chip>
+      <ion-chip  routerLink="/uzisha/reports" class="font-bold-600 cursor-pointer light-shadow font-size-12 smalldevicehidden" slot="end">Rapport</ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-toolbar class="contentbody largedevicehidden">
+    <ion-chip routerLink="/uzisha/stock/inventory" class="font-bold-600 cursor-pointer light-shadow font-size-12" slot="end">Inventaire</ion-chip>
+    <ion-chip  routerLink="/uzisha/reports" class="font-bold-600 cursor-pointer light-shadow font-size-12" slot="end">Rapport</ion-chip>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" fullscreen>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Recharge des données...">
+    </ion-refresher-content>
+  </ion-refresher>
+    <mat-tab-group>
+      <mat-tab class="workspace-item">
+        <ng-template mat-tab-label>
+          <ion-text>Entrées</ion-text>
+          <ion-text><ion-badge color="warning">({{articlesfromapi.length}})</ion-badge></ion-text>
+        </ng-template>
+        <div class="content">
+          <ion-button size="small" mode="ios" shape="round" color="warning" (click)="gotostockarticlepicker()">
+            <span class="font-size-13">Nouvelle entrée</span> &nbsp;
+            <ion-icon name="add-circle-outline" size="small"></ion-icon>
+          </ion-button> 
+          <ion-button size="small" mode="ios" shape="round" color="success" (click)="saveEntries()" class="ion-float-right" *ngIf="articlesfromapi.length>0">
+            <span class="font-size-12">Enregistrer</span> &nbsp;
+            <ion-icon name="checkmark-circle-outline" size="small"></ion-icon>
+          </ion-button>
+          <div class="ion-padding  bd-square bd-radius-10 ion-margin-bottom" *ngFor="let article of articlesfromapi; let i = index">
+            <ion-grid>
+              <ion-row>
+                <ion-col size="12">
+                  <ion-item class="contentbody default-list-item"  lines="none">
+                    <ion-checkbox slot="start" *ngIf="showcheckbox" mode="ios" size="small" aria-label="product" [checked]="article.selected"></ion-checkbox>
+                    <ion-avatar slot="start" [class]="article.selected?'bg-success':''">
+                      <ion-text class="ion-text-uppercase">{{article.service.name | slice:0:2}}</ion-text>
+                    </ion-avatar>
+                    <ion-label>
+                      <p class="item-label-title" (click)="replacearticle(article,i)">
+                        <ion-text>{{article.service.name | titlecase}}</ion-text>
+                      </p>
+                      <p class="secondpara">
+                        {{article.service.description | titlecase}}
+                      </p>
+                      <p class="secondpara">
+                        <ion-chip>
+                          <ion-input type="date" [(ngModel)]="article.done_at" class="font-size-12" label="Date"></ion-input>
+                        </ion-chip>
+                      </p> 
+                    </ion-label>
+                    <ion-icon name="trash-outline" size="small" slot="end" color="warning" (click)="removearticle(article)"></ion-icon>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                  <ion-col size="12" class="ion-padding" size-lg="4">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12" [color]="article.deposit_mistaken?'danger':''">
+                      <ion-select label="Dépôt" mode="ios" [(ngModel)]="article.deposit_id" (ionChange)="ifexistsdeposit(article)">
+                        <ion-select-option [value]="deposit.id" *ngFor="let deposit of listdeposits">{{deposit.name | titlecase}}</ion-select-option>
+                      </ion-select>
+                    </ion-item>  
+                  </ion-col> 
+                  <ion-col size="12" size-lg="4">
+                    <ion-grid style="margin-top: 10px!important;">
+                      <ion-row>
+                        <ion-col size="10">
+                          <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12">
+                            <ion-select label="Fournisseur:" mode="ios" [(ngModel)]="article.provider_id">
+                              <ion-select-option [value]="provider.id" *ngFor="let provider of providers">{{provider.providerName | titlecase}}</ion-select-option>
+                            </ion-select>
+                          </ion-item>
+                        </ion-col>
+                        <ion-col size="2" (click)="newprovider()">
+                          <ion-icon name="add-circle-outline" size="large" style="margin-top: 5px!important;"></ion-icon>
+                        </ion-col>
+                      </ion-row>
+                    </ion-grid>
+                    
+                  </ion-col>
+                  <ion-col size="12"  size-lg="4" class="ion-padding">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12" [color]="article.quantity_mistaken?'danger':''">
+                      <ion-input type="number" label="Quantité:" [(ngModel)]="article.quantity" (keyup)="totalcalculate2(article)" step="any"></ion-input>
+                    </ion-item>
+                  </ion-col>
+              </ion-row>
+                <ion-row>
+                  <ion-col size="12"  size-lg="4" class="ion-padding">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12" [color]="article.price_mistaken?'danger':''">
+                      <ion-input type="number" label="Prix d'achat:" [(ngModel)]="article.price" (keyup)="totalcalculate2(article)"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="12"  size-lg="4" class="ion-padding">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12">
+                      <ion-input label="Expiration:" [(ngModel)]="article.expiration_date" type="date"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="12" size-lg="4" class="ion-padding">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12">
+                      <ion-input type="text" label="Libellé:" [(ngModel)]="article.motif"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+                <ion-row> 
+                  <ion-col size="12" size-lg="6" class="ion-padding-start ion-padding-end ion-padding-bottom">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12">
+                      <ion-textarea label="Entrer une note:" [(ngModel)]="article.note" autoGrow="true"></ion-textarea>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="12" size-lg="6" class="ion-padding-end ion-padding-start">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12">
+                      <ion-input type="text" label="N° palette:" [(ngModel)]="article.palette"></ion-input>
+                    </ion-item>
+                  </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+        </div>
+        <div class="ion-padding" style="height: 100px!important;padding-bottom: 15px!important;">
+          <ion-button size="small" mode="ios" shape="round" color="warning"  class="ion-float-right ion-margin-bottom" (click)="gotostockarticlepicker()" *ngIf="this.articlesfromapi.length>0">
+            <span class="font-size-13">Nouvelle entrée</span> &nbsp;
+            <ion-icon name="add-circle-outline" size="small"></ion-icon>
+          </ion-button>
+        </div>
+      </mat-tab> 
+      <mat-tab class="workspace-item">
+        <ng-template mat-tab-label>
+          <ion-text>Sorties</ion-text>
+          <ion-text><ion-badge color="warning">({{depositarticles.length}})</ion-badge></ion-text>
+        </ng-template>
+          <div class="content ion-padding">
+            <ion-grid>
+                <ion-row class="bd-square bd-radius-10">
+                    <ion-col size="12" class="ion-padding" size-md="6" size-lg="4">
+                      <ion-searchbar animated="true" placeholder="Séléctionner un produit" (click)="setModalarticlesOpened(true)" mode="ios" search-icon="search-circle" class="font-size-11"></ion-searchbar>
+                    </ion-col>
+                    <ion-col size="12" class="ion-padding" size-md="6" size-lg="4">
+                      <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12">
+                        <ion-select label="Dépôt" mode="ios" [value]="listdeposits.length>0?listdeposits[0].id:0" (ionChange)="changedefaultdeposit($event)">
+                          <ion-select-option [value]="deposit.id" *ngFor="let deposit of listdeposits">{{deposit.name | titlecase}}</ion-select-option>
+                        </ion-select>
+                      </ion-item>  
+                    </ion-col>
+                    <ion-col size="12" class="ion-padding" size-md="6" size-lg="4">
+                      <ion-button size="small" mode="ios" shape="round" color="success" (click)="saveWithdraw()" class="ion-float-right" *ngIf="depositarticles.length>0">
+                        <span class="font-size-12">Enregistrer</span> &nbsp;
+                        <ion-icon name="checkmark-circle-outline" size="small"></ion-icon>
+                      </ion-button> 
+                    </ion-col> 
+                </ion-row>
+            </ion-grid>
+           
+            <div class="ion-padding  bd-square bd-radius-10 ion-margin-bottom" *ngFor="let article of depositarticles; let i = index">
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="12">
+                    <ion-item class="contentbody default-list-item"  lines="none">
+                      <ion-checkbox slot="start" *ngIf="showcheckbox" mode="ios" size="small" aria-label="product" [checked]="article.selected"></ion-checkbox>
+                      <ion-avatar slot="start" [class]="article.selected?'bg-success':''">
+                        <ion-text class="ion-text-uppercase">{{article.service.name | slice:0:2}}</ion-text>
+                      </ion-avatar>
+                      <ion-label>
+                        <p class="item-label-title" (click)="replacearticle(article,i)">
+                          <ion-text>{{article.service.name | titlecase}}</ion-text>
+                        </p>
+                        <p class="secondpara">
+                          {{article.service.description | titlecase}}
+                        </p>
+                        <p class="secondpara">
+                          <ion-chip>
+                            <ion-input type="date" [(ngModel)]="article.done_at" class="font-size-12" label="Date"></ion-input>
+                          </ion-chip>
+                        </p> 
+                      </ion-label>
+                      <ion-icon name="trash-outline" size="small" slot="end" color="warning" (click)="removewithdrawarticle(article)"></ion-icon>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+          
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="12" size-md="6" size-lg="4" class="ion-padding">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12">
+                      <ion-input type="number" label="Quantité: " [(ngModel)]="article.quantity" (keyup)="totalcalculate2(article)"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="12" size-md="6" size-lg="4" class="ion-padding">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12">
+                      <ion-input type="number" label="Déstoqué au prix de: " [(ngModel)]="article.service.price" (keyup)="totalcalculate2(article)"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="12" size-md="6" size-lg="4" class="ion-padding">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12">
+                      <ion-input type="text" label="Motif" [(ngModel)]="article.motif"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="12" size-md="6" size-lg="4" class="ion-padding">
+                    <ion-item lines="none" mode="ios" class="contentbody bd-square bd-radius-10 font-size-12">
+                      <ion-textarea label="Entrer une note: " [(ngModel)]="article.note"></ion-textarea>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </div>
+            <hr class="hr" *ngIf="this.depositarticles.length>0">
+            <ion-button size="small" mode="ios" shape="round" color="warning"  class="ion-float-right ion-margin-bottom"  (click)="setModalarticlesOpened(true)" *ngIf="this.depositarticles.length>0">
+              <span class="font-size-13">Nouvelle sortie</span> &nbsp;
+              <ion-icon name="search-outline" size="small"></ion-icon>
+            </ion-button>
+
+          <ion-modal  (willDismiss)="BeforeClosingSearchModal($event)" (didPresent)="aftermodalpresented($event)" [isOpen]="isModalOpen" class="modal-border-radius-20">
+            <ng-template>
+              <ion-header class="ion-no-border">
+                <ion-toolbar class="contentbody ion-padding-top">
+                  <ion-searchbar  
+                    mode="ios" placeholder="Recherche"  #mobileinputSearch (keyup)="mobilelookupmethod($event)" 
+                    (ionClear)="appserv.closemodal()" cancel-button-text="Fermer"
+                    show-cancel-button="always"
+                    cancel-button-icon="trash"
+                    ></ion-searchbar>
+                </ion-toolbar>
+              </ion-header>
+              <ion-content class="contentbody">
+                <ion-item *ngFor="let article of withdrawlistarticles; let i =index;" class="default-list-item contentbody" (click)="addtocart(article,i)">
+                  <ion-avatar>
+                    <ion-img  *ngIf="article.service.photo" [src]="article.service.photo" ></ion-img>
+                    <ion-icon name="image-outline" *ngIf="!article.service.photo"></ion-icon>
+                  </ion-avatar>
+                  <ion-label>
+                    <p class="item-label-title">{{article.service.name | titlecase}}</p>
+                    <p class="secondpara">{{article.service.description | titlecase}}</p>
+                  </ion-label>
+                  <ion-chip class="font-size-11 font-bold-600" *ngIf="!article.selected">{{article.quantity | number}} {{article.service.uom_symbol}}</ion-chip>
+                  <ion-icon name="checkmark-outline" color="success" *ngIf="article.selected"></ion-icon>
+                </ion-item>
+              </ion-content>
+            </ng-template>
+          </ion-modal>
+          </div>
+      </mat-tab>
+        <!-- <mat-tab class="workspace-item">
+                <ng-template mat-tab-label>
+                  <ion-text>Transferts</ion-text>
+                  <ion-text><ion-badge color="warning">({{depositarticles.length}})</ion-badge></ion-text>
+                </ng-template>
+                  <div class="content ion-padding">
+                    <ion-chip class="font-size-12" color="secondary">Tous</ion-chip>
+                    <ion-chip class="font-size-12" color="medium">Envoyés</ion-chip>
+                    <ion-chip class="font-size-12" color="primary">Pour vous</ion-chip>
+                    <ion-chip class="font-size-12" color="success">Validés</ion-chip>
+                    <ion-chip class="font-size-12" color="danger">Non validés</ion-chip>
+                    <ion-button size="small" mode="ios" shape="round" color="warning"  class="ion-float-right" (click)="newtransfert()">
+                      <span class="font-size-13">Nouveau transfert</span> &nbsp;
+                      <ion-icon name="add-outline" size="small"></ion-icon>
+                    </ion-button>
+                    <hr class="hr">
+                    <ion-searchbar mode="ios" placeholder="Rechercher"></ion-searchbar>
+                    <h5>Réçus</h5>
+                    <ion-item class="contentbody default-list-item bd-square bd-radius-10 ion-margin-bottom"  lines="none" *ngFor="let transfert of listransferts.received">
+                      <ion-avatar slot="start">
+                        <ion-text class="ion-text-uppercase">{{transfert.service_name | slice:0:2}}</ion-text>
+                      </ion-avatar>
+                      <ion-label>
+                        <p class="item-label-title">
+                          <ion-text>{{transfert.service_name | titlecase}}</ion-text>
+                        </p> 
+                        <p class="secondpara">
+                          <ion-text>Expéditeur: {{transfert.deposit_sender_name | titlecase}}</ion-text>
+                        </p>
+                        <p class="secondpara">
+                          Destinataire : {{transfert.deposit_receiver_name | titlecase}}
+                        </p>
+                        <p class="secondpara font-bold-600">
+                          {{transfert.status==='pending'?'En cours':transfert.status==='received'?'Réçu':transfert.status==='refused'?'Réfusé':''}}
+                        </p>
+                        <p>
+                          <ion-chip mode="ios" class="font-size-12" color="success" (click)="validatetransfert(transfert)">Valider <ion-icon name="thumbs-up" size="small"></ion-icon></ion-chip>
+                          <ion-chip mode="ios" class="font-size-12" color="danger">Réfuser <ion-icon name="thumbs-down" size="small"></ion-icon></ion-chip>
+                        </p> 
+                      </ion-label>
+                      <ion-chip>{{transfert.quantity_sent | number}} {{transfert.uom_symbol}}</ion-chip>
+                      <ion-icon name="ellipsis-vertical" size="small" (click)="detailtransfert(transfert)" class="cursor-pointer"></ion-icon>
+                    </ion-item>
+
+                    <h5>Envoyés</h5>
+                    <ion-item class="contentbody default-list-item bd-square bd-radius-10 ion-margin-bottom"  lines="none" *ngFor="let transfert of listransferts.sent">
+                      <ion-avatar slot="start">
+                        <ion-text class="ion-text-uppercase">{{transfert.service_name | slice:0:2}}</ion-text>
+                      </ion-avatar>
+                      <ion-label>
+                        <p class="item-label-title">
+                          <ion-text>{{transfert.service_name | titlecase}}</ion-text>
+                        </p> 
+                        <p class="secondpara">
+                          <ion-text>Expéditeur: {{transfert.deposit_sender_name | titlecase}}</ion-text>
+                        </p>
+                        <p class="secondpara">
+                          Destinataire : {{transfert.deposit_receiver_name | titlecase}}
+                        </p>
+                        <p class="secondpara font-bold-600">
+                          {{transfert.status}}
+                        </p> 
+                      </ion-label>
+                      <ion-chip>{{transfert.quantity_sent | number}}</ion-chip>
+                    </ion-item>
+                    
+                   </div>
+              </mat-tab> -->
+    </mat-tab-group>
+</ion-content>
+
+

@@ -1,0 +1,38 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none" class="contentbody">
+      <ion-icon name="chevron-back-outline" color="primary" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <h4 slot="start" class="font-bold-600 font-size-15">{{selectedarticles.length===0?'Sélectionner les produits':selectedarticles.length>1?selectedarticles.length + ' sélectionnés':selectedarticles.length + ' sélectionné'}}</h4>
+      <ion-chip [disabled]="selectedarticles.length===0" (click)="sendselected()" slot="end" color="primary">
+        <ion-icon name="checkmark-outline"  size="large"></ion-icon>
+      </ion-chip>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-item class="font-size-12 contentbody" lines="none">
+    <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-12" [(ngModel)]="search"></ion-searchbar>
+  </ion-item>
+
+  
+  <!-- <ion-note *ngFor="let item of listarticles">
+      {{item.name}}
+  </ion-note> -->
+  <ion-item class="contentbody default-list-item" *ngFor="let article of listarticles  |filter:search" (click)="selected(article)" lines="inset">
+    <ion-avatar slot="start">
+      <ion-text class="ion-text-uppercase">{{article.service.name | slice:0:2}}</ion-text>
+    </ion-avatar>
+    <ion-label>
+      <p class="item-label-title">
+        <ion-text>{{article.service.name | titlecase}}</ion-text> 
+      </p>
+      <!-- <p class="secondpara">
+        <span class="reqtotalprinted font-size-11">{{article.prices[0].price}} {{article.prices.length>0?article.prices[0].abreviation:''}} | Catég. {{article.service.category_name | titlecase}}</span>
+      </p> -->
+      <p class="secondpara">
+        {{article.service.description | titlecase}}
+      </p> 
+    </ion-label>
+    <ion-icon slot="end" *ngIf="article.selected"  name="checkmark-circle-outline" color="success" size="small"></ion-icon>
+  </ion-item>
+</ion-content>

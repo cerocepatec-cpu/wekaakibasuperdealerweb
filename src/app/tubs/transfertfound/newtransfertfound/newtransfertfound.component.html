@@ -1,0 +1,50 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none" (click)="picktubs('tub1')">
+      <ion-label>
+        <p>Caisse expéditrice</p>
+        <p class="font-size-12 font-bold-600">{{tubSent.description}}</p>
+      </ion-label>
+      <ion-chip>
+        {{tubSent.money_abreviation}}
+      </ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" type="indeterminate" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="ion-padding contentbody">
+  <h2><ion-text>Nouveau Transfert</ion-text></h2>
+  <ion-item (click)="picktubs()" mode="ios" color="secondary" class="bd-radius-10 font-size-12" lines="none" detail="true">
+    <ion-label>Caisse destinataire</ion-label>
+    <ion-text class="font-bold-600">{{receiverTub.description | titlecase}}</ion-text>
+  </ion-item>
+  <br>
+  <form [formGroup]="newtransfert" class="form">
+    <ion-item lines="none" class="bd-square font-size-12">
+      <ion-label >{{'date operation'| titlecase}}</ion-label>
+      <ion-input type="date" formControlName="date_operation"></ion-input>
+    </ion-item> 
+    <ion-item lines="none" class="bd-square font-size-12">
+      <ion-label>Montant</ion-label>
+      <ion-input type="number" formControlName="amount" (ionChange)="ratechanging()"></ion-input>
+    </ion-item>
+    <ion-item lines="none" class="bd-square font-size-12">
+      <ion-label>Taux</ion-label>
+      <ion-input type="number" formControlName="rate" (ionChange)="ratechanging()"></ion-input>
+    </ion-item>
+    <ion-item lines="none" class="bd-square font-size-12">
+      <ion-label>Commentaire</ion-label>
+      <ion-input type="text" formControlName="comment"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="showconvertedamount" lines="none" class="bd-square font-size-12">
+      <ion-label>Montant converti</ion-label>
+      <ion-input type="number" formControlName="converted_amount" [disabled]="true"></ion-input>
+    </ion-item>
+    <br>
+    <div class="buttons-group">
+      <ion-chip class="lightbutton" (click)="appserv.closemodal()">Annuler</ion-chip>
+      <ion-chip class="submitbutton" (click)="addnewtransfert()">Transférer</ion-chip>
+    </div>
+  </form> 
+</ion-content>
+  

@@ -1,0 +1,44 @@
+<ion-content class="refresh-container">
+  <canvas id="securityParticles"></canvas>
+
+  <div class="security-overlay">
+    <div class="security-frame animate__animated animate__fadeInDown">
+      <div class="security-logo">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+      </div>
+
+      <h2 class="title">Authentification requise</h2>
+      <p class="subtitle">
+        Votre session est expirée. Veuillez entrer votre mot de passe pour continuer.
+      </p>
+
+      <form (ngSubmit)="validatePassword()" [formGroup]="form">
+        <ion-item class="input-item">
+          <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+          <ion-input
+            type="password"
+            formControlName="password"
+            placeholder="Mot de passe"
+            autofocus
+          ></ion-input>
+        </ion-item>
+
+        <ion-button
+          expand="block"
+          shape="round"
+          class="btn-validate"
+          [disabled]="form.invalid || loading"
+          type="submit"
+        >
+          <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
+          <span *ngIf="!loading">Déverrouiller</span>
+        </ion-button>
+      </form>
+
+      <div class="security-footer cursor-pointer" (click)="reconnectMe()">
+        <ion-icon name="key-outline"></ion-icon>
+        <span>Me réconnecter</span>
+      </div>
+    </div>
+  </div>
+</ion-content>

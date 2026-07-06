@@ -1,0 +1,96 @@
+<ion-header class="ion-no-border ion-padding">
+  <ion-toolbar *ngIf="!groupvalidation">
+    <ion-row>
+      <ion-col (click)="appserv.closemodal()"><ion-text color="warning">Annuler</ion-text></ion-col>
+      <ion-col>
+        <ion-title>{{criteria==="employees"?"Ajouter des employés":"Ajouter des membres"}}</ion-title><br>
+        <ion-note style="padding-left: 100px!important;padding-top: -40px!important;position: relative;">{{selectedusers.length}}/{{listusers.length}}</ion-note>
+      </ion-col>
+      <ion-col *ngIf="selectedusers.length>0 && !groupvalidation" (click)="nextstep()"><ion-text color="warning">{{groupsent?'Ajouter':'Suivant'}}</ion-text></ion-col>
+    </ion-row>
+  </ion-toolbar>  
+  <ion-toolbar *ngIf="groupvalidation">
+    <ion-row>
+      <ion-col (click)="groupvalidation=!groupvalidation"><ion-text color="warning">Retour</ion-text></ion-col>
+      <ion-col>
+        <ion-title class="font-size-15">Nouveaux postes</ion-title>
+      </ion-col>
+      <ion-col *ngIf="selectedusers.length>0 && groupvalidation" (click)="validatejobsnames()"><ion-text color="warning">Créer</ion-text></ion-col>
+    </ion-row>
+  </ion-toolbar>
+  <ion-toolbar *ngIf="!groupvalidation">
+    <ion-searchbar mode="ios" placeholder="Rechercher par un nom ou un code"  [(ngModel)]="search" #defaultinput (ionInput)="handlesearchchange($event)"></ion-searchbar>
+    <ion-card mode="ios" class="ion-padding-left" *ngIf="selectedusers.length>0">
+      <ion-buttons class="vertical-scroll">
+        <ion-tab-button class="chat-item" *ngFor="let selected of selectedusers">
+          <div class="avatar-container">
+            <img src="../../assets/wekaakibalight.png" alt="Avatar" class="avatar">
+            <button class="delete-btn" (click)="removefromlist(selected)">&#10005;</button>
+          </div>
+          <ion-label class="text-ellipsis">
+            {{(selected.full_name?selected.full_name:selected.user_name) | titlecase}}
+          </ion-label>
+        </ion-tab-button>
+      </ion-buttons>
+    </ion-card>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ng-container *ngIf="!groupvalidation">
+    <ion-card mode="ios" class="ion-padding" *ngIf="listusers.length>0">
+      <ion-item class="default-avatar-item" *ngFor="let user of listusers">
+        <ion-avatar slot="start">
+          <ion-icon name="person"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <p class="item-label-title">{{(user.full_name?user.full_name:user.user_name) | uppercase}}</p>
+          <p>{{user.uuid}}</p>
+        </ion-label>
+        <ion-checkbox [checked]="user.selected" slot="end" (ionChange)="handleselectuserchange($event,user)"></ion-checkbox>
+      </ion-item>
+    </ion-card>
+  </ng-container>
+  
+
+  <ng-container *ngIf="groupvalidation">
+    <div class="ion-padding">
+      <ion-note class="ion-padding-start">EMPLOYES: {{selectedusers.length}}</ion-note>
+      <ion-card mode="ios" class="ion-padding" *ngIf="selectedusers.length>0">
+        <ion-grid *ngFor="let selected of selectedusers" class="font-size-12 bd-radius-10 bd-square full-width ion-margin-bottom">
+          <ion-row>
+            <ion-col size="12">
+              <ion-item class="default-list-item"  lines="none">
+                <ion-avatar slot="start">
+                  <ion-icon name="person" size="small"></ion-icon>
+                </ion-avatar>
+                <ion-label >
+                  <p class="item-label-title font-size-14"><ion-text>{{(selected.full_name?selected.full_name:selected.user_name)|titlecase }} <ion-note class="font-size-12">({{selected.uuid?selected.uuid:selected.description}})</ion-note></ion-text></p>
+                  <p class="secondpara"><ion-text>{{selected.user_name?selected.user_name:selected.note}}</ion-text></p>
+                </ion-label>
+                <ion-icon name="trash" size="small" color="warning" class="cursor-pointer" slot="end" (click)="removefromlist(selected)"></ion-icon>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="12" class="font-size-12">
+              <ion-item lines="full">
+                <ion-text slot="start" class="font-size-12">Poste:</ion-text>
+                <select [(ngModel)]="selected.position_id" class="bd-square bd-radius-10 font-size-12" slot="end" (onChange)="handlepositionchanged($event)">
+                  <!-- <option value="addnew"> Nouveau poste</option> -->
+                  <option *ngFor="let position of positionslist" [value]="position.id">
+                    {{position.name}}
+                  </option>
+                </select>
+              </ion-item>
+            </ion-col> 
+            <ion-col size="12" class="font-size-12">
+              <ion-item lines="full">
+                <ion-textarea class="font-size-12" autoGrow="true" spellcheck="true" [(ngModel)]="selected.description" label="Déscription:"></ion-textarea>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card>
+    </div>
+  </ng-container>
+</ion-content>

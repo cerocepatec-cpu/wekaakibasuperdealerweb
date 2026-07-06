@@ -1,0 +1,58 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item  lines="full">
+      <ion-avatar class="bg-medium justify-content cursor-pointer" slot="start" routerLink="/uzisha/stock"><ion-icon color="light" name="chevron-back-outline" size="large"></ion-icon></ion-avatar>
+      <ion-text class="font-bold-600 font-size-30">Demandes d'approvisionnement</ion-text>
+      <ion-icon name="add-circle-outline" color="primary" size="large" slot="end" (click)="newrequest()"></ion-icon>
+      <ion-icon name="print-outline" color="secondary" slot="end" size="large" (click)="export('print')"></ion-icon>
+      <ion-icon name="download-outline" color="success" slot="end" [matMenuTriggerFor]="menuexport" size="large"></ion-icon>
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item (click)="export('excel')"><ion-text class="font-size-12">Exporter en Excel</ion-text></button>
+      <button mat-menu-item (click)="export('pdf')"><ion-text class="font-size-12">Exporter en PDF</ion-text></button>
+    </mat-menu>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+ 
+  <ion-item lines="none" class="contentbody margin-left-moins-15">
+    <ion-searchbar class="font-size-11"  mode="ios" placeholder="Recherche" [(ngModel)]="search"></ion-searchbar>
+    <ion-icon name="calendar-outline" slot="end" color="primary" size="small" (click)="periodicfilter()"></ion-icon>
+    <ion-icon name="filter-outline" slot="end"  size="small" [matMenuTriggerFor]="animals2" color="primary"></ion-icon>
+    <mat-menu #animals2="matMenu">
+      <button mat-menu-item ><ion-text class="font-size-11" color="danger">Annuler le filtre</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-11">Entrées</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-11">Sorties</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-11">Cash</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-11">Dettes</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-11">Dépôt</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-11">Agent</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-11">Articles</ion-text></button>
+    </mat-menu>
+  </ion-item>
+  <ion-item class="bd-radius-10" *ngIf="listrequest.length===0" color="warning" lines="none">
+    <ion-text class="font-size-13">Aucune demande disponible</ion-text>
+   </ion-item>
+  <ion-item mode="ios" class="default-list-item3 contentbody"  lines="full" *ngFor="let request of listrequest |filter:search" (click)="detail(request)">
+    <ion-avatar slot="start"><ion-text class="font-bold-600 font-size-15 ion-text-uppercase">{{request.service_name | slice:0:2}}</ion-text></ion-avatar>
+    <ion-label>
+      <ion-text class="item-label-title font-size-15" [color]="request.type==='withdraw'?'danger':''">{{request.service_name | titlecase}}</ion-text>
+      <h4 class="secondpara font-size-11"><ion-note>Dépôt demandeur : {{request.deposit_sender_name | titlecase}}</ion-note></h4>
+      <h4 class="secondpara font-size-11"><ion-note>Dépôt fournisseur : {{request.deposit_receiver_name | titlecase}}</ion-note></h4>
+      <h4 class="secondpara font-size-11">
+        <ion-note class="font-bold-600">Fait, le {{request.created_at| date}} </ion-note>
+      </h4> 
+      <h4 class="secondpara">
+        <ion-note class="done_by_bloc">Par {{request.sender_name | titlecase}}</ion-note>
+      </h4>
+      <h4 class="secondpara">
+        <ion-note class="done_by_bloc">Réçu le {{request.updated_at | date }} par {{request.receiver_name | titlecase}}</ion-note>
+      </h4>
+    </ion-label>
+    <ion-text slot="end" class="font-size-16" [color]="request.type==='withdraw'?'danger':''">
+      {{request.quantity_sent | number}} {{request.uom_symbol}} 
+    </ion-text>
+    <ion-icon name="radio-button-on-outline" [color]="request.status==='0'?'warning':'secondary'" slot="end" size="small" class="unreadbutton ion-padding-start" *ngIf="!request.read" ></ion-icon>
+  </ion-item>
+</ion-content>

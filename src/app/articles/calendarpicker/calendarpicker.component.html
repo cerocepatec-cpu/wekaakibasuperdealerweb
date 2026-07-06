@@ -1,0 +1,15 @@
+<ion-header class="ion-no-border ion-padding">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-text  (click)="closemodal()" slot="start" color="primary" class="font-size-14">Annuler</ion-text>
+      <ion-text slot="start" class="font-size-14">Sélectionner une date d'expiration</ion-text> 
+      <ion-icon name="checkmark-outline" slot="end" size="large" (click)="sendcalendar()" color="success"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+ 
+    <ion-datetime locale="fr-GB-u-hc-h12" [(ngModel)]="calendar">
+      <span slot="time-label">Heure</span>
+    </ion-datetime>
+</ion-content>

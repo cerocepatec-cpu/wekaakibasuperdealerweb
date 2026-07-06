@@ -1,0 +1,37 @@
+<div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm transition">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-start mb-3">
+    <div class="text-sm text-gray-500 dark:text-gray-400">
+      {{ title }}
+    </div>
+    <ion-icon
+      [name]="icon"
+      class="text-lg text-gray-400">
+    </ion-icon>
+  </div>
+
+  <!-- TOTAL COUNT -->
+  <div class="text-2xl font-bold text-gray-900 dark:text-white">
+    {{ totalCount | number}}
+  </div>
+
+  <!-- AMOUNTS BY CURRENCY -->
+  <div class="mt-2 space-y-1">
+
+    <div *ngFor="let item of data | keyvalue"
+         class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+
+      <span class="font-medium">
+        {{ item.key }}
+      </span>
+
+      <span>
+        {{ item.value.amount | number}}
+      </span>
+
+    </div>
+
+  </div>
+
+</div>

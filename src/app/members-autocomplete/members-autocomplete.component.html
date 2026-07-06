@@ -1,0 +1,63 @@
+<div class="relative w-full">
+
+  <!-- INPUT -->
+  <div
+    class="flex items-center gap-3 px-4 py-3
+           bg-white dark:bg-gray-800
+           rounded-xl shadow-sm
+           focus-within:ring-2 focus-within:ring-primary">
+
+    <ion-icon
+      [name]="icon"
+      class="text-gray-400 text-lg">
+    </ion-icon>
+
+    <input
+      type="text"
+      [placeholder]="placeholder"
+      class="flex-1 bg-transparent outline-none text-sm"
+      [value]="query"
+      (input)="onInput($event)"
+      (keydown)="onKeyDown($event)"
+      (blur)="close()"
+    />
+  </div>
+
+  <!-- DROPDOWN -->
+  <div
+    *ngIf="isOpen && results.length"
+    class="absolute z-50 mt-2 w-full
+           bg-white dark:bg-gray-800
+           rounded-xl shadow-lg
+           overflow-hidden">
+
+    <div
+      *ngFor="let item of results; let i = index"
+      (mousedown)="select(item)"
+      [class.bg-gray-100]="i === activeIndex"
+      [class.dark:bg-gray-700]="i === activeIndex"
+      class="flex gap-3 px-4 py-3 cursor-pointer
+             hover:bg-gray-100 dark:hover:bg-gray-700">
+
+      <ion-icon
+        name="person-outline"
+        class="text-gray-400 mt-0.5">
+      </ion-icon>
+
+      <div>
+        <div
+          class="text-sm"
+          [innerHTML]="highlight(item[labelKey])">
+        </div>
+
+        <div
+          *ngIf="subLabelKey && item[subLabelKey]"
+          class="text-xs text-gray-500">
+          {{ item[subLabelKey] }}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

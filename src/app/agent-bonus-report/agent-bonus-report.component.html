@@ -1,0 +1,575 @@
+<ion-header
+  class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700"
+>
+  <ion-toolbar class="bg-transparent px-4">
+    <div
+      class="flex flex-col md:flex-row md:items-center md:justify-between w-full gap-3"
+    >
+      <!-- LEFT : TITLE -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <h1 class="text-lg font-bold text-gray-800 dark:text-white">
+          Agent Bonus Report
+        </h1>
+
+        <div class="flex rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden text-xs">
+          <button
+            type="button"
+            (click)="switchTab('report')"
+            [ngClass]="activeTab === 'report' ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300'"
+            class="px-3 py-1.5 font-semibold transition"
+          >
+            Rapport
+          </button>
+          <button
+            type="button"
+            (click)="switchTab('disbursement')"
+            [ngClass]="activeTab === 'disbursement' ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300'"
+            class="px-3 py-1.5 font-semibold transition border-l border-gray-200 dark:border-slate-700"
+          >
+            Decaissement
+          </button>
+        </div>
+
+        <span
+          *ngIf="activeTab === 'report' && pagination.total"
+          class="text-sm text-gray-500 dark:text-gray-400"
+        >
+          ({{ pagination.total }} found)
+        </span>
+      </div>
+
+      <!-- RIGHT : PAGINATION -->
+      <div
+        *ngIf="activeTab === 'report' && pagination.last_page > 1"
+        class="flex items-center gap-2 flex-wrap"
+      >
+        <!-- Previous -->
+        <button
+          (click)="prevPage()"
+          [disabled]="pagination.current_page === 1"
+          aria-label="Page precedente"
+          title="Page precedente"
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md border bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-slate-800 transition"
+        >
+          <ion-icon name="chevron-back-outline" aria-hidden="true"></ion-icon>
+        </button>
+
+        <!-- Numbered Pages -->
+        <button
+          *ngFor="let page of getPages()"
+          (click)="loadReport(page)"
+          [ngClass]="{
+            'bg-emerald-600 text-white': page === pagination.current_page,
+            'bg-white dark:bg-slate-900 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-slate-700':
+              page !== pagination.current_page
+          }"
+          class="px-3 py-1 rounded-md text-sm font-medium transition hover:bg-gray-100 dark:hover:bg-slate-800"
+        >
+          {{ page }}
+        </button>
+
+        <!-- Next -->
+        <button
+          (click)="nextPage()"
+          [disabled]="pagination.current_page === pagination.last_page"
+          aria-label="Page suivante"
+          title="Page suivante"
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md border bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-slate-800 transition"
+        >
+          <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gray-50 dark:bg-slate-950" fullscreen>
+  <div class="p-4 space-y-4" *ngIf="activeTab === 'report'">
+    <!-- ================= FILTER CARD ================= -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-5">
+      <!-- ================= BASIC FILTERS ================= -->
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-end"
+      >
+        <!-- SEARCH -->
+        <div class="xl:col-span-2">
+          <input
+            type="text"
+            [(ngModel)]="filters.search"
+            placeholder="Search agent, transaction..."
+            class="w-full rounded-xl border px-4 py-2.5 bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none transition"
+          />
+        </div>
+
+        <!-- CURRENCY -->
+        <select
+          [(ngModel)]="filters.currency_id"
+          class="rounded-xl border px-4 py-2.5 bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500"
+        >
+          <option value="">All Currencies</option>
+          <option *ngFor="let m of currencies" [value]="m.id">
+            {{ m.abreviation }}
+          </option>
+        </select>
+      </div>
+
+      <!-- ================= ACTION ROW ================= -->
+      <div
+        class="mt-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+      >
+        <!-- LEFT SIDE : RESET + APPLY -->
+        <div class="flex gap-3">
+          <button
+            type="button"
+            (click)="resetFilters()"
+            class="px-5 py-2 rounded-xl bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200 font-medium"
+          >
+            Reset
+          </button>
+
+          <button
+            type="button"
+            (click)="loadReport()"
+            class="px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition"
+          >
+            Apply Filters
+          </button>
+        </div>
+
+        <!-- RIGHT SIDE : ADVANCED -->
+        <button
+          (click)="toggleAdvancedFilters()"
+          class="flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition"
+        >
+          Advanced Filters
+
+          <ion-icon
+            name="chevron-down-outline"
+            aria-hidden="true"
+            class="transition duration-300"
+            [ngClass]="{ 'rotate-180': showAdvancedFilters }"
+          ></ion-icon>
+        </button>
+      </div>
+
+      <!-- ================= ADVANCED FILTERS ================= -->
+      <div
+        *ngIf="showAdvancedFilters"
+        class="mt-5 border-t border-gray-200 dark:border-slate-700 pt-5 space-y-5"
+      >
+        <!-- AGENT + PERIOD -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+          <select
+            [(ngModel)]="filters.agent_id"
+            class="rounded-xl border px-4 py-2.5 bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="">All Agents</option>
+            <option *ngFor="let a of agents" [value]="a.id">
+              {{ a.name }}
+            </option>
+          </select>
+
+          <div class="md:col-span-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              (click)="setPeriod('today')"
+              [ngClass]="getPeriodClass('today')"
+              class="px-4 py-1.5 rounded-full text-sm font-medium transition"
+            >
+              Today
+            </button>
+
+            <button
+              type="button"
+              (click)="setPeriod('week')"
+              [ngClass]="getPeriodClass('week')"
+              class="px-4 py-1.5 rounded-full text-sm font-medium transition"
+            >
+              Week
+            </button>
+
+            <button
+              type="button"
+              (click)="setPeriod('month')"
+              [ngClass]="getPeriodClass('month')"
+              class="px-4 py-1.5 rounded-full text-sm font-medium transition"
+            >
+              Month
+            </button>
+
+            <button
+              type="button"
+              (click)="toggleGroupMode()"
+              [ngClass]="
+                groupByAgent
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200'
+              "
+              class="px-4 py-1.5 rounded-full text-sm font-medium transition"
+            >
+              Grouper par agent
+            </button>
+          </div>
+        </div>
+
+        <!-- DATE RANGE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            type="date"
+            [(ngModel)]="filters.start_date"
+            class="rounded-xl border px-4 py-2.5 bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700"
+          />
+
+          <input
+            type="date"
+            [(ngModel)]="filters.end_date"
+            class="rounded-xl border px-4 py-2.5 bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700"
+          />
+        </div>
+      </div>
+    </div>
+    <!-- ================= END FILTER CARD ================= -->
+    <!-- ================= SUMMARY TOGGLE ================= -->
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        Summary
+      </h2>
+
+      <button
+        (click)="toggleStats()"
+        class="flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition"
+      >
+        {{ showStats ? "Hide" : "Show" }}
+
+        <ion-icon
+          name="chevron-down-outline"
+          aria-hidden="true"
+          class="transition duration-300"
+          [ngClass]="{ 'rotate-180': showStats }"
+        ></ion-icon>
+      </button>
+    </div>
+
+    <div
+      *ngIf="showStats"
+      class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 transition-all duration-300"
+    >
+      <div
+        *ngFor="let s of stats"
+        class="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm"
+      >
+        <div class="flex justify-between items-center mb-3">
+          <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            {{ s.currency.abreviation }}
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <span class="text-xs text-gray-500">Total</span>
+            <span class="font-bold text-gray-800 dark:text-white">
+              {{ s.total | number : "1.2-2" }}
+            </span>
+          </div>
+
+          <div class="flex justify-between">
+            <span class="text-xs text-gray-500">Paid</span>
+            <span class="font-semibold text-emerald-600">
+              {{ s.paid | number : "1.2-2" }}
+            </span>
+          </div>
+
+          <div class="flex justify-between">
+            <span class="text-xs text-gray-500">Pending</span>
+            <span class="font-semibold text-amber-500">
+              {{ s.pending | number : "1.2-2" }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SLIM DESKTOP TABLE ================= -->
+    <div
+      *ngIf="!groupByAgent"
+      class="hidden md:block bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden"
+    >
+      <div class="max-h-[600px] overflow-auto">
+        <table class="w-full text-xs border-collapse">
+          <!-- HEADER -->
+          <thead
+            class="sticky top-0 z-10 bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-gray-400"
+          >
+            <tr class="uppercase tracking-wide">
+              <th class="px-4 py-2 text-left font-semibold">Agent</th>
+
+              <th class="px-4 py-2 text-left font-semibold">Date</th>
+
+              <th class="px-4 py-2 text-right font-semibold">Amount</th>
+
+              <th class="px-4 py-2 text-center font-semibold">Status</th>
+            </tr>
+          </thead>
+
+          <!-- BODY -->
+          <tbody>
+            <tr
+              *ngFor="let bonus of bonuses"
+              class="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+            >
+              <!-- Agent -->
+              <td class="px-4 py-2 text-gray-800 dark:text-white font-medium">
+                {{ bonus.agent?.name }}
+              </td>
+
+              <!-- Date -->
+              <td class="px-4 py-2 text-gray-500 dark:text-gray-400">
+                {{ bonus.created_at | date : "short" }}
+              </td>
+
+              <!-- Amount -->
+              <td class="px-4 py-2 text-right">
+                <span class="font-semibold text-gray-900 dark:text-white">
+                  {{ bonus.amount | number : "1.2-2" }}
+                </span>
+
+                <span class="text-[10px] text-gray-500 ml-1">
+                  {{ bonus.currency?.abreviation }}
+                </span>
+              </td>
+
+              <!-- Status -->
+              <td class="px-4 py-2 text-center">
+                <span
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium"
+                  [ngClass]="{
+                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300':
+                      bonus.status === 'paid',
+                    'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300':
+                      bonus.status === 'pending'
+                  }"
+                >
+                  <span
+                    class="w-1.5 h-1.5 rounded-full mr-1"
+                    [ngClass]="{
+                      'bg-emerald-500': bonus.status === 'paid',
+                      'bg-amber-500': bonus.status === 'pending'
+                    }"
+                  >
+                  </span>
+
+                  {{ bonus.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- GROUPED VIEW -->
+    <div *ngIf="groupByAgent" class="space-y-4">
+      <div
+        *ngFor="let item of bonuses"
+        class="bg-white dark:bg-slate-900 rounded-xl shadow-sm p-4"
+      >
+        <h3 class="font-semibold text-gray-800 dark:text-white mb-3">
+          {{ item.agent.name }}
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div
+            *ngFor="let t of item.totals"
+            class="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg"
+          >
+            <p class="text-xs text-gray-500 mb-1">
+              {{ t.currency }}
+            </p>
+
+            <p class="text-sm font-semibold">
+              Total: {{ t.total | number : "1.2-2" }}
+            </p>
+
+            <p class="text-xs text-emerald-600">
+              Paid: {{ t.paid | number : "1.2-2" }}
+            </p>
+
+            <p class="text-xs text-amber-500">
+              Pending: {{ t.pending | number : "1.2-2" }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MOBILE CARDS ================= -->
+    <div *ngIf="!groupByAgent" class="md:hidden space-y-3">
+      <div
+        *ngFor="let bonus of bonuses"
+        class="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm"
+      >
+        <div class="flex justify-between">
+          <div>
+            <p class="font-semibold text-gray-800 dark:text-white">
+              {{ bonus.agent?.name }}
+            </p>
+            <p class="text-xs text-gray-500">
+              {{ bonus.created_at | date : "short" }}
+            </p>
+          </div>
+
+          <div class="text-right">
+            <p
+              class="font-bold"
+              [ngClass]="{
+                'text-emerald-600': bonus.status === 'paid',
+                'text-amber-500': bonus.status === 'pending'
+              }"
+            >
+              {{ bonus.amount }} {{ bonus.currency?.abreviation }}
+            </p>
+            <p class="text-xs text-gray-500">
+              {{ bonus.status | uppercase }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-4 space-y-4" *ngIf="activeTab === 'disbursement'">
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm p-5 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+      <div>
+        <h2 class="text-base font-bold text-gray-800 dark:text-white">Decaissement</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Paiement des wallets bonus collecteurs depuis une caisse automatique.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-[260px_auto] gap-3 items-end">
+        <!-- <select
+          [(ngModel)]="selectedFundId"
+          class="rounded-xl border px-4 py-2.5 bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500"
+        >
+          <option value="">Selectionner une caisse</option>
+          <option *ngFor="let fund of collectorFunds" [value]="fund.id">
+            {{ fund.description }} - {{ fund.sold | number : "1.2-2" }} {{ fund.abreviation }}
+          </option>
+        </select> -->
+
+        <button
+          type="button"
+          (click)="loadDisbursement()"
+          class="px-5 py-2 rounded-xl bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200 font-medium"
+        >
+          Actualiser
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm">
+        <p class="text-xs text-gray-500">Collecteurs a payer</p>
+        <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+          {{ disbursementCollectors.length }}
+        </p>
+      </div>
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm">
+        <p class="text-xs text-gray-500">Total lignes</p>
+        <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+          {{ getDisbursementTotal() | number : "1.2-2" }}
+        </p>
+      </div>
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm">
+        <p class="text-xs text-gray-500">Caisses disponibles</p>
+        <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+          {{ collectorFunds.length }}
+        </p>
+      </div>
+    </div>
+
+    <div *ngIf="disbursementLoading" class="bg-white dark:bg-slate-900 rounded-xl shadow-sm p-6 text-sm text-gray-500">
+      Chargement des decaissements...
+    </div>
+
+    <div *ngIf="!disbursementLoading && disbursementCollectors.length === 0" class="bg-white dark:bg-slate-900 rounded-xl shadow-sm p-6 text-sm text-gray-500">
+      Aucun collecteur avec un solde bonus a decaisser.
+    </div>
+
+    <div *ngIf="!disbursementLoading && disbursementCollectors.length > 0" class="hidden md:block bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
+      <div class="max-h-[620px] overflow-auto">
+        <table class="w-full text-xs border-collapse">
+          <thead class="sticky top-0 z-10 bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-gray-400">
+            <tr class="uppercase tracking-wide">
+              <th class="px-4 py-2 text-left font-semibold">Collecteur</th>
+              <th class="px-4 py-2 text-left font-semibold">Monnaie</th>
+              <th class="px-4 py-2 text-right font-semibold">Montant</th>
+              <th class="px-4 py-2 text-right font-semibold">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let collector of disbursementCollectors">
+              <tr
+                *ngFor="let wallet of collector.wallets"
+                class="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+              >
+                <td class="px-4 py-2 text-gray-800 dark:text-white font-medium">
+                  {{ collector.agent_fullname || collector.agent_username }}
+                  <p class="text-[10px] text-gray-500">{{ collector.agent_phone }}</p>
+                </td>
+                <td class="px-4 py-2 text-gray-500 dark:text-gray-400">
+                  {{ wallet.money_name || wallet.abreviation }}
+                </td>
+                <td class="px-4 py-2 text-right font-semibold text-gray-900 dark:text-white">
+                  {{ wallet.total_balance | number : "1.2-2" }}
+                  <span class="text-[10px] text-gray-500 ml-1">{{ wallet.abreviation }}</span>
+                </td>
+                <td class="px-4 py-2 text-right">
+                  <button
+                    type="button"
+                    (click)="payCollectorLine(collector, wallet)"
+                    [disabled]="!selectedFundId || payingKey === collector.agent_id + '-' + wallet.currency_id"
+                    class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    {{ payingKey === collector.agent_id + '-' + wallet.currency_id ? 'Virement...' : 'Virer' }}
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="!disbursementLoading" class="md:hidden space-y-3">
+      <div
+        *ngFor="let collector of disbursementCollectors"
+        class="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm"
+      >
+        <p class="font-semibold text-gray-800 dark:text-white">
+          {{ collector.agent_fullname || collector.agent_username }}
+        </p>
+        <p class="text-xs text-gray-500 mb-3">{{ collector.agent_phone }}</p>
+
+        <div *ngFor="let wallet of collector.wallets" class="flex items-center justify-between py-2 border-t border-gray-100 dark:border-slate-700">
+          <div>
+            <p class="text-sm font-semibold text-gray-800 dark:text-white">
+              {{ wallet.total_balance | number : "1.2-2" }} {{ wallet.abreviation }}
+            </p>
+            <p class="text-xs text-gray-500">{{ wallet.money_name }}</p>
+          </div>
+          <button
+            type="button"
+            (click)="payCollectorLine(collector, wallet)"
+            [disabled]="!selectedFundId || payingKey === collector.agent_id + '-' + wallet.currency_id"
+            class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-50"
+          >
+            {{ payingKey === collector.agent_id + '-' + wallet.currency_id ? '...' : 'Payer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+

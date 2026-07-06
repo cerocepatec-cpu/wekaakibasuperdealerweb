@@ -1,0 +1,34 @@
+export interface DataSyncingOptions{
+    articles?: boolean;	
+    articlesLoading?: boolean;	
+    articlesFailed?: boolean;	
+    productsToSell?:boolean;
+    productsToSellFailed?:boolean;
+    productsToSellLoading?:boolean;
+    customers?:boolean;	
+    customersLoading?:boolean;	
+    tables?:boolean;	
+    tablesLoading?:boolean;	
+    servers?:boolean;	
+    serversLoading?:boolean;	
+    accounts?:boolean;	
+    accountsLoading?:boolean;	
+    conversionMoney?:boolean;	
+    conversionMoneyLoading?:boolean;	
+    money?:boolean;	
+    moneyLoading?:boolean;	
+    articlesDone?: boolean;	
+    productsToSellDone?: boolean;
+    customersDone?:boolean;	
+    customersFailed?:boolean;	
+    tablesDone?:boolean;	
+    tablesFailed?:boolean;	
+    serversDone?:boolean;	
+    serversFailed?:boolean;	
+    accountsDone?:boolean;	
+    accountsFailed?:boolean;	
+    conversionMoneyDone?:boolean;	
+    conversionMoneyFailed?:boolean;	
+    moneyDone?:boolean;	
+    moneyFailed?:boolean;	
+}

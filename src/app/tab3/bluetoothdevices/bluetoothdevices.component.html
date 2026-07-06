@@ -1,0 +1,79 @@
+<ion-header class="ion-no-border ion-padding-top">
+  <ion-toolbar>
+    <ion-item lines="none" class="contentbody">
+      <ion-icon name="chevron-back" (click)="appserv.closemodal()"></ion-icon>
+      <ion-title class="font-bold-600 font-size-20" color="medium">Bluetooth et Imprimantes</ion-title>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="contentbody ion-padding">
+  
+  <ion-item mode="ios" class="bd-square box-big ion-margin-bottom" lines="none">
+    <ion-icon name="bluetooth" slot="start"></ion-icon>
+    <ion-label>
+      <p class="font-size-12 font-bold-600">Bluetooth</p>
+      <p class="font-size-11">Détectable en tant que "Device name"</p>
+    </ion-label>
+    <ion-toggle color="primary" mode="ios" (ionChange)="toggleBle($event)" [checked]="ble">
+       
+    </ion-toggle>
+  </ion-item> 
+   <ion-item mode="ios" class="bd-square box-big ion-margin-bottom" lines="none">
+    <ion-text slot="start" class="font-size-12">Connecter un nouvel appareil</ion-text>
+    <ion-chip   [disabled]="bluetoothIsScanning" (click)="scanForBluetoothDevices()" class="bd-square bd-radius-10 font-size-11" slot="end" color="primary">
+      {{ bluetoothIsScanning?"Recherche en cours...":" Associer appareil" }}
+    </ion-chip>
+  </ion-item>
+
+    <ng-container *ngIf="bluetoothConnectedDevice" style="margin-top: 40px">
+      <ion-list-header>
+        <ion-item lines="none" mode="ios" class="bd-square box-big ion-margin-bottom">
+          <ion-text slot="start">
+            Connecté à : {{bluetoothConnectedDevice.device.name}} ✅
+          </ion-text> 
+          <ion-chip class="font-size-11  bd-radius-10" slot="end" (click)="disconnectFromBluetoothDevice(bluetoothConnectedDevice)" color="danger">Déconnecter</ion-chip>
+          <ion-chip class="font-size-11  bd-radius-10" slot="end" (click)="testprinting()" color="primary">Imprimer</ion-chip>
+        </ion-item>
+      </ion-list-header>
+    </ng-container>
+
+    <ion-list>
+      <ion-list-header class="font-size-14 ion-padding-start">APPAREILS CONNECTES PRECEDEMMENT</ion-list-header>
+      <ion-card mode="ios" class="bd-radius-10">
+        <ion-item lines="none" class="default-list-item padding-5">
+          <ion-avatar slot="start">
+            <ion-icon name="print" size="large"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2 class="font-size-12">AirPods Pro</h2>
+            <h4 class="font-size-11"><ion-note><ion-icon name="radio" color="success" class="button-small"></ion-icon> Paired</ion-note></h4>
+          </ion-label>
+          <ion-chip class="font-size-11 bd-radius-10" slot="end">Connecter</ion-chip>
+          <ion-chip class="font-size-11  bd-radius-10" slot="end">Déconnecter</ion-chip>
+          <ion-icon name="ellipsis-horizontal" slot="end" size="small" color="medium"></ion-icon>
+        </ion-item>
+      </ion-card>
+    </ion-list>
+
+  <ion-list>
+    <ion-list-header>
+      Appareils trouvés
+    </ion-list-header>
+    <ng-container *ngIf="bluetoothScanResults.length>0">
+      <ion-item *ngFor="let scanResult of bluetoothScanResults" lines="none" class="default-list-item padding-5">
+        <ion-avatar slot="start">
+          <ion-icon name="print" size="large"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2 class="font-size-12">{{scanResult.device.name ?? "NO name" }}</h2>
+          <h4 class="font-size-11"><ion-note><ion-icon name="radio" color="warning" class="button-small"></ion-icon>{{scanResult.device.deviceId}}</ion-note></h4>
+        </ion-label>
+        <ion-chip class="font-size-11 bd-radius-10" slot="end" (click)="connectToBluetoothDevice(scanResult)">Connecter</ion-chip>
+        <ion-chip class="font-size-11  bd-radius-10" slot="end" (click)="disconnectFromBluetoothDevice(scanResult)" color="danger">Déconnecter</ion-chip>
+        <ion-icon name="ellipsis-horizontal" slot="end" size="small" color="medium"></ion-icon>
+      </ion-item>
+    </ng-container>
+
+  </ion-list>
+</ion-content>

@@ -1,0 +1,25 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-text slot="start">Nouvelle table</ion-text>
+      <ion-chip [disabled]="!newform.valid" slot="end" color="secondary">
+        <ion-icon name="checkmark-outline"  size="large" (click)="addnew()" color="success"></ion-icon> 
+      </ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" *ngIf="showcreatingprogress" mode="ios" color="primary"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <div class="newrequestform">
+    <form class="form" [formGroup]="newform">
+      <h2><ion-text>Informations sur la table</ion-text></h2> 
+      <ion-item lines="none">
+        <ion-input formControlName="name" label="Nom"></ion-input>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-input formControlName="description" label="Déscription"></ion-input>
+      </ion-item>
+    </form>
+  </div>
+</ion-content>

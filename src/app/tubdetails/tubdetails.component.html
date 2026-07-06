@@ -1,0 +1,132 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" (click)="closemodal()" slot="start" color="warning" size="large"></ion-icon>
+      <ion-text slot="start">{{tubsent.description | uppercase}}</ion-text>
+      <ion-buttons slot="end">
+        <ion-button size="small" mode="ios" (click)="isDescriptionModalOpen=true"  *ngIf="appserv.permissionFilter('caisses','edit')">
+          <ion-icon  name="document" size="small">edit</ion-icon>
+        </ion-button>
+        <ion-button size="small" mode="ios" (click)="deletetub(tubsent)" *ngIf="appserv.permissionFilter('caisses','delete')">
+          <ion-icon  name="trash" size="small" slot="end">delete</ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+    <ion-progress-bar type="inderminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <ion-modal [isOpen]="isDescriptionModalOpen">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar>
+          <ion-item lines="none">
+            <ion-icon name="chevron-back-outline" (click)="isDescriptionModalOpen=false" slot="start" size="large" color="warning"></ion-icon>
+            <ion-text slot="start">Description caisse</ion-text>
+            <ion-chip color="secondary" slot="end" (click)="editTub();isDescriptionModalOpen=false;">
+              <ion-icon name="checkmark-outline" size="large"></ion-icon>
+            </ion-chip>
+          </ion-item>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding contentbody">
+          <form [formGroup]="tubinfos">
+            <ion-item lines="none" class="font-size-11 bd-rounded ion-margin-bottom">
+              <ion-label><ion-note class="font-size-11">Description </ion-note></ion-label>
+              <ion-input placeholder="Type something here" formControlName="description" class="font-size-12">
+              </ion-input>
+            </ion-item>
+            <ion-item lines="none" class="font-size-11 bd-rounded ion-margin-bottom">
+              <mat-label><ion-note>Monnaie</ion-note></mat-label>  &nbsp;&nbsp;&nbsp;
+              <mat-select formControlName="money_id">
+                  <mat-option [value]="money.id" *ngFor="let money of listmoney">
+                    {{money.abreviation}}
+                  </mat-option>
+              </mat-select>
+            </ion-item>
+            <ion-item lines="none" class="font-size-11 bd-rounded ion-margin-bottom">
+              <mat-label><ion-note>Caissier</ion-note></mat-label> &nbsp;&nbsp;&nbsp;
+              <mat-select formControlName="user_id">
+                  <mat-option [value]="agent.id" *ngFor="let agent of listagents; let ind=index">
+                    {{agent.user_name | titlecase}}
+                  </mat-option>
+              </mat-select>
+            </ion-item>
+          </form>
+        </ion-content>
+    </ng-template>
+  </ion-modal>
+  <div class="ion-text-center detailrequestheader ion-padding">
+    <div class="blocheader ion-text-center">
+      <h2 *ngIf="!showedingmode" class="font-size-20">{{tubsent.description | uppercase}}</h2>
+      <ion-item lines="none" class="contentbody" *ngIf="showedingmode"><ion-input [(ngModel)]="tubsent.description" class="font-size-11" slot="start"></ion-input> 
+        <ion-icon name="checkmark-circle-outline" color="success" size="small" slot="start"  (click)="editTub()"></ion-icon></ion-item>
+      <ion-note class="font-size-20">Solde : </ion-note>
+      <ion-note class="font-size-20 font-bold-600">{{tubsent.sold | number}} {{tubsent.money_abreviation}}</ion-note>
+      <br>
+      <ion-note color="secondary">
+        {{tubsent.principal===1?'Principale':''}}
+      </ion-note>
+    </div>
+    
+    <ion-card mode="ios" class="margin-btm-15 bd-radius-10" *ngIf="appserv.permissionFilter('caisses','edit')">
+      <ion-item lines="none" (click)="isDescriptionModalOpen=true" [detail]="true" class="ion-padding-start">
+        <ion-avatar slot="start" class="square-avatar-primary"><ion-icon name="person" size="small"></ion-icon></ion-avatar>
+        <ion-text class="font-size-12" [color]="tubsent.description?'':'primary'" slot="start">Caissier.ère</ion-text>
+        <ion-note slot="end" class="font-size-12">{{tubsent.user_name | titlecase}}</ion-note>
+      </ion-item>
+    </ion-card>
+    <ion-card class="bd-radius-10 ion-padding" mode="ios" *ngIf="appserv.permissionFilter('caisses','entry') || appserv.permissionFilter('caisses','withdraw')">
+      <ion-item mode="ios" class="default-list-item ion-margin-bottom cursor-pointer"  lines="inset" [detail]="true" (click)="openaddnewoperation()">
+        <ion-avatar slot="start"><ion-icon  name="add-circle" size="small"></ion-icon></ion-avatar>
+        <ion-label>
+          <h2 class="item-label-title ion-padding-bottom font-bold-600"><ion-note>Nouvelle opération</ion-note></h2>
+          <h4 class="secondpara font-size-11"><ion-note>Ajouter une opération</ion-note></h4>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+
+    <ion-item lines="none" class="contentbody margin-btm-25 font-bold-500 smallavatar">
+      <ion-text slot="start" class="font-size-16">{{listmouvements.length}} récente{{listmouvements.length>1?'s':''}} opération{{listmouvements.length>1?'s':''}}</ion-text>
+      <ion-segment mode="ios" slot="end" [(ngModel)]="operationsfilter">
+        <ion-segment-button value="all" (click)="filteroperations('all')">Toutes</ion-segment-button>
+        <ion-segment-button value="entry" (click)="filteroperations('entry')">Entrées</ion-segment-button>
+        <ion-segment-button value="wayout" (click)="filteroperations('withdraw')">Sorties</ion-segment-button>
+      </ion-segment>
+      <ion-avatar slot="end"><ion-icon name="search-outline" size="small" (click)="opensearchoperation()"></ion-icon></ion-avatar>
+    </ion-item>
+   
+ 
+     <ng-container *ngIf="!showprogress">
+         <ion-card class="bd-radius-10 ion-padding" mode="ios">
+            <ion-item mode="ios" class="default-list-item" *ngFor="let mouvement of listmouvements | slice:0:10" lines="inset" (click)="menuoperation(mouvement)" [detail]="true">
+              <ion-avatar slot="start" [class]="mouvement.type==='entry'?'':'color-customer-warn'"><ion-icon [color]="mouvement.type==='withdraw'?'danger':''" [name]="mouvement.type==='entry'?'arrow-down-outline':'arrow-up-outline'" size="small"></ion-icon></ion-avatar>
+              <ion-label>
+                <h2 class="item-label-title ion-padding-bottom font-bold-600"><ion-note [class]="mouvement.type==='entry'?'':'color-customer-warn'">{{mouvement.uuid}}</ion-note></h2>
+                <h4 class="secondpara font-size-11"><ion-note>{{mouvement.motif | titlecase}}</ion-note></h4>
+                <h4 class="secondpara font-size-11"><ion-note>{{mouvement.created_at | date}}</ion-note></h4>
+              </ion-label>
+              <ion-chip slot="end" class="font-size-11 chipset">{{mouvement.user_name | titlecase}}</ion-chip>
+              <ion-text slot="end" class="font-size-11">
+                {{mouvement.amount|number}} {{tubsent.money_abreviation}}
+              </ion-text>
+            </ion-item>
+            <ion-item mode="ios" lines="none" *ngIf="listmouvements.length>10" (click)="opensearchoperation()">
+              <ion-note slot="start" class="font-size-12">
+                Tout voir
+              </ion-note>
+              <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+            </ion-item>
+          </ion-card>
+      </ng-container>
+   
+     <app-skeleton-loader *ngIf="showprogress"></app-skeleton-loader>
+    <ion-item mode="ios" class="contentbody footeritem" lines="none">
+      <ion-label>
+        <h4 class="font-size-11"><ion-note>Caisse pour {{tubsent?.user_name | titlecase}}.</ion-note></h4>
+        <h4 class="font-size-11"><ion-note>Créée le {{tubsent.created_at | date}}.</ion-note></h4>
+        <h4 class="font-size-11"><ion-note>Dernière modification : {{tubsent.updated_at | date}}.</ion-note></h4>
+      </ion-label>
+  </ion-item>
+</div>
+</ion-content>

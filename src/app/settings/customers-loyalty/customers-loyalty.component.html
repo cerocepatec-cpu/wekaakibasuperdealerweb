@@ -1,0 +1,76 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none">
+        <ion-icon name="chevron-back-outline" size="large" color="warning" (click)="appserv.closemodal()"></ion-icon>
+        <ion-text class="font-size-18">Configuration fidélisation clients</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+    <ion-card mode="ios" color="warning" class="ion-padding">
+      Il est à noter que vous ne pouvez utiliser qu'un seul mode de fidélisation à la fois!
+    </ion-card>
+
+    <ion-card mode="ios" class="ion-padding">
+      <ion-list>
+        <ion-list-header class="font-size-14">Fidélisation par défaut</ion-list-header>
+        <ion-item>
+          <ion-toggle class="font-size-11" [checked]="actualEse.fidelitydefaultmode==='point'"  (ionChange)="updateEse('point')">Points de fidélité</ion-toggle>
+          &nbsp; &nbsp;&nbsp;
+          <ion-input class="font-size-11 secondpara ion-text-right" *ngIf="actualEse.fidelitydefaultmode==='point'" placeholder="Fixer la valeur d'1 point" (ionChange)="updatefidelitypointvalue($event)" [(ngModel)]="actualEse.fidelitypointvalue"></ion-input>
+          <ion-chip slot="end" class="font-size-11" *ngIf="actualEse.fidelitydefaultmode==='point'">{{appserv.getDefaultmoney().abreviation}}</ion-chip>
+        </ion-item>
+        <!-- <ion-item>
+          <ion-toggle class="font-size-11" [checked]="actualEse.fidelitydefaultmode==='bonus'"   (ionChange)="updateEse('bonus')">Bonus</ion-toggle> <br>
+        </ion-item> -->
+      </ion-list>
+       
+    </ion-card>
+    
+    <h2 class="ion-padding-start ion-margin-end font-size-16" *ngIf="actualEse.fidelitydefaultmode==='bonus'">Groupes de bonus <ion-icon name="add-circle-outline" class="strock-icon ion-float-right" size="small" (click)="newPos()"></ion-icon></h2>
+    <ion-card mode="ios" class="ion-padding" *ngIf="actualEse.fidelitydefaultmode==='bonus'">
+
+      <ion-accordion-group>
+        <ion-accordion [value]="pos.id" *ngFor="let pos of listpos">
+          <ion-item slot="header" color="light">
+            <ion-label>{{pos.name}}</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <ion-toggle class="font-size-15 ion-padding-start" [checked]="pos.bonusperbuy" [(ngModel)]="pos.bonusperbuy">Bonus par article?</ion-toggle>
+            <ion-toggle class="font-size-15 ion-padding-start" [checked]="pos.status" [(ngModel)]="pos.status">Actif/Inactif?</ion-toggle>
+            <ion-icon  class="strock-icon ion-float-right" name="document-outline" size="small" (click)="updatepos(pos)"></ion-icon>
+            <ion-item lines="inset" class="default-list-item colorleftside" mode="ios" detail="false">
+              <ion-input class="font-size-11 secondpara" label="Description" labelPlacement="floating" [(ngModel)]="pos.description"  placeholder="Créer une description du groupe"></ion-input>
+            </ion-item>  
+            <ion-item lines="inset" class="default-list-item colorleftside" mode="ios" detail="false">
+              <ion-input class="font-size-11 secondpara" label="Pourcentage de calcul bonus" labelPlacement="floating" [(ngModel)]="pos.bonus_percentage" placeholder="Pourcentage de calcul bonus par achat vente"></ion-input>
+              <ion-text>%</ion-text>
+            </ion-item>
+            <ion-item lines="inset" class="default-list-item colorleftside" mode="ios" detail="false" *ngIf="!pos.bonusperbuy">
+              <ion-input class="font-size-11 secondpara" label="Toute facture à partir de " labelPlacement="floating" [(ngModel)]="pos.beginfromamount" placeholder="Commcencer à partir de"></ion-input>
+              <ion-chip slot="end" class="font-size-11">{{appserv.getDefaultmoney().abreviation}}</ion-chip>
+            </ion-item>
+            <ion-item lines="inset" class="default-list-item colorleftside" mode="ios" detail="false" *ngIf="pos.bonusperbuy">
+              <ion-input class="font-size-11 secondpara" label="Faire" labelPlacement="floating" [(ngModel)]="pos.nb_sales_bonus" placeholder="Condition pour bénéficier"></ion-input>
+              <ion-chip slot="end" class="font-size-11">achats par article pour bénéficier</ion-chip>
+            </ion-item> 
+
+            <h4 class="font-size-15">Utilisateurs <ion-icon name="add-circle-outline" class="strock-icon ion-float-right" size="small" (click)="pickusers(pos)"></ion-icon></h4>
+            <br>
+            <ion-item class="default-list-item contentbody ion-padding-bottom" *ngFor="let user of pos.users | filter:search" (click)="usermenu(user)" lines="full">
+              <ion-avatar>
+                <ion-img [src]="user.avatar" *ngIf="user.avatar"></ion-img> 
+                <ion-text *ngIf="!user.avatar" color="light">{{user.user_name |titlecase | slice:0:1}} </ion-text>
+              </ion-avatar>
+              <ion-label>
+                <p class="item-label-title font-size-12">{{(user.user_name?user.user_name:user.user_mail) | titlecase}}</p>
+                <p class="secondpara font-size-12">{{user.user_mail}}</p>
+              </ion-label>
+              <ion-icon name="trash-outline" (click)="deleteuser(user,pos)" size="small" slot="end"></ion-icon>
+            </ion-item> 
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
+  
+    </ion-card>
+</ion-content>

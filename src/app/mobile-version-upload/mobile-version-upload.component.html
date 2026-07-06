@@ -1,0 +1,116 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title> Gestion des versions mobiles </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" fullscreen>
+  <div class="max-w-3xl mx-auto space-y-10">
+    <!-- UPLOAD CARD -->
+
+    <div class="bg-white shadow rounded-lg p-6 space-y-6">
+      <h2 class="text-xl font-semibold">Uploader une nouvelle version APK</h2>
+
+      <div>
+        <label class="text-sm text-gray-600"> Version </label>
+
+        <input
+          type="text"
+          [(ngModel)]="version"
+          class="w-full border rounded p-2 mt-1"
+        />
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-600"> Version Code </label>
+
+        <input
+          type="number"
+          [(ngModel)]="version_code"
+          class="w-full border rounded p-2 mt-1"
+        />
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-600"> Fichier APK </label>
+
+        <input
+          type="file"
+          accept=".apk"
+          (change)="onFileSelected($event)"
+          class="w-full border rounded p-2 mt-1"
+        />
+      </div>
+
+      <div *ngIf="uploading">
+        <div class="w-full bg-gray-200 rounded h-4">
+          <div class="bg-blue-500 h-4 rounded" [style.width.%]="progress"></div>
+        </div>
+
+        <p class="text-sm mt-2">Téléchargement {{ progress }}%</p>
+      </div>
+
+      <button
+        (click)="upload()"
+        class="w-full bg-blue-600 text-white p-3 rounded-lg"
+      >
+        Uploader APK
+      </button>
+    </div>
+
+    <!-- LISTE DES VERSIONS -->
+
+    <div class="bg-white shadow rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-4">Historique des versions</h2>
+
+      <table class="w-full text-sm">
+        <thead class="border-b">
+          <tr class="text-left text-gray-600">
+            <th class="p-2">Version</th>
+            <th class="p-2">Code</th>
+            <th class="p-2">Statut</th>
+            <th class="p-2">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let v of versions" class="border-b">
+            <td class="p-2">
+              {{ v.version }}
+            </td>
+
+            <td class="p-2">
+              {{ v.version_code }}
+            </td>
+
+            <td class="p-2">
+              <span
+                *ngIf="v.status === 'published'"
+                class="text-green-600 font-semibold"
+              >
+                Publié
+              </span>
+
+              <span
+                *ngIf="v.status !== 'published'"
+                class="text-yellow-600 font-semibold"
+              >
+                Draft
+              </span>
+            </td>
+
+            <td class="p-2">
+              <button
+                *ngIf="v.status !== 'published'"
+                (click)="publish(v.id)"
+                class="bg-green-600 text-white px-3 py-1 rounded"
+              >
+                Publier
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</ion-content>

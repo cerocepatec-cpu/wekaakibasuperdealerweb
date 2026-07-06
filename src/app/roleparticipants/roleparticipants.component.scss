@@ -1,0 +1,26 @@
+.footer-nav {
+  --background: transparent;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+}
+
+.page-info {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.nav-btn {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --color: var(--ion-color-primary);
+}
+
+.nav-btn[disabled] {
+  opacity: 0.4;
+}

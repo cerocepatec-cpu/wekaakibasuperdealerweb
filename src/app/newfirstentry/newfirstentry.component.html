@@ -1,0 +1,111 @@
+<ion-header class="ion-no-border bd-square">
+  <ion-toolbar *ngIf="!firstentrysent.id">
+    <ion-item lines="none" class="default-list-item">
+      <ion-icon name="chevron-back" size="large" color="warning" slot="start" (click)="beforeleft()"></ion-icon>
+      <ion-icon name="person" class="strock-icon" slot="start" color="dark" style="margin-right: -3px!important;"></ion-icon>
+        <ion-label style="margin-left:6px!important;">
+          <p class="item-label-title font-size-16">{{(usersent.full_name?usersent.full_name:usersent.user_name)|titlecase }}</p>
+          <p color="medium" class="secondpara font-size-13">
+              {{usersent.uuid?usersent.uuid:usersent.description}}
+          </p> 
+        </ion-label>
+        <ion-chip>{{usersent.id}}</ion-chip>
+    </ion-item>
+  </ion-toolbar> 
+  <ion-toolbar *ngIf="firstentrysent.id">
+    <ion-item lines="none" class="default-list-item">
+      <ion-icon name="chevron-back" size="large" color="warning" slot="start" (click)="beforeleft()"></ion-icon>
+      <ion-icon name="person" class="strock-icon" slot="start" color="dark" style="margin-right: -3px!important;"></ion-icon>
+        <ion-label style="margin-left:6px!important;">
+          <p class="item-label-title font-size-16">{{(firstentrysent.member_fullname?firstentrysent.member_fullname:firstentrysent.member_user_name)|titlecase }}</p>
+          <p color="medium" class="secondpara font-size-13">
+              {{firstentrysent.member_uuid}}
+          </p> 
+        </ion-label>
+        <ion-chip>{{firstentrysent.member_id}}</ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12">
+        <div class="newrequestform ion-padding ion-margin-bottom">
+          <form class="form bd-radius-10 bd-square" [formGroup]="firstentryform">
+            <ion-card mode="ios" class="ion-padding-top ion-padding-bottom">
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="12">
+                    <ion-text class="font-size-14 ion-padding-start" color="primary">Encaissée?</ion-text> 
+                  </ion-col>
+                  <ion-col size="12">
+                    <ion-segment formControlName="cashed" mode="ios" style="width: 200px!important;height: 30px!important;margin-top:0px!important;padding: 3px !important;border-radius: 40px !important;">
+                        <ion-segment-button value="0" style="height: 18px!important;min-height: 18px!important;margin-top: 0px!important;">Non</ion-segment-button>
+                        <ion-segment-button value="1" style="height: 18px!important;min-height: 18px!important;margin-top: 0px!important;">Oui</ion-segment-button>
+                    </ion-segment> 
+                  </ion-col>
+                  <ion-col size="12">
+                    <ion-item lines="none" class="default-list-item2" mode="ios">
+                      <ion-select class="font-size-12" formControlName="fund" label="Caisse associé:" (ngModelChange)="fundchanged($event)">
+                        <ion-select-option *ngFor="let tub  of listtubs" [value]="tub.id">
+                          {{tub.description}}
+                        </ion-select-option>
+                      </ion-select>
+                   </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid> 
+            </ion-card>
+            
+            <ion-card mode="ios" class="ion-padding-top">
+              <ion-text class="font-size-12 ion-padding-start" color="primary">Autes informations</ion-text>
+              <ion-item lines="none" class="default-list-item2" mode="ios" (click)="agentsfilter()">
+                <ion-avatar slot="start" class="square-avatar-medium"><ion-icon name="person-outline"></ion-icon></ion-avatar> 
+                <ion-label>
+                  <h2 class="font-size-14 item-label-title"><ion-text>Collecteur</ion-text></h2>
+                </ion-label>
+                <ion-chip class="font-size-11" *ngIf="actualcollector.full_name" slot="end">
+                  <ion-text>{{actualcollector.full_name}}</ion-text>
+                </ion-chip> 
+               </ion-item>
+               <ion-item lines="none" class="font-size-12" [disabled]="true">
+                <ion-select class="font-size-12" formControlName="money_id" label="Monnaie:">
+                  <ion-select-option *ngFor="let money  of listmoney" [value]="money.id">
+                    {{money.abreviation?money.abreviation:money.money_name}}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item lines="none" class="default-list-item2" mode="ios">
+                <ion-avatar slot="start" class="square-avatar-medium"><ion-icon name="calendar-outline"></ion-icon></ion-avatar> 
+                <ion-label>
+                  <h2 class="font-size-14 item-label-title"><ion-text>Date opération</ion-text></h2>
+                </ion-label>
+                <ion-chip class="font-size-11" slot="end">
+                  <ion-input type="date" formControlName="done_at"></ion-input>
+                </ion-chip> 
+               </ion-item>
+              <ion-item lines="none" class="font-size-12">
+                <ion-input type="number" formControlName="amount" #defaultinput label="Montant(*):"></ion-input>
+              </ion-item>
+              <ion-item lines="none" class="font-size-12">
+                <ion-textarea class="font-size-12 ion-margin-top ion-margin-bottom ion-padding" autoGrow="true" spellcheck="true" formControlName="description" label="Description:"></ion-textarea>
+              </ion-item> 
+            </ion-card>
+          </form>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-footer>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="1"></ion-col>
+      <ion-col size="10">
+        <ion-button color="warning" mode="ios" expand="block" [disabled]="!firstentryform.valid" (click)="validateoperation()">{{firstentrysent.id>0?"Modifier l'opération":"Valider l'opération"}}</ion-button>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer>

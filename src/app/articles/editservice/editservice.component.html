@@ -1,0 +1,112 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" (click)="closemodal()" slot="start"></ion-icon>
+      <ion-text slot="start">Edition {{servicename}}</ion-text>
+      <ion-icon name="checkmark-outline" slot="end" (click)="editservice()" color="success" size="large"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" *ngIf="showcreatingprogress" mode="ios" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <br>
+  <div class="mobileform">
+    <form class="" [formGroup]="newserviceform">
+    
+      <ion-card mode="ios" class="ion-padding-top ion-padding-bottom ion-padding-start">
+        <ion-text class="font-size-12 ion-padding-start" color="primary">Cochez un Type</ion-text> 
+        <br> <br>
+        <ion-segment formControlName="type" mode="ios">
+          <ion-segment-button value="1" (click)="servicename='article'">Carnet</ion-segment-button>
+        </ion-segment>
+
+        <ion-toggle class="font-size-11" formControlName="has_vat" mode="ios" *ngIf="servicename!=='accomp'">Appliquer la TVA</ion-toggle>
+        <br *ngIf="servicename!=='accomp'"> <br *ngIf="servicename!=='accomp'">
+        <ion-toggle class="font-size-11" formControlName="bonus_applicable" mode="ios" *ngIf="servicename!=='accomp'">Bonus applicable</ion-toggle>
+      </ion-card>
+      
+      <ion-card mode="ios" class="ion-padding-top">
+        <ion-text class="font-size-12" color="primary ion-padding-start">Informations de base</ion-text>
+        <ion-item lines="full" class="font-size-12">
+          <ion-input formControlName="name" class="ion-color-medium" label="Nom"></ion-input>
+        </ion-item>
+        <ion-item lines="none" class="font-size-12">
+          <ion-input formControlName="description" placeholder="Déscription" label="Déscription"></ion-input>
+        </ion-item>
+      </ion-card>
+    
+      <ion-card mode="ios">
+        <ion-item lines="none" class="font-size-12" (click)="showcategorisationbloc=!showcategorisationbloc">
+          <ion-text color="primary" slot="start">Catégorisation</ion-text> &nbsp;
+          <ion-text slot="start" class="font-size-12 font-bold-500" color="medium">({{article.service.category_name | titlecase}})</ion-text>
+          <ion-icon name="chevron-down-outline" slot="end" size="small" *ngIf="!showcategorisationbloc" color="primary"></ion-icon>
+          <ion-icon name="chevron-up-outline" slot="end" size="small" *ngIf="showcategorisationbloc"  color="primary"></ion-icon>
+        </ion-item>
+        <ion-grid *ngIf="showcategorisationbloc">
+          <ion-row>
+            <ion-col size="10">
+              <ion-item class="font-size-12 margin-left-moins-10" lines="full">
+                <ion-select okText="Okay" cancelText="Fermer" formControlName="category_id" label="Catégorie">
+                  <ion-select-option value="{{category.category.id}}" *ngFor="let category of listcategories">{{category.category.name | titlecase}}</ion-select-option>
+                </ion-select>
+              </ion-item> 
+            </ion-col>
+            <ion-col size="2">
+              <ion-icon name="add-circle-outline" class="margin-top-10" color="success" size="large" (click)="newcategory()"></ion-icon>
+            </ion-col>
+          </ion-row>
+          <ion-row class="block">
+            <ion-col size="10">
+              <ion-item class="font-size-12 margin-left-moins-10" lines="none">
+                <ion-select value="brown" okText="Okay" cancelText="Fermer" formControlName="uom_id" label="Unité de mesure">
+                  <ion-select-option value="{{oum.id}}" *ngFor="let oum of listunitofmeasure">{{oum.name | titlecase}}</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+            <ion-col size="2">
+              <ion-icon name="add-circle-outline" class="margin-top-10" size="large" color="success" (click)="newunitofmeasure()"></ion-icon>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card>
+      <ion-card mode="ios">
+        <ion-item class="font-size-12" lines="none">
+          <ion-text color="primary" slot="start">Prix (Cliquez sur + pour ajouter un prix)</ion-text>&nbsp;
+          <ion-icon name="add" (click)="addnewpricecategory()" slot="end"></ion-icon>
+        </ion-item>
+      
+        <div class="block">
+          <ion-item lines="full" class="contentbody font-size-11" *ngFor="let pricing of listpricing" >
+            <ion-note class="font-bold-600" [color]="pricing.principal===1?'primary':''">{{pricing.label | titlecase}} : {{pricing.price | number}} {{pricing.abreviation | uppercase}}</ion-note>
+            <ion-icon name="checkmark-outline" color="secondary" *ngIf="pricing.principal" slot="end" size="small"></ion-icon>
+            <ion-icon name="document-outline" size="small" slot="end" [color]="pricing.principal===1?'secondary':'medium'" (click)="editpricing(pricing)"></ion-icon>
+            <ion-icon name="trash-outline" size="small" slot="end" [color]="pricing.principal===1?'secondary':'medium'" (click)="removepricingfromapi(pricing)"></ion-icon>
+          </ion-item>
+        </div>
+      </ion-card>
+     
+      <ion-card mode="ios" *ngIf="servicename!=='accomp'">
+        <ion-item lines="none" class="font-size-12" (click)="showothersinfosbloc=!showothersinfosbloc">
+          <ion-text color="primary" slot="start">Autres informations</ion-text> &nbsp;
+          <ion-icon name="chevron-down-outline" slot="end" size="small" *ngIf="!showothersinfosbloc" color="primary"></ion-icon>
+          <ion-icon name="chevron-up-outline" slot="end" size="small" *ngIf="showothersinfosbloc"  color="primary"></ion-icon>
+        </ion-item>
+        <div class="block" *ngIf="showothersinfosbloc">
+          <ion-item lines="full" class="font-size-12">
+            <ion-input formControlName="code_manuel" placeholder="Code manuel"></ion-input>
+          </ion-item>
+          <ion-item lines="full" class="font-size-12">
+            <ion-input formControlName="codebar" placeholder="Code bar"></ion-input>
+          </ion-item>
+          <ion-item lines="full" class="font-size-12">
+            <ion-input formControlName="point" placeholder="Nombre de points par vente"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="font-size-12">
+            <ion-input  formControlName="nbrgros" placeholder="Passer en prix de gros après" slot="start"></ion-input>
+            <ion-label slot="end"> vente(s)</ion-label>
+          </ion-item>
+        </div>
+      </ion-card>
+    </form>
+  </div>
+</ion-content>

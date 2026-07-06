@@ -1,0 +1,41 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none" class="contentbody">
+      <ion-icon slot="start" name="chevron-back-outline" (click)="appserv.closemodal()" color="primary"></ion-icon>
+      <ion-icon name="print-outline" color="secondary" slot="end"></ion-icon>
+      <!-- <ion-icon name="download-outline" color="success" slot="end" [matMenuTriggerFor]="menuexport"></ion-icon> -->
+      <!-- <ion-icon name="share-outline" color="primary" slot="end"></ion-icon> -->
+    </ion-item>
+    <mat-menu #menuexport="matMenu">
+      <button mat-menu-item ><ion-text class="font-size-12">Excel</ion-text></button>
+      <button mat-menu-item ><ion-text class="font-size-12">PDF</ion-text></button>
+    </mat-menu>
+  </ion-toolbar>
+  <ion-toolbar class="contentbody">
+    <h1 class="font-bold-600 font-size-30 ion-padding-start">Valorisation Stock</h1>
+    <h1 class="font-bold-600 font-size-20 ion-padding-start">Dépôt : {{depositsent.name | titlecase}}</h1>
+    <h1 class="font-bold-600 font-size-15 ion-padding-start">Date : {{appserv.today | date}}</h1>
+    <h1 class="font-bold-600 font-size-15 ion-padding-start">Valeur totale du stock : {{totalgeneral | currency}}</h1>
+    <ion-searchbar mode="ios" placeholder="Recherche" [(ngModel)]="search" #defaultinput></ion-searchbar> 
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody">
+    
+  <hr class="hr">
+  <ion-item class="bd-radius-10 ion-padding-start ion-padding-end" *ngIf="inventory.length===0" color="warning" lines="none">
+    <ion-text class="font-size-13">Aucun article ou service affecté au dépôt</ion-text>
+  </ion-item>
+  <ion-item mode="ios" class="default-list-item3 contentbody font-size-15"  lines="full" *ngFor="let article of inventory | filter:search" >
+    <ion-avatar slot="start"><ion-icon name="image-outline"></ion-icon></ion-avatar>
+    <ion-label>
+      <ion-text class="item-label-title" [color]="article.type==='withdraw'?'danger':''">{{article.service.name | titlecase}}</ion-text>
+      <h4 class="secondpara font-size-11"><ion-note>Qté. {{article.service.available_qte | number}} {{article.uom_symbol | titlecase}} * {{article.prices.length>0?article.prices[0].price:0}} {{article.prices.length>0?article.prices[0].abreviation:''}}</ion-note></h4>
+    </ion-label>
+    <ion-text slot="end">
+      {{(article.prices.length>0?article.prices[0].price * article.service.available_qte:'0') | number}} {{article.prices.length>0?article.prices[0].abreviation:''}}
+    </ion-text>
+  </ion-item>
+</ion-content>
+
+

@@ -1,0 +1,23 @@
+<ion-header class="ion-no-border" [hidden]="scanActive">
+  <ion-toolbar class="contentbody">
+    <ion-item class="contentbody">
+      <ion-icon name="chevron-back-outline" (click)="appserv.closemodal()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content [style.--background]="scanActive ? '#00000000':'#fff'">
+  <ion-button expand="full" (click)="startscan()" [hidden]="scanActive" mode="ios">
+    <ion-icon name="scan" slot="start"></ion-icon>
+    Scanner
+  </ion-button>
+
+  <p class="ion-text-center" *ngIf="result && !scanActive" >{{result}}</p>
+
+  <ion-row class="scanner-buttons" [hidden]="!scanActive">
+    <ion-col class="ion-no-padding">
+      <ion-button expand="full" (click)="stopScanner()" mode="ios">Arrêter</ion-button>
+    </ion-col>
+  </ion-row>
+
+  <div class="scan-box" [hidden]="!scanActive"></div>
+</ion-content>

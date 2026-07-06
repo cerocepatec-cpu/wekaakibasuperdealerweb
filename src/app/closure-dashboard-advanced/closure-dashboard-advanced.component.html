@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Dashboard Clôtures Avancé</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- KPI cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+    <ion-card class="text-center p-4 shadow-lg rounded-lg">
+      <h3>Total Clôturé</h3>
+      <p class="text-xl font-bold">{{ kpi.totalClosures | number:'1.0-2' }}</p>
+    </ion-card>
+    <ion-card class="text-center p-4 shadow-lg rounded-lg">
+      <h3>Total Reçu</h3>
+      <p class="text-xl font-bold">{{ kpi.totalReceived | number:'1.0-2' }}</p>
+    </ion-card>
+    <!-- <ion-card class="text-center p-4 shadow-lg rounded-lg"
+              [ngClass]="{'bg-green-100':kpi.soldeStatus=='créditeur','bg-red-100':kpi.soldeStatus=='débiteur','bg-gray-100':kpi.soldeStatus=='équilibré'}">
+      <h3>Solde Total</h3>
+      <p class="text-xl font-bold">{{ kpi.soldeTotal | number:'1.0-2' }} ({{ kpi.soldeStatus }})</p>
+    </ion-card> -->
+  </div>
+
+  <!-- Graphique -->
+  <ion-card class="mb-4">
+    <ion-card-header>
+      <strong>Statistiques Clôtures</strong>
+      <ion-segment [(ngModel)]="filters.group_by" (ionChange)="loadStats()">
+        <ion-segment-button value="day">Jour</ion-segment-button>
+        <ion-segment-button value="week">Semaine</ion-segment-button>
+        <ion-segment-button value="month">Mois</ion-segment-button>
+        <ion-segment-button value="year">Année</ion-segment-button>
+      </ion-segment>
+    </ion-card-header>
+    <ion-card-content style="height:400px;">
+      <!-- <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels"
+              [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType">
+      </canvas> -->
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Liste groupée -->
+  <div *ngFor="let group of groupedClosures | keyvalue">
+    <ion-card class="mb-3 shadow-md border rounded-lg">
+      <ion-card-header class="bg-gray-100 px-4 py-2">
+        <strong>{{ group.value[0].closed_at | date:'dd/MM/yyyy' }}</strong> - {{ group.value[0].user?.name }}
+      </ion-card-header>
+      <ion-card-content class="px-4 py-2">
+        <!-- <div *ngFor="let closure of group.value" class="mb-2 p-2 border rounded flex flex-col md:flex-row justify-between items-center">
+          <div>
+            <strong>{{ closure.fund?.name }}</strong> ({{ closure.currency?.abreviation }})<br>
+            Total: {{ closure.total_amount | number:'1.0-2' }} | Reçu: {{ closure.received_amount | number:'1.0-2' }} |
+            Solde: <span [ngClass]="{
+              'text-green-600': closure.total_amount <= closure.received_amount,
+              'text-red-600': closure.total_amount > closure.received_amount
+            }">{{ closure.total_amount - (closure.received_amount||0) }}</span>
+          </div>
+          <div class="flex gap-1 mt-2 md:mt-0">
+            <ion-button size="small" color="success" (click)="validate(closure)" *ngIf="closure.status==='pending'">Recevoir</ion-button>
+            <ion-button size="small" color="danger" (click)="reject(closure)" *ngIf="closure.status==='pending'">Rejeter</ion-button>
+            <ion-button size="small" color="primary" (click)="downloadPDF(closure.id)">PDF</ion-button>
+            <ion-button size="small" color="secondary" (click)="downloadTicket(closure.id)">Ticket</ion-button>
+          </div>
+        </div> -->
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+</ion-content>

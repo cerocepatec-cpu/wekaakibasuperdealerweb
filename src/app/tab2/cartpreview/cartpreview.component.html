@@ -1,0 +1,105 @@
+<ion-header class="ion-no-border ion-padding">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <ion-tab-button slot="start" (click)="tablepicker()">
+          <ion-text color="primary" class="font-bold-500 font-size-14">Table</ion-text>
+        <ion-label>
+          {{(actualtable.name?actualtable.name:'')|titlecase}}
+        </ion-label>
+      </ion-tab-button>
+      <ion-tab-button slot="end" (click)="pickservant()">
+        <ion-text color="primary" class="font-bold-500 font-size-14">Serveur</ion-text>
+        <ion-label>
+          {{(actualservant.name?actualservant.name:'')|titlecase}}
+        </ion-label>
+      </ion-tab-button>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+    <ion-item lines="none" class="default-avatar-item contentbody" (click)="pickcustomer()">
+      <ion-avatar [class]="customerclass">
+        <ion-img [src]="actualcustomer.photo?appserv.imgUrl+actualcustomer.photo:''" *ngIf="actualcustomer.photo"></ion-img>
+        <ion-icon [name]="actualcustomer.type==='physique'?'person':actualcustomer.type==='moral'?'people':'person'" size="large" *ngIf="!actualcustomer.photo"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title font-size-14 font-bold-500"><ion-text>Client</ion-text></p>
+        <p class="secondpara"><ion-note>{{(actualcustomer.customerName?actualcustomer.customerName:'Ajouter')|titlecase}}</ion-note> </p>
+      </ion-label>
+    </ion-item>
+    <br>
+    <ion-grid>
+      <ion-row *ngFor="let article of details" class="bd-radius-10 box-big padding-5 margin-btm-15 cart-item">
+        <ion-grid>
+          <ion-row >
+            <ion-col size="9">
+              <ion-label class="font-bold-600 font-size-15" color="primary">{{article.service_name | titlecase}}</ion-label>
+            </ion-col>
+            <ion-col size="3">
+              <ion-label>
+                <ion-icon name="trash" size="small" color="danger" (click)="removefromlist(article)"></ion-icon>
+              </ion-label>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="4">
+                <ion-label class="font-size-12" (click)="servicepricespicker(article)">
+                  {{article.price | number}} {{article.money_abreviation | titlecase}} / {{article.uom_symbol | titlecase}}
+                </ion-label>
+            </ion-col>
+            <ion-col size="1">
+              <ion-chip class="el-box bd-radius-10" (click)="quantitychange(article,'remove')"><ion-icon class="margin-auto" name="remove-outline" size="small"></ion-icon></ion-chip>
+            </ion-col>
+            <ion-col size="2" class="ion-text-center">
+              <ion-label class="font-size-15" (click)="tipquantity(article)">{{article.quantity}}</ion-label>
+            </ion-col>
+            <ion-col size="1">
+              <ion-chip class="el-box bd-radius-10" (click)="quantitychange(article,'add')"><ion-icon class="margin-auto" name="add-outline" size="small"></ion-icon></ion-chip>
+            </ion-col>
+            <ion-col size="4" class="ion-text-right">
+              <ion-text class="font-size-13 text-ellipsis" color="primary">{{article.total}} {{article.money_abreviation}}</ion-text>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-row>
+      <hr class="hr">
+      <ion-row>
+        <ion-col size="12" class="bd-radius-10 box-big">
+          <tr (click)="vatenter()"><td><ion-text class="font-bold-600 font-size-15" color="primary">Tva (%)</ion-text></td><td>&nbsp; :&nbsp; </td> <td>{{vat_amount|number}} $</td></tr>
+          <tr (click)="reductionenter()"><td><ion-text class="font-bold-600 font-size-15" color="primary">Réduction</ion-text></td><td>&nbsp; : &nbsp;</td> <td>{{reduction | number}} $</td></tr>
+          <tr><td><ion-text class="font-bold-600 font-size-15" color="primary">Total HT</ion-text></td><td>&nbsp; : &nbsp; </td> <td>{{(totalgeneral - reduction) | number}} $</td></tr>
+          <tr><td><ion-text class="font-bold-600 font-size-15" color="primary">Total</ion-text></td><td>&nbsp; : &nbsp; </td> <td>{{(totalgeneral+vat_amount)-reduction | number}} $</td></tr>
+          <tr><td><ion-text class="font-bold-600 font-size-15" color="primary">Retour</ion-text></td><td>&nbsp; : &nbsp; </td> <td>{{invoice.back | number}} $</td></tr>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+</ion-content>
+<ion-footer class="ion-no-border">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" (click)="achiveinvoice()">
+        <ion-button mode="ios" color="primary" expand="block" shape="round" fill="outline">
+          Valider Facture
+          <ion-icon slot="end" name="checkmark-outline" size="small"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="6" (click)="typechange()">
+        <ion-tab-button mode="ios" color="primary" expand="block" shape="round" fill="outline">
+          <ion-text class="font-size-15" color="primary">Type</ion-text>
+          <ion-label>
+            {{invoice.type_facture}}
+          </ion-label>
+        </ion-tab-button>
+      </ion-col>
+      <ion-col size="6">
+        <ion-tab-button mode="ios" color="primary" expand="block" shape="round" fill="outline">
+          <ion-text class="font-size-15" color="primary">Mode P.</ion-text>
+          <ion-label>
+            {{invoice.payment_mode}}
+          </ion-label>
+        </ion-tab-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer>

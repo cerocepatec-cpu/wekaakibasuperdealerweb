@@ -1,0 +1,36 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-text>{{!marginSent.id?'Nouvelle Marge':'Edition Marge'}}</ion-text>
+      <ion-chip [disabled]="!newMargin.valid" slot="end" color="secondary" (click)="addNewMargin()">
+        <ion-icon name="checkmark-outline" color="primary" size="large" ></ion-icon>
+      </ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" *ngIf="showprogress" mode="ios"></ion-progress-bar>
+</ion-header>
+<ion-content class="contentbody" [fullscreen]="true">
+  <br>
+  <div class="mobileform">
+    <form [formGroup]="newMargin">
+      <ion-card mode="ios" class="ion-padding-top">
+        <ion-text class="font-size-12" color="primary ion-padding-start">Informations</ion-text>
+        <ion-item lines="full" class="font-size-12">
+          <ion-input formControlName="description" placeholder="Description(*)"></ion-input>
+        </ion-item>
+        <ion-item lines="full" class="font-size-12">
+          <ion-input formControlName="minimum" placeholder="Montant Minimum" type="number"></ion-input>
+        </ion-item>
+        <ion-item lines="full" class="font-size-12">
+          <ion-input formControlName="maximum" placeholder="Montant Maximum (*)" type="number"></ion-input>
+        </ion-item>
+        <ion-item lines="none" class="font-size-12">
+          <ion-select mode="ios" formControlName="money_id" label="Monnaies">
+            <ion-select-option *ngFor="let money of listmoneys" [value]="money.id">{{(money.money_name?money.money_name:money.abreviation) | titlecase}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-card> 
+    </form>
+  </div>
+</ion-content>

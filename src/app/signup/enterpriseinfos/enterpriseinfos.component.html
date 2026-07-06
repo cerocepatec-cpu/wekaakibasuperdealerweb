@@ -1,0 +1,58 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none" class="contentbody">
+      <ion-avatar class="bg-medium justify-content" slot="start"><ion-back-button color="light"></ion-back-button></ion-avatar>
+      <ion-icon name="chevron-back-outline" *ngIf="modalincoming" color="primary" (click)="appserv.closemodal()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding ion-text-center">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6" class="left-side-login smalldevicehidden" sizeLg="6" sizeMd="0" sizeSm="0">
+          <div class="ion-text-center left-side-content">
+            <ion-text color="light" class="font-size-70 font-bold-600">CERO UZISHA</ion-text>
+          </div>
+      </ion-col>
+      <ion-col size="6" sizeMd="6" sizeSm="12" class="right-side-login">
+        <div class="">
+          <ion-grid>
+            <ion-row>
+              <ion-col size="12">
+                <ion-avatar style="margin:auto; width: 30vh; height: 30vh;">
+                  <ion-text>UZH</ion-text>
+                </ion-avatar>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="12" class="display-flex-center">
+                <ion-text color="medium" class="font-bold-500 text-italic">Configurez votre entreprise</ion-text>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="12">
+                <br>
+                <form [formGroup]="newenterprise" class="form">
+                  <ion-item class="bd-square bd-radius-10 ion-margin-bottom" lines="none">
+                    <ion-input type="text" placeholder="Nom" formControlName="name"></ion-input>
+                  </ion-item>  
+                  <ion-item class="bd-square bd-radius-10 ion-margin-bottom" lines="none">
+                    <ion-input type="text" placeholder="Télephone" formControlName="phone"></ion-input>
+                  </ion-item> 
+                  <ion-item class="bd-square bd-radius-10 ion-margin-bottom" lines="none">
+                    <ion-input type="text" placeholder="Adresse" formControlName="adresse"></ion-input>
+                  </ion-item> 
+                </form>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="12" class="display-flex-center">
+                <ion-button expand="block" class="box-big font-bold-500 bd-radius-40" color="secondary" [disabled]="!newenterprise.valid" mode="ios" (click)="setenterprise()">Terminer</ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>    
+         </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

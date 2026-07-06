@@ -1,0 +1,162 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+        <ion-icon name="chevron-back-outline" color="primary" slot="start" (click)="closemodal()"></ion-icon>
+        <ion-icon name="share-outline" slot="end" size="small"></ion-icon>
+        <ion-icon name="print-outline" slot="end" size="small" (click)="generatePDF()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody ion-padding">
+  <div id="invoice" #invoice class="ion-padding">
+    <ion-item lines="none" class="contentbody">
+      <ion-avatar slot="start"><ion-img src="../../assets/cerouzisha2.png"></ion-img></ion-avatar>
+      <ion-text slot="end">
+        <ion-tab-button>
+          <ion-label class="font-bold-600">
+            CERO CEPATEC
+          </ion-label>
+          <ion-text class="font-size-11">
+            RCCM
+          </ion-text>
+          <ion-text class="font-size-11">
+            +243 991 518 715
+          </ion-text>
+          <ion-text class="font-size-11">
+            Av. du stade des martyrs 
+          </ion-text>
+        </ion-tab-button>
+        
+      </ion-text>
+     
+    </ion-item>
+    <hr class="hr">
+      <h2 class="ion-text-center font-size-20">Situation Générale du produit  <br>{{article.service.name | titlecase}}</h2>
+      <hr class="hr">
+      <div>
+        <h4 class="font-size-15 font-bold-500 bd-square bg-medium-clean ion-padding-start">Informations</h4>
+        <div class="content ion-padding font-size-12 bd-radius-10">
+          <tr><td>Description</td><td>  : </td><td>{{article.service.description}}</td></tr>
+          <tr><td>Catégorie</td><td> : </td><td>{{article.service.category_name}}</td></tr>
+          <tr><td>Quantité disponible</td><td> : </td><td>{{article.service.available_quantity}}</td></tr>
+          <tr><td>Ajouté le</td><td> : </td><td>{{article.service.created_at | date}}</td></tr>
+          <tr><td>Dernière modification</td><td> : </td><td>{{article.service.updated_at | date}}</td></tr>
+        </div>
+        <br>
+        <div class="content ion-padding-bottom ion-padding-start font-size-12 bd-radius-10">
+         <h5 class="font-size-14">Prix</h5>
+         <ion-chip class="font-size-11" *ngFor="let pricing of article.prices">
+            {{pricing.label | titlecase}} : {{pricing.price | number}} {{pricing.abreviation | uppercase}}
+         </ion-chip>
+        </div>
+      </div>
+  
+      <div>
+        <br>
+        <h4 class="font-size-15 font-bold-500 bd-square bg-medium-clean ion-padding-start">Mouvements stock</h4>
+        <div>
+            <table class="table">
+              <caption>Entrées</caption>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Op. Id.</th>
+                  <th>Qte</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2023-03-13</td>
+                  <td>2023885555</td>
+                  <td>100 Pcs</td>
+                </tr> 
+                <tr>
+                  <td>2023-03-13</td>
+                  <td>2023885555</td>
+                  <td>100 Pcs</td>
+                </tr> <tr>
+                  <td>2023-03-13</td>
+                  <td>2023885555</td>
+                  <td>100 Pcs</td>
+                </tr> <tr>
+                  <td>2023-03-13</td>
+                  <td>2023885555</td>
+                  <td>100 Pcs</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="2">Total Général ventes</th>
+                  <th colspan="1">200 $</th>
+                </tr>
+              </tfoot>
+          </table>
+        </div>
+        <br>
+        <div>
+            <table class="table">
+              <caption>Sorties</caption>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Op. Id.</th>
+                  <th>Qte</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2023-03-13</td>
+                  <td>2023885555</td>
+                  <td>100 Pcs</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="1">Total Général ventes</th>
+                  <th colspan="2">200 $</th>
+                </tr>
+              </tfoot>
+          </table>
+        </div>
+      </div>
+      <div>
+  
+      <div>
+        <br>
+        <h4 class="font-size-15 font-bold-500 bd-square bg-medium-clean ion-padding-start">Ventes</h4>
+        
+          <table class="table">
+            <caption>Ventes</caption>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Facture Id.</th>
+                  <th>Qte</th>
+                  <th>P.U</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2023-03-13</td>
+                  <td>2023885555</td>
+                  <td>100 Pcs</td>
+                  <td>2 $</td>
+                  <td>200 $</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="2">Total Général ventes</th>
+                  <th colspan="3">200 $</th>
+                </tr>
+              </tfoot>
+          </table>
+        </div>
+      </div>
+      <hr class="hr">
+      <ion-note class="font-size-12">Imprimée le {{appserv.today | date}} par {{actualuser.user_name | titlecase}}</ion-note>
+
+  </div>
+</ion-content>
+

@@ -1,0 +1,258 @@
+<div class="p-4 space-y-6">
+  <!-- HEADER -->
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-white">
+        CLÔTURES MENSUELLES
+      </h1>
+      <p class="text-sm text-gray-500">
+        Gestion des distributions mensuelles par entreprise
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- YEAR FILTER -->
+      <select
+        [(ngModel)]="selectedYear"
+        (change)="loadSnapshots()"
+        class="border rounded-xl px-3 py-2 text-sm dark:bg-slate-800 dark:border-slate-700"
+      >
+        <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+      </select>
+
+      <button
+        (click)="createSnapshot()"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl shadow-md transition"
+      >
+        + Nouvelle clôture
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="text-center py-6">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <!-- DESKTOP TABLE -->
+  <div
+    class="hidden md:block bg-white dark:bg-slate-900 rounded-2xl shadow overflow-hidden"
+  >
+    <div class="max-h-[600px] overflow-auto">
+      <table class="w-full text-sm">
+        <!-- HEADER -->
+        <thead class="sticky top-0 bg-gray-50 dark:bg-slate-800 z-10">
+          <tr
+            class="text-left text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider"
+          >
+            <th class="px-6 py-4">Clôture</th>
+            <th class="px-6 py-4">Statut</th>
+            <th class="px-6 py-4 text-right">Total consolidé</th>
+            <th class="px-6 py-4">Créée le</th>
+            <th class="px-6 py-4 text-right">Actions</th>
+          </tr>
+        </thead>
+
+        <!-- BODY -->
+        <tbody>
+          <tr
+            *ngFor="let snapshot of snapshots"
+            class="border-t dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+          >
+            <!-- PÉRIODE -->
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div
+                  class="bg-indigo-100 dark:bg-indigo-900 p-2 rounded-xl text-indigo-600 dark:text-indigo-300"
+                >
+                  📅
+                </div>
+
+                <div class="flex flex-col">
+                  <span class="font-semibold text-gray-900 dark:text-white">
+                    {{ snapshot.period_formatted }}
+                  </span>
+                  <span class="text-xs text-gray-400">
+                    Clôture ID #{{ snapshot.id }}
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <!-- STATUT -->
+            <td class="px-6 py-4">
+              <span
+                [ngClass]="statusClass(snapshot.status)"
+                class="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 w-fit"
+              >
+                <span *ngIf="snapshot.status === 'draft'">⏳</span>
+                <span *ngIf="snapshot.status === 'validated'">🔵</span>
+                <span *ngIf="snapshot.status === 'executed'">✔</span>
+                <span *ngIf="snapshot.status === 'failed'">⚠</span>
+
+                {{ statusLabel(snapshot.status) }}
+              </span>
+            </td>
+
+            <!-- TOTAL CONSOLIDÉ -->
+            <td class="px-6 py-4 text-right font-semibold">
+              <!-- Cas normal -->
+              <span
+                *ngIf="!snapshot.has_missing_rates"
+                class="text-gray-900 dark:text-white"
+              >
+                {{ snapshot.total_in_main_currency | number:'1.2-2' }} {{
+                snapshot.main_currency_code }}
+              </span>
+
+              <!-- Cas taux manquant -->
+              <div
+                *ngIf="snapshot.has_missing_rates"
+                class="flex flex-col items-end"
+              >
+                <span
+                  class="text-amber-500 font-semibold flex items-center gap-1"
+                >
+                  ⚠ Conversion partielle
+                </span>
+
+                <span class="text-[11px] text-amber-400">
+                  {{ snapshot.total_in_main_currency | number:'1.2-2' }} {{
+                  snapshot.main_currency_code }} (certains taux absents)
+                </span>
+              </div>
+            </td>
+
+            <!-- DATE -->
+            <td class="px-6 py-4 text-gray-500 text-sm">
+              {{ snapshot.created_at | date:'mediumDate' }}
+            </td>
+
+            <!-- ACTIONS -->
+            <td class="px-6 py-4 text-right space-x-2">
+              <button
+                *ngIf="snapshot.status === 'draft'"
+                (click)="generate(snapshot.id)"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-xs transition shadow-sm"
+              >
+                Générer
+              </button>
+
+              <button
+                [routerLink]="['/uzisha/revenue/snapshots', snapshot.id]"
+                class="text-gray-600 dark:text-gray-300 hover:underline text-xs"
+              >
+                Voir
+              </button>
+            </td>
+          </tr>
+
+          <!-- EMPTY STATE -->
+          <tr *ngIf="!snapshots.length && !loading">
+            <td colspan="5" class="text-center py-8 text-gray-500">
+              Aucune clôture trouvée pour {{ selectedYear }}.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MOBILE CARDS -->
+  <div class="space-y-4 md:hidden">
+    <div
+      *ngFor="let snapshot of snapshots"
+      class="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border dark:border-slate-800"
+    >
+      <!-- HEADER -->
+      <div class="flex justify-between items-start">
+        <div class="flex items-center gap-3">
+          <div
+            class="bg-indigo-100 dark:bg-indigo-900 p-2 rounded-xl text-indigo-600 dark:text-indigo-300"
+          >
+            📅
+          </div>
+
+          <div>
+            <p class="font-semibold text-gray-900 dark:text-white">
+              {{ snapshot.period_formatted }}
+            </p>
+
+            <p class="text-xs text-gray-400">
+              Créée le {{ snapshot.created_at | date:'mediumDate' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- STATUT -->
+        <span
+          [ngClass]="statusClass(snapshot.status)"
+          class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+        >
+          <span *ngIf="snapshot.status === 'draft'">⏳</span>
+          <span *ngIf="snapshot.status === 'validated'">🔵</span>
+          <span *ngIf="snapshot.status === 'executed'">✔</span>
+          <span *ngIf="snapshot.status === 'failed'">⚠</span>
+
+          {{ statusLabel(snapshot.status) }}
+        </span>
+      </div>
+
+      <!-- TOTAL CONSOLIDÉ -->
+      <div class="mt-4">
+        <!-- Cas normal -->
+        <div
+          *ngIf="!snapshot.has_missing_rates"
+          class="text-lg font-semibold text-gray-900 dark:text-white"
+        >
+          {{ snapshot.total_in_main_currency | number:'1.2-2' }} {{
+          snapshot.main_currency_code }}
+        </div>
+
+        <!-- Cas taux manquant -->
+        <div *ngIf="snapshot.has_missing_rates" class="space-y-1">
+          <div class="text-amber-500 font-semibold flex items-center gap-1">
+            ⚠ Conversion partielle
+          </div>
+
+          <div class="text-sm text-amber-400">
+            {{ snapshot.total_in_main_currency | number:'1.2-2' }} {{
+            snapshot.main_currency_code }}
+          </div>
+
+          <div class="text-xs text-gray-500">
+            Certains taux de change manquent.
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="mt-4 flex justify-end gap-3">
+        <button
+          *ngIf="snapshot.status === 'draft'"
+          (click)="generate(snapshot.id)"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs transition shadow-sm"
+        >
+          Générer
+        </button>
+
+        <button
+          [routerLink]="['/uzisha/revenue/snapshots', snapshot.id]"
+          class="text-gray-600 dark:text-gray-300 text-xs underline"
+        >
+          Voir
+        </button>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE MOBILE -->
+    <div
+      *ngIf="!snapshots.length && !loading"
+      class="text-center py-8 text-gray-500"
+    >
+      Aucune clôture trouvée pour {{ selectedYear }}.
+    </div>
+  </div>
+</div>

@@ -1,0 +1,50 @@
+<ion-content class="p-4 bg-gray-100 dark:bg-gray-900">
+
+  <!-- FORM -->
+  <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow mb-6">
+    <h2 class="text-lg font-bold mb-3 text-gray-800 dark:text-white">
+      Ajouter une ville
+    </h2>
+
+    <input
+      [(ngModel)]="form.name"
+      placeholder="Nom de la ville"
+      class="w-full mb-3 p-2 border rounded"
+    />
+
+    <input
+      [(ngModel)]="form.province"
+      placeholder="Province"
+      class="w-full mb-3 p-2 border rounded"
+    />
+
+    <button
+      (click)="addCity()"
+      class="bg-blue-600 text-white px-4 py-2 rounded w-full">
+      Ajouter
+    </button>
+  </div>
+
+  <!-- LIST -->
+  <div class="space-y-3">
+    <div *ngFor="let city of cities"
+         class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow flex justify-between items-center">
+
+      <div>
+        <p class="font-bold text-gray-800 dark:text-white">
+          {{ city.name }}
+        </p>
+        <p class="text-sm text-gray-500">
+          {{ city.province }}
+        </p>
+      </div>
+
+      <button
+        (click)="deleteCity(city.id)"
+        class="text-red-500">
+        Supprimer
+      </button>
+    </div>
+  </div>
+
+</ion-content>

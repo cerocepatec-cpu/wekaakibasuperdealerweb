@@ -1,0 +1,52 @@
+<!-- eslint-disable @angular-eslint/template/eqeqeq -->
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" (click)="appserv.closemodal()" slot="start"></ion-icon>
+      <ion-text slot="start">Transfert d'argent {{title}} ({{listTransferts.length}})</ion-text>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar mode="ios" type="indeterminate" *ngIf="showprogress"></ion-progress-bar>
+</ion-header>
+<ion-content class="ion-padding contentbody">
+  <ion-item lines="none" class="contentbody">
+    <ion-searchbar mode="ios" placeholder="Recherche" [(ngModel)]="search"></ion-searchbar>
+    <ion-icon name="filter-outline" [matMenuTriggerFor]="operationsfilter"></ion-icon>
+  </ion-item>
+
+  <mat-menu #operationsfilter="matMenu">
+      <button mat-menu-item (click)="filterbyincoming()">
+        <span>Entrants</span>
+      </button>
+      <button mat-menu-item (click)="filterbyout()">
+        <span>Sortants</span>
+      </button>
+  </mat-menu>
+  
+    <ion-item class="middleavatar light-shadow bd-radius-10" (click)="openaddnewtransfert()" lines="none" *ngIf="appserv.actualUser.id===tubSent.user_id">
+      <ion-avatar slot="start" class="display-flex-center"><mat-icon color="primary">add</mat-icon></ion-avatar>
+      <ion-label>
+        <h2 class="item-label-title font-size-12 ion-padding-top"><ion-text color="primary">Nouveau transfert</ion-text></h2>
+      </ion-label>
+    </ion-item>
+    <br>
+    <ion-item mode="ios" class="default-list-item" *ngFor="let transfert of listTransferts | slice:0:10" lines="full" (click)="menuoperation(transfert)" [detail]="true">
+      <ion-avatar slot="start"><mat-icon [class]="transfert.type==='entry'?'':'color-customer-warn'">{{transfert.tubSender_id===tubSent.id?'arrow_upward':'arrow_downward'}}</mat-icon></ion-avatar>
+      <ion-label>
+        <p class="item-label-title"><ion-note [class]="transfert.type==='entry'?'':'color-customer-warn'">{{transfert.uuid}}</ion-note></p>
+        <p class="secondpara font-size-11">Expéditrice : <span class="font-bold-600">{{transfert.tubSender_name | titlecase}}</span></p>
+        <p class="secondpara font-size-11">Destinataire : <span class="font-bold-600">{{transfert.tubReceiver_name | titlecase}}</span> </p>
+        <p class="secondpara font-size-11" *ngIf="transfert.comment"><ion-note>Libellé:{{transfert.comment | titlecase}}</ion-note></p>
+      </ion-label>
+      <ion-chip slot="end" class="font-size-11 chipset">{{transfert.created_at | date}} {{'par'}} <ion-note class="font-bold-600" color="dark"> &nbsp; {{transfert.senderName | titlecase}}</ion-note></ion-chip>
+      <ion-text slot="end" class="font-size-11">
+        {{transfert.amount|number}} {{tubSent.money_abreviation}}
+      </ion-text>
+    </ion-item>
+    <ion-item mode="ios" lines="none" *ngIf="listTransferts.length>10" (click)="opensearchoperation()">
+      <ion-note slot="start" class="font-size-12">
+        Tout voir
+      </ion-note>
+      <ion-icon class="mediumcolor" name="chevron-forward-outline" slot="end"  size="small"></ion-icon>
+    </ion-item>
+</ion-content>

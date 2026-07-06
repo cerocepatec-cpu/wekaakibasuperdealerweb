@@ -1,0 +1,66 @@
+<ion-header class="ion-no-border ion-padding">
+  <ion-toolbar>
+    <ion-item class="default-list-item" lines="full">
+      <ion-icon name="chevron-back-outline" color="warning" size="large" slot="start" (click)="appserv.closemodal()"></ion-icon>
+      <ion-avatar *ngIf="!advancesent">
+        <ion-icon name="cash-outline" size="large"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="font-size-14">
+         {{!advancesent?"Entrer une nouvelle avance":"Modifier avance salaire"}}
+        </p>
+        <p class="font-size-13">
+          <ion-text color="warning">{{agentsent.agent_fullname?agentsent.agent_fullname:agentsent.agent_username}}</ion-text> <br *ngIf="advancesent">
+          <ion-note *ngIf="advancesent">
+            {{advancesent.uuid}}
+          </ion-note>
+        </p>
+      </ion-label>
+      <ion-icon name="trash-outline" color="warning" slot="end" size="small" *ngIf="advancesent.id && advancesent.status!=='validated'" (click)="deleteadvancesent()"></ion-icon>
+      <ion-icon name="print-outline" color="warning" slot="end" size="small" *ngIf="advancesent.id"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="newrequestform ion-padding ion-margin-bottom">
+    <form class="form bd-radius-10 bd-square" [formGroup]="newadanceform">
+      <br>
+        <ion-segment formControlName="status" mode="ios" style="height: 35px!important;">
+          <ion-segment-button value="pending">En attente</ion-segment-button>
+          <ion-segment-button value="validated">Validée</ion-segment-button>
+        </ion-segment>
+     
+        <ion-item lines="none" class="font-size-12 contentbody" mode="ios">
+          <ion-avatar slot="start" class="square-avatar-medium"><ion-icon name="calendar-outline"></ion-icon></ion-avatar> 
+          <ion-label>
+            <h2 class="font-size-14 item-label-title"><ion-text>Date opération</ion-text></h2>
+          </ion-label>
+          <ion-chip class="font-size-11" slot="end">
+            <ion-input type="date" formControlName="done_at"></ion-input>
+          </ion-chip> 
+         </ion-item>
+        <ion-item lines="none" class="font-size-12 contentbody">
+          <ion-input placeholder="Montant" type="number" formControlName="amount" #defaultinput></ion-input>
+        </ion-item>
+        <ion-item lines="none" class="font-size-12 contentbody">
+          <ion-select class="font-size-12" formControlName="money_id" label="Monnaie:">
+            <ion-select-option *ngFor="let money  of listmoney" [value]="money.id">
+              {{money.abreviation?money.abreviation:money.money_name}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item lines="none" class="font-size-12 contentbody">
+          <ion-input placeholder="Motif" type="text" formControlName="description"></ion-input>
+        </ion-item>
+    </form>
+  </div>
+</ion-content>
+<ion-footer>
+    <ion-row>
+      <ion-col size="1"></ion-col>
+      <ion-col size="10">
+        <ion-button size="small" color="warning" mode="ios" expand="block" [disabled]="!newadanceform.valid" (click)="validateoperation()">{{!advancesent.id?"Valider":"Modifier"}}</ion-button>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+</ion-footer>

@@ -1,0 +1,150 @@
+<ion-header translucent>
+  <ion-toolbar color="primary">
+    <ion-title>{{account.description | titlecase}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" color="light" (click)="appserv.closemodal()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-searchbar placeholder="Rechercher..." [ngModel]="search" mode="ios" #defaultinput></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="account-detail-page">
+  <ion-modal trigger="open-validation-modal" cssClass="modal-border-radius-20" initialBreakpoint="0.50" [breakpoints]="[0.25,0.50,0.75,1]" (willDismiss)="appserv.closemodal()">
+    <ng-template>
+      <ng-container *ngIf="account.type==='blocked'">
+         <ion-header class="ion-no-border ion-no-margin ion-no-padding">
+            <ion-toolbar>
+              <ion-title>Débloquer compte</ion-title>
+            </ion-toolbar>
+          </ion-header>
+        <ion-content class="ion-padding display-text-center">
+          <ion-button mode="ios" color="warning" (click)="deblocaccount()">Débloquer compte</ion-button>
+        </ion-content>
+      </ng-container>
+      <ng-container *ngIf="account.type!=='blocked' ">
+         <ion-header class="ion-no-border ion-no-margin ion-no-padding">
+            <ion-toolbar>
+              <ion-button (click)="appserv.closemodal()" mode="ios" size="small" slot="start">Annuler</ion-button>
+              <ion-title>Bloqué compte</ion-title>
+              <ion-button slot="end" (click)=" confirm()" [strong]="true">Valider</ion-button>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding">
+            <form [formGroup]="accountForm">
+              <ion-item lines="none bd-square bd-radius-10 ion-padding-top">
+                  <ion-grid class="ion-no-margin ion-no-padding">
+                    <ion-row class="ion-align-items-center ion-no-margin ion-no-padding">
+                      <ion-col size="4" class="ion-no-margin ion-no-padding">
+                        <ion-label>Bloqué pendant</ion-label>
+                      </ion-col>
+                      <ion-col size="4" class="ion-no-margin ion-no-padding bd-square bd-radius-10">
+                        <ion-input
+                          type="number"
+                          formControlName="blocked_step"
+                          inputmode="numeric" value="1"
+                        ></ion-input>
+                      </ion-col>
+                      <ion-col size="4" class="ion-no-margin ion-no-padding">
+                        <ion-select formControlName="blocked_periocity" interface="popover" value="year">
+                          <ion-select-option value="year">An(s)</ion-select-option>
+                          <ion-select-option value="month">Mois</ion-select-option>
+                        </ion-select>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+              </ion-item>
+            </form>
+          </ion-content>
+      </ng-container>
+     
+    </ng-template>
+  </ion-modal>
+
+  <section class="account-summary">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ account.user_name | titlecase }}</ion-card-title>
+        <ion-card-subtitle>{{ account.account_number }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="balance-row">
+          <span class="label">Solde actuel</span>
+          <h2 class="amount">{{ account.sold | number }} {{ account.money_abreviation }}</h2>
+        </div>
+
+        <div class="actions">
+          <ion-button color="danger" mode="ios" size="small" (click)="blockAccount()" id="open-validation-modal" *ngIf="appserv.permissionFilter('comptes','edit')">{{account.type==='blocked' && !showadeblocagebloc?'Déploquer':account.type!=='blocked' && !showadeblocagebloc?'Bloquer':'Valider' }}</ion-button>
+          <ion-button color="warning" mode="ios" size="small" (click)="disableAccount()" *ngIf="appserv.permissionFilter('comptes','edit')">{{account.account_status==='enabled'?'Désactiver':'Activer' }}</ion-button>
+          <ion-button color="success" mode="ios" size="small" (click)="transferFunds()" *ngIf="appserv.permissionFilter('comptes','transfert')">Transférer</ion-button>
+        </div>
+       
+        
+      </ion-card-content>
+    </ion-card>
+  </section>
+
+  <section class="transaction-filter">
+    <ion-item lines="none">
+      <ion-label><ion-note color="dark" (click)="periodicfilter()"><ion-note class="font-bold-600">Du:</ion-note>  {{(appserv.frdate(from))}} <ion-note class="font-bold-600">Au:</ion-note> {{appserv.frdate(to)}}</ion-note></ion-label>
+    </ion-item>
+  </section>
+
+  <section class="transactions-list">
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Récentes transactions</ion-label>
+      </ion-list-header>
+      <app-skeleton-loader *ngIf="loaded" [repeat]="6" type="list"></app-skeleton-loader>
+
+       <main class="dashboard" *ngIf="!loaded">
+          <ion-row *ngFor="let transaction of filteredTransactions | filter:search" class="ion-padding-start">
+            <ion-col size="11" class="ion-no-padding">
+              <ion-item 
+                mode="ios" 
+                lines="none" 
+                class="second-bd-rounded shadow-light dashboard-summary-item"
+                [ngClass]="{'selected-item-border': transaction.selected}">
+                
+                <ion-avatar slot="start" class="bg-avatar-icon rounded-md">
+                  <ion-icon 
+                    [name]="transaction.type === 'withdraw' ? 'arrow-up-circle-outline' : 'arrow-down-circle-outline'" 
+                    [color]="transaction.type === 'withdraw' ? 'danger' : 'success'" 
+                    size="large">
+                  </ion-icon>
+                </ion-avatar>
+
+                <ion-label>
+                  <p class="font-size-14 font-bold text-dark">
+                    {{ transaction.member_fullname | titlecase }} ({{ transaction.member_uuid }})
+                  </p>
+                  <p class="font-size-13 text-muted d-flex align-items-center">
+                    <ion-icon name="time-outline" class="calendar-icon" color="medium"></ion-icon>
+                    &nbsp;{{ transaction.done_at | date}} &nbsp;&bull;&nbsp; Par 
+                    <strong>{{ transaction.done_by_name | titlecase }}</strong>
+                  </p>
+                  <p class="font-size-13 text-muted">
+                    Cpt: <strong>{{ transaction.memberaccount_name }}</strong> &nbsp;&bull;&nbsp; <br> OP.ID: {{ transaction.uuid }}
+                  </p>
+                </ion-label>
+
+                <div class="ion-text-end text-right" slot="end">
+                  <p class="font-size-15 font-bold" 
+                    [class.text-danger]="transaction.type === 'withdraw'" 
+                    [class.text-success]="transaction.type !== 'withdraw'">
+                    {{ transaction.amount | number:'1.0-2' }} {{ transaction.abreviation }}
+                  </p>
+                  <ion-badge 
+                    [color]="transaction.transaction_status === 'validated' ? 'success' : 'warning'" 
+                    class="font-size-11 font-bold">
+                    {{ transaction.transaction_status | titlecase }}
+                  </ion-badge>
+                </div>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+       </main>
+    </ion-list>
+  </section>
+</ion-content>

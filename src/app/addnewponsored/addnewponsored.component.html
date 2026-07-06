@@ -1,0 +1,33 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="contentbody">
+    <ion-item lines="none">
+      <ion-icon name="chevron-back-outline" slot="start" (click)="appserv.closemodal()" size="large" color="primary"></ion-icon>
+      <ion-label>
+        <p slot="start" class="font-bold-600 font-size-14" *ngIf="selectedusers.length<=0">{{usertype==="collectors"?"Sélectionner les collecteurs":"Sélectionner les membres"}}</p>
+        <p><ion-text *ngIf="selectedusers.length>0">{{selectedusers.length}} Sélectionnés</ion-text></p>
+        <p><ion-note *ngFor="let user of selectedusers" class="font-size-11">{{(user.full_name?user.full_name:user.user_name) | lowercase}},</ion-note></p>
+      </ion-label>
+    </ion-item>
+    <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-14" [(ngModel)]="search" #defaultinput (ionInput)="getlistusers()"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contentbody">
+  <ion-list class="contentbody">
+    <ion-item class="default-list-item contentbody"  lines="inset" *ngFor="let user of listusers | filter:search" (click)="selected(user)">
+      <ion-avatar slot="start">
+        <ion-img [src]="user.avatar?appserv.imgUrl+user.avatar:''" *ngIf="user.avatar"></ion-img>
+        <ion-icon name="person-outline" size="small" *ngIf="!user.avatar"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <p class="item-label-title"><ion-text>{{(user.full_name?user.full_name:user.user_name)|titlecase }}</ion-text></p>
+        <p class="secondpara"><ion-text>{{user.uuid}}</ion-text></p>
+      </ion-label>
+      <ion-icon slot="end" *ngIf="user.selected"  name="checkmark-circle-outline" color="success" size="small"></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<ion-footer class="ion-no-border contentbody ion-padding" *ngIf="multiselect>0 && selectedusers.length>0" >
+  <ion-button expand="block" class="box-big" color="secondary" mode="ios" (click)="sendselecteduser()">
+    <span>Affecter ({{selectedusers.length}})</span>
+  </ion-button>
+</ion-footer>

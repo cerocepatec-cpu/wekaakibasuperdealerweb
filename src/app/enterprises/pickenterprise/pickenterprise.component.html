@@ -1,0 +1,19 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back" slot="start" color="primary" (click)="appserv.closemodal()"></ion-icon>
+      <ion-chip slot="end" [disabled]="selectedenterprises.length<1" (click)="senddata()"><ion-icon name="checkmark" color="primary"></ion-icon></ion-chip>
+    </ion-item>
+  </ion-toolbar>
+  <ion-progress-bar type="indeterminate" mode="ios" *ngIf="showprogress" ></ion-progress-bar>
+</ion-header> 
+<ion-content class="contentbody">
+  <h4 class="font-bold-600 ion-padding-start">Sélectionner une entreprise</h4>
+    <ion-searchbar mode="ios" placeholder="Recherche" class="font-size-12"></ion-searchbar>
+  <ion-list class="contentbody">
+    <ion-item lines="full" *ngFor="let enterprise of listenterprises" (click)="selected(enterprise)" class="font-size-15 contentbody">
+      <ion-text slot="start">{{enterprise.name | titlecase}}</ion-text>
+      <ion-icon slot="end" *ngIf="enterprise.selected"  name="checkmark-circle-outline" color="success" size="small"></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>

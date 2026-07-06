@@ -1,0 +1,23 @@
+<ion-content>
+  <ion-item lines="none" class="default-avatar-item">
+    <ion-icon name="menu-outline" slot="start" color="primary" (click)="showmenutext=!showmenutext"></ion-icon>
+    <h2 class="font-size-20" slot="start">CERO UZISHA</h2>
+    <ion-avatar slot="end" class="light-border-radius" [matMenuTriggerFor]="menuavatar">
+      <ion-img [src]="actualuser.avatar?appserv.imgUrl+actualuser.avatar:''" *ngIf="actualuser.avatar"></ion-img>
+      <ion-icon name="person-outline" size="small" *ngIf="!actualuser.avatar"></ion-icon>
+    </ion-avatar>
+  </ion-item>
+  <mat-menu #menuavatar="matMenu" class="ion-padding">
+    <button mat-menu-item><ion-note class="font-size-14">{{appserv.getactualuser().user_name | titlecase}}</ion-note></button> 
+    <button mat-menu-item (click)="logout()">
+      <ion-icon name="log-out-outline" size="large"></ion-icon>
+      <span class="font-size-11">Déconnexion</span>
+    </button>
+    <button mat-menu-item>
+      <span class="material-symbols-outlined">
+        settings
+      </span>
+      <span class="font-size-11">Configuration</span>
+    </button>
+  </mat-menu>
+</ion-content>

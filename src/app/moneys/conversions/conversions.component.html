@@ -1,0 +1,29 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-icon name="chevron-back" size="large" color="secondary" (click)="appserv.closemodal()"></ion-icon>
+      <ion-title>Conversions Monnaies</ion-title>
+      <ion-icon size="large" color="secondary" name="add-circle-outline" slot="end" (click)="addnew()"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="contentbody">
+ 
+      <ion-searchbar placeholder="Recherche" mode="ios" [(ngModel)]="searchconversion" class="font-size-12"></ion-searchbar>
+      
+          <ion-item lines="full"  detail="true" class="default-list-item contentbody" *ngFor="let conversion of listconversions | filter:searchconversion; let i=index;" (click)="menuconversion(conversion)">
+            <ion-avatar slot="start"><ion-icon name="sync"></ion-icon></ion-avatar>
+              <ion-label>
+                <p class="item-label-title">
+                  <ion-text class="font-size-11">{{conversion.name1}} ({{conversion.abreviation1}})</ion-text>
+                </p>
+                <p class="secondpara"><ion-icon name="arrow-down-outline" size="small"></ion-icon></p>
+                <p class="secondpara font-bold-500"> 
+                  <ion-text class="font-size-11">{{conversion.name2}} ({{conversion.abreviation2}})</ion-text> 
+                </p>
+              </ion-label>
+              <ion-note class="reqtotalprinted font-bold-600" slot="end">Taux: <span class="font-bold-500 font-size-15">{{conversion.rate}}</span></ion-note>
+          </ion-item>
+</ion-content>
+

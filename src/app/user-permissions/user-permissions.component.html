@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Gestion des permissions</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label>Utilisateur</ion-label>
+    <ion-select [(ngModel)]="selectedUser">
+      <ion-select-option *ngFor="let user of users" [value]="user">{{ user.name }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Rôle</ion-label>
+    <ion-select [(ngModel)]="selectedRole">
+      <ion-select-option *ngFor="let role of roles" [value]="role">{{ role.title }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-button expand="block" (click)="onAssignRole()">Attribuer le rôle</ion-button>
+
+  <ion-item>
+    <ion-label>Permissions</ion-label>
+    <ion-select [(ngModel)]="selectedPermissions" multiple="true">
+      <ion-select-option *ngFor="let perm of permissions" [value]="perm.name">{{ perm.name }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-button expand="block" (click)="onAssignPermissions()">Attribuer les permissions</ion-button>
+</ion-content>

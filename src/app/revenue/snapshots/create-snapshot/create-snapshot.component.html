@@ -1,0 +1,177 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="appserv.closemodal()">Fermer</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="bg-gray-50 dark:bg-slate-950">
+  <div class="p-6 space-y-6">
+    <!-- HEADER -->
+    <div class="flex items-center justify-between">
+      <button
+        (click)="previousYear()"
+        class="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 shadow"
+      >
+        ←
+      </button>
+
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
+        {{ selectedYear }}
+      </h2>
+
+      <button
+        (click)="nextYear()"
+        class="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 shadow"
+      >
+        →
+      </button>
+    </div>
+
+    <!-- MONTHS -->
+
+    <div class="grid grid-cols-3 gap-4">
+      <div
+        *ngFor="let m of months"
+        (click)="selectMonth(m.id)"
+        [ngClass]="{
+          'bg-indigo-600 text-white shadow-xl': selectedMonth === m.id,
+
+          'opacity-40 cursor-not-allowed':
+            isFutureMonth(m.id) || existingMonths.includes(m.id),
+
+          'bg-white dark:bg-slate-900 text-gray-700 dark:text-gray-300 hover:scale-105':
+            !isFutureMonth(m.id) &&
+            !existingMonths.includes(m.id) &&
+            selectedMonth !== m.id
+        }"
+        class="rounded-2xl p-4 text-center transition-all duration-200"
+      >
+        <div class="font-semibold">
+          {{ m.label }}
+        </div>
+
+        <div
+          *ngIf="existingMonths.includes(m.id)"
+          class="text-xs mt-2 text-red-400"
+        >
+          Clôturé
+        </div>
+      </div>
+    </div>
+
+    <!-- LOADER -->
+
+    <div *ngIf="loadingPreview" class="flex justify-center py-8">
+      <ion-spinner></ion-spinner>
+    </div>
+
+    <!-- PREVIEW -->
+
+    <div *ngIf="selectedMonth && !loadingPreview">
+      <!-- TOTALS -->
+
+      <div *ngIf="previewData?.totals?.length" class="space-y-4">
+        <div
+          *ngFor="let total of previewData.totals"
+          class="bg-white dark:bg-slate-900 rounded-3xl p-5 shadow-sm"
+        >
+          <div class="flex justify-between items-center mb-5">
+            <div>
+              <div class="text-sm text-gray-500">Total estimé</div>
+
+              <div class="text-3xl font-bold text-indigo-600">
+                {{ total.amount | number : "1.2-2" }}
+              </div>
+            </div>
+
+            <div class="text-lg font-semibold text-gray-800 dark:text-white">
+              {{ total.money_code }}
+            </div>
+          </div>
+
+          <!-- BREAKDOWN -->
+
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span>🏢 Vente siège</span>
+
+              <span>
+                {{
+                  getAmount(previewData.sales_siege, total.money_id)
+                    | number : "1.2-2"
+                }}
+              </span>
+            </div>
+
+            <div class="flex justify-between">
+              <span>👥 Vente collecteurs</span>
+
+              <span>
+                {{
+                  getAmount(previewData.sales_collectors, total.money_id)
+                    | number : "1.2-2"
+                }}
+              </span>
+            </div>
+
+            <div class="flex justify-between">
+              <span>💰 Premières mises</span>
+
+              <span>
+                {{
+                  getAmount(previewData.first_entries, total.money_id)
+                    | number : "1.2-2"
+                }}
+              </span>
+            </div>
+
+            <div class="flex justify-between">
+              <span>🏧 Frais retraits</span>
+
+              <span>
+                {{
+                  getAmount(previewData.withdraw_fees, total.money_id)
+                    | number : "1.2-2"
+                }}
+              </span>
+            </div>
+
+            <div class="flex justify-between text-red-500">
+              <span>📉 Dépenses validées</span>
+
+              <span>
+                -
+                {{
+                  getAmount(previewData.expenditures, total.money_id)
+                    | number : "1.2-2"
+                }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMPTY -->
+
+      <div
+        *ngIf="!hasRevenue"
+        class="bg-amber-50 dark:bg-amber-950 rounded-2xl p-5 text-amber-700"
+      >
+        Aucune donnée trouvée pour cette période.
+      </div>
+    </div>
+
+    <!-- CREATE -->
+
+    <button
+      [disabled]="!selectedMonth || loading"
+      (click)="create()"
+      class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white py-4 rounded-2xl font-semibold"
+    >
+      <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+      <span *ngIf="!loading"> Créer la clôture </span>
+    </button>
+  </div>
+</ion-content>
