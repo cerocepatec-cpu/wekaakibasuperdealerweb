@@ -18,9 +18,21 @@ import { FormBuilder } from '@angular/forms';
 import { ScanResult } from '@capacitor-community/bluetooth-le';
 import { ReportsalesComponent } from '../articles/reportsales/reportsales.component';
 import { Enterprise } from '../interfaces/enterprise';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as pdfMakeModule from 'pdfmake/build/pdfmake';
+import * as pdfFontsModule from 'pdfmake/build/vfs_fonts';
+
+const pdfMake: any = (pdfMakeModule as any).default || pdfMakeModule;
+const pdfFonts: any = (pdfFontsModule as any).default || pdfFontsModule;
+
+const vfs =
+  pdfFonts?.pdfMake?.vfs ||
+  pdfFonts?.vfs ||
+  pdfFonts?.default?.pdfMake?.vfs ||
+  pdfFonts?.default?.vfs;
+
+if (vfs) {
+  pdfMake.vfs = vfs;
+}
 import * as XLSX from 'xlsx';
 import { FileSharer } from '@byteowls/capacitor-filesharer';
 import { DatepickerComponent } from '../reports/datepicker/datepicker.component';
@@ -86,50 +98,22 @@ export class AppservicesService {
           router: '/uzisha/notebook-sales',
           icon: 'cart',
           bgClass: 'bg-fintech',
-          permission: { module: 'facturation', action: 'view' },
+          //permission: { module: 'facturation', action: 'view' },
         },
          {
           name: 'Transactions',
           router: '/uzisha/transactions',
           icon: 'send-outline',
           bgClass: 'bg-bank',
-          permission: { module: 'transactions', action: 'view' },
-        },
-        {
-          name: 'Vente virtuel',
-          router: '/uzisha/virtualsales',
-          icon: 'send-outline',
-          bgClass: 'bg-bank',
-          permission: { module: 'transactions', action: 'salevirtual' },
-        },
-        {
-          name: 'Transfert',
-          router: '/uzisha/wekatransfertfound',
-          icon: 'send-outline',
-          bgClass: 'bg-bank',
-          // permission: { module: 'transactions', action: 'transfert' },
+          //permission: { module: 'transactions', action: 'view' },
         },
         {
           name: 'Historique transactions',
           router: '/uzisha/generalreport',
           icon: 'thumbs-up-outline',
           bgClass: 'bg-bank',
-          permission: { module: 'transactions', action: 'view' },
-        },
-        {
-          name: 'Limites transactions',
-          router: '/uzisha/transactions-limit',
-          icon: 'wallet',
-          bgClass: 'bg-fintech',
-          permission: { module: 'transactions', action: 'limits' },
-        },
-        {
-          name: 'Villes',
-          router: '/uzisha/cities',
-          icon: 'swap-horizontal-outline',
-          bgClass: 'bg-fintech',
-          permission: { module: 'cities', action: 'view' },
-        },
+          //permission: { module: 'transactions', action: 'view' },
+        }
       ],
     },
 
@@ -141,28 +125,7 @@ export class AppservicesService {
           router: '/uzisha/agents',
           icon: 'people',
           bgClass: 'bg-cyber',
-          permission: { module: 'agents', action: 'view' },
-        },
-        {
-          name: 'Avances',
-          router: '/uzisha/salariesadvancesview',
-          icon: 'accessibility-outline',
-          bgClass: 'bg-cyber',
-          permission: { module: 'agents', action: 'advancesalaries' },
-        },
-        {
-          name: 'Groupes',
-          router: '/uzisha/groups',
-          icon: 'people-circle-outline',
-          bgClass: 'bg-cyber',
-          permission: { module: 'agents', action: 'groups_view' },
-        },
-        {
-          name: 'Départements',
-          router: '/uzisha/departements',
-          icon: 'briefcase-outline',
-          bgClass: 'bg-cyber',
-          permission: { module: 'departements', action: 'view' },
+          //permission: { module: 'agents', action: 'view' },
         },
       ],
     },
@@ -171,53 +134,18 @@ export class AppservicesService {
       category: '🏦 Comptabilité & Finances',
       items: [
         {
-          name: 'Caisses',
-          router: '/uzisha/tubs',
-          icon: 'book-outline',
-          bgClass: 'bg-bank',
-          permission: { module: 'caisses', action: 'view' },
-        },
-        {
           name: 'Finances',
           router: '/uzisha/wekaadmindashboard',
           icon: 'stats-chart-outline',
           bgClass: 'bg-bank',
-          permission: { module: 'rapports', action: 'finance-dashboard' },
+          //permission: { module: 'rapports', action: 'finance-dashboard' },
         },
         {
           name: 'Dépenses',
           router: '/uzisha/expenditures',
           icon: 'cash-outline',
           bgClass: 'bg-bank',
-          permission: { module: 'depenses', action: 'view' },
-        },
-        {
-          name: 'Clôtures',
-          router: '/uzisha/finances/fences',
-          icon: 'stats-chart-outline',
-          bgClass: 'bg-bank',
-          permission: { module: 'clotures', action: 'view' },
-        },
-        {
-          name: 'Credits',
-          router: '/uzisha/credits',
-          icon: 'stats-chart-outline',
-          bgClass: 'bg-bank',
-          permission: { module: 'credits', action: 'view' },
-        },
-        {
-          name: 'Clôtures Mensuelles',
-          router: '/uzisha/snapshots',
-          icon: 'briefcase-outline',
-          bgClass: 'bg-cyber',
-          permission: { module: 'snapshots', action: 'view' },
-        },
-        {
-          name: 'Politique de Répartition des Revenus',
-          router: '/uzisha/rules',
-          icon: 'briefcase-outline',
-          bgClass: 'bg-cyber',
-          permission: { module: 'snapshots', action: 'view' },
+          //permission: { module: 'depenses', action: 'view' },
         },
       ],
     },
@@ -225,115 +153,15 @@ export class AppservicesService {
     {
       category: '🚀 Outils & Sponsoring',
       items: [
-        // {
-        //   name: 'Sponsoring',
-        //   router: '/uzisha/sponsoring',
-        //   icon: 'paw-outline',
-        //   bgClass: 'bg-nasa',
-        //   permission: { module: 'sponsoring', action: 'view' },
-        // },
         {
           name: 'Rapports',
           router: '/uzisha/reports',
           icon: 'bar-chart-outline',
           bgClass: 'bg-nasa',
-          permission: { module: 'rapports', action: 'view' },
-        },
-        {
-          name: 'Paiement collecteurs',
-          router: '/uzisha/agents-bonuses',
-          icon: 'bar-chart-outline',
-          bgClass: 'bg-nasa',
-          // permission: { module: 'bonuses', action: 'view' },
-        },
-      ],
-    },
-
-    {
-      category: '🛡️ Administration & Sécurité',
-      items: [
-        {
-          name: 'Permissions',
-          router: '/uzisha/permissions',
-          icon: 'key',
-          bgClass: 'bg-cyber',
-          permission: { module: 'permissions', action: 'view' },
-        },
-        {
-          name: 'Taux de change',
-          router: '/uzisha/exchanges',
-          icon: 'key',
-          bgClass: 'bg-cyber',
-          permission: { module: 'exchanges', action: 'view' },
-        },
-        {
-          name: 'apkcdnupload',
-          router: '/uzisha/apkcdnupload',
-          icon: 'key',
-          bgClass: 'bg-cyber',
-          permission:{ module: 'apkcdnupload', action: 'view' },
-        },
-      ],
-    },
-    {
-      category: '📦 Gestion & Exploitation',
-      items: [
-        {
-          name: 'Carnets',
-          router: '/uzisha/articles/catalogue',
-          icon: 'document-outline',
-          bgClass: 'bg-stock',
-          permission: { module: 'produits', action: 'view' },
-        },
-        {
-          name: 'Stock',
-          router: '/uzisha/stock',
-          icon: 'layers-outline',
-          bgClass: 'bg-stock',
-          permission: { module: 'stock', action: 'view' },
-        },
-        {
-          name: 'Dépôts',
-          router: '/uzisha/deposits',
-          icon: 'layers-outline',
-          bgClass: 'bg-stock',
-          permission: { module: 'depots', action: 'view' },
+          // permission: { module: 'rapports', action: 'view' },
         }
       ],
-    },
-    {
-      category: '🛡️ Administration & Système',
-      items: [
-        {
-          name: 'Entreprise',
-          router: '/uzisha/enterprises',
-          icon: 'business-outline',
-          bgClass: 'bg-corporate',
-          permission: { module: 'entreprise', action: 'view' },
-        },
-        {
-          name: 'Marges dépenses',
-          router: '/uzisha/settingmargins',
-          icon: 'reader-outline',
-          bgClass: 'bg-admin',
-          permission: { module: 'settingmargins', action: 'view' },
-        },
-        {
-          name: 'Frais de transactions',
-          router: '/uzisha/transaction-fees',
-          icon: 'reader-outline',
-          bgClass: 'bg-admin',
-          permission: { module: 'transaction_fees', action: 'view' },
-        },
-        {
-          name: 'Premiere mise',
-          router: '/uzisha/firstentries',
-          icon: 'reader-outline',
-          bgClass: 'bg-admin',
-          // permission: { module: 'accounts', action: 'first_entries' },
-        }
-      ],
-    },
+    }
   ];
 
   constructor(

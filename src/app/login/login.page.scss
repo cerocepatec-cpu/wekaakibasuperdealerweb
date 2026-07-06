@@ -95,3 +95,31 @@
     }
   }
 }
+
+.portal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(255, 193, 7, 0.16);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.45);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.login-logo {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.text-white {
+  color: #ffffff !important;
+}

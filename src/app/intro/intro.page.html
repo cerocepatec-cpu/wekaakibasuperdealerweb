@@ -3,22 +3,40 @@
   <div id="particle-bg"></div>
 
   <div [class]="isModal ? '' : 'scallable-content'">
+    
     <!-- Titre principal animé -->
     <div class="ion-text-center ion-margin-bottom animate__animated animate__fadeInDown">
-      <h1 class="font-size-60 font-bold-600 text-gradient">CERO WEKA AKIBA</h1>
-      <p class="ion-text-center text-light font-size-20" *ngIf="!isModal" style="color: white!important;">
-        Votre outil digital de gestion microfinancière
+      <div class="portal-badge">
+        Portail officiel Super Dealer
+      </div>
+
+      <h1 class="font-size-60 font-bold-600 text-gradient">
+        WEKA AKIBA
+      </h1>
+
+      <h2 class="font-bold-600 text-white font-size-24 ion-no-margin">
+        Espace Super Dealer
+      </h2>
+
+      <p
+        class="ion-text-center text-light font-size-20"
+        *ngIf="!isModal"
+        style="color: white!important;"
+      >
+        Supervisez vos dealers, vos opérations et vos performances en temps réel.
       </p>
     </div>
 
     <ion-card class="feature-card animate__animated animate__fadeInUp animate__delay-1s">
       <ion-item lines="none" class="card-item">
         <ion-avatar slot="start" class="feature-icon bg-primary text-white">
-          <ion-icon name="document-outline" size="large"></ion-icon>
+          <ion-icon name="business-outline" size="large"></ion-icon>
         </ion-avatar>
         <ion-label>
-          <h2 class="font-bold-600">Utilisation facile</h2>
-          <p class="font-size-13 text-medium">Gérer toutes vos activités de Microfinance simplement !</p>
+          <h2 class="font-bold-600">Gestion Super Dealer</h2>
+          <p class="font-size-13 text-medium">
+            Accédez à votre portail dédié pour piloter vos dealers et vos activités WEKA AKIBA.
+          </p>
         </ion-label>
       </ion-item>
     </ion-card>
@@ -26,11 +44,13 @@
     <ion-card class="feature-card animate__animated animate__fadeInUp animate__delay-2s">
       <ion-item lines="none" class="card-item">
         <ion-avatar slot="start" class="feature-icon bg-success text-white">
-          <ion-icon name="happy-outline" size="large"></ion-icon>
+          <ion-icon name="people-outline" size="large"></ion-icon>
         </ion-avatar>
         <ion-label>
-          <h2 class="font-bold-600">Fonctionnalités puissantes</h2>
-          <p class="font-size-13 text-medium">Importer votre liste de membres via Excel en un clic.</p>
+          <h2 class="font-bold-600">Suivi des dealers</h2>
+          <p class="font-size-13 text-medium">
+            Consultez les dealers rattachés à votre réseau et suivez leur activité sur le terrain.
+          </p>
         </ion-label>
       </ion-item>
     </ion-card>
@@ -38,11 +58,13 @@
     <ion-card class="feature-card animate__animated animate__fadeInUp animate__delay-3s">
       <ion-item lines="none" class="card-item">
         <ion-avatar slot="start" class="feature-icon bg-danger text-white">
-          <ion-icon name="chevron-down-outline" size="large"></ion-icon>
+          <ion-icon name="cash-outline" size="large"></ion-icon>
         </ion-avatar>
         <ion-label>
-          <h2 class="font-bold-600">Dépôts & retraits</h2>
-          <p class="font-size-13 text-medium">Effectuez les transactions de vos membres en temps réel.</p>
+          <h2 class="font-bold-600">Dépôts, retraits & commissions</h2>
+          <p class="font-size-13 text-medium">
+            Suivez les opérations financières, les mouvements et les commissions générées.
+          </p>
         </ion-label>
       </ion-item>
     </ion-card>
@@ -50,20 +72,27 @@
     <ion-card class="feature-card animate__animated animate__fadeInUp animate__delay-4s">
       <ion-item lines="none" class="card-item">
         <ion-avatar slot="start" class="feature-icon bg-warning text-white">
-          <ion-icon name="print-outline" size="large"></ion-icon>
+          <ion-icon name="bar-chart-outline" size="large"></ion-icon>
         </ion-avatar>
         <ion-label>
-          <h2 class="font-bold-600">Rapports clairs & rapides</h2>
-          <p class="font-size-13 text-medium">Générez des rapports journaliers, mensuels et plus.</p>
+          <h2 class="font-bold-600">Tableaux de bord & rapports</h2>
+          <p class="font-size-13 text-medium">
+            Analysez les performances de votre réseau avec des rapports simples, clairs et rapides.
+          </p>
         </ion-label>
       </ion-item>
     </ion-card>
 
-    <ion-button expand="block" color="warning" mode="ios" 
-                (click)="start()" 
-                class="feature-card animate__animated animate__fadeInUp animate__delay-5s" 
-                *ngIf="!isModal">
-      Continuer
+    <ion-button
+      expand="block"
+      color="warning"
+      mode="ios"
+      (click)="start()"
+      class="feature-card animate__animated animate__fadeInUp animate__delay-5s"
+      *ngIf="!isModal"
+    >
+      Entrer dans le portail Super Dealer
     </ion-button>
+
   </div>
 </ion-content>

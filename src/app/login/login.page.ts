@@ -122,9 +122,15 @@ async login() {
 
   this.authService.login(this.credentials.value).subscribe({
     next: async (response: any) => {
+      console.log('Login response:', response);
       this.showprogress = false;
 
       if (response.message === 'success' && response.status === 200) {
+        if(response.data.user.user_type!=='super_dealer'){
+           this.appserv.presentToast("Vous n'avez pas les droits d'accès à cette application","danger");
+           return;
+        }
+
         const permissions = response.data.permissions ?? [];
         this.appserv.setactualuser(response.data.user);
         this.appserv.setactualenterprise(response.data.enterprise);
